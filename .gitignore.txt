@@ -1,0 +1,14 @@
+
+# Xcode user data
+xcuserdata/
+*.xcuserstate
+
+# Build artifacts
+build/
+DerivedData/
+
+# Environment / secrets
+.env
+
+# Temporary ignore
+README.md
