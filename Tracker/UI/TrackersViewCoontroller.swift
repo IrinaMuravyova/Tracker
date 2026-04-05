@@ -7,9 +7,18 @@
 
 import UIKit
 
-class TrackersViewController: UIViewController {
-    var titleLabel: UILabel?
-    var emptyStageView: UIView?
+final class TrackersViewController: UIViewController {
+    private var titleLabel: UILabel?
+    private var emptyStageView: UIView?
+    private var categories: [TrackerCategory] = []
+    private var completedTrackers: [TrackerRecord] = []
+    
+    var datePicker: UIDatePicker = {
+        let datePicker = UIDatePicker()
+        datePicker.datePickerMode = .date
+        datePicker.preferredDatePickerStyle = .compact
+        return datePicker
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad( )
@@ -21,11 +30,20 @@ class TrackersViewController: UIViewController {
 
 private extension TrackersViewController {
     func setupNavButton() {
+        setupAddTrackerButton()
+        setupDatePicker()
+    }
+    
+    func setupAddTrackerButton() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             image: UIImage(systemName: "plus"),
             style: .plain,
             target: nil,
             action: nil)
+    }
+    
+    func setupDatePicker() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
     }
     
     func setupTitle() {
@@ -62,7 +80,7 @@ private extension TrackersViewController {
         emptyStageView.addSubview(emptyStageLabel)
         view.addSubview(emptyStageView)
         
-        guard let titleLabel else { return }
+//        guard let titleLabel else { return }
         
         NSLayoutConstraint.activate([
             emptyStageImage.centerXAnchor.constraint(equalTo: emptyStageView.centerXAnchor),
