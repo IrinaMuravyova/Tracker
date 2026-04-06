@@ -16,7 +16,9 @@ struct Tracker {
 }
 
 enum TrackerColor {
-    case red, green, blue, yellow, purple, orange, pink, brown, black, white
+    case colorselection1, colorselection2, colorselection3, colorselection4, colorselection5, colorselection6, colorselection7, colorselection8, colorselection9, colorselection10, colorselection11, colorselection12,
+         colorselection13, colorselection14, colorselection15,
+         colorselection16, colorselection17, colorselection18
 }
 
 enum TrackerSchedule {
