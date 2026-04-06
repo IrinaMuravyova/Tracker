@@ -1,5 +1,5 @@
 //
-//  TrackersViewCoontroller.swift
+//  TrackersViewController.swift
 //  Tracker
 //
 //  Created by Irina Muravyeva on 30.03.2026.
@@ -8,11 +8,7 @@
 import UIKit
 
 final class TrackersViewController: UIViewController {
-    private var titleLabel: UILabel?
-    private var emptyStageView: UIView?
-    private var categories: [TrackerCategory] = []
-    private var completedTrackers: [TrackerRecord] = []
-    
+    // MARK: - UI
     var datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
@@ -20,14 +16,41 @@ final class TrackersViewController: UIViewController {
         return datePicker
     }()
     
+    var collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        return UICollectionView(frame: .zero, collectionViewLayout: layout)
+    }()
+    
+    // MARK: - Private properties
+    private var titleLabel: UILabel?
+    private var emptyStageView: UIView?
+    
+    private var categories: [TrackerCategory] = []
+    private var completedTrackers: [TrackerRecord] = []
+    private var trackers: [Tracker] = []
+    
+    // MARK: - Public properties
+    let params = GeometricParams(cellCount: 2,
+                                 leftInset: 8,
+                                 rightInset: 8,
+                                 cellSpacing: 8)
+    var helper: SupplementaryCollection?
+    
+    // MARK: - Life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad( )
         setupNavButton()
         setupTitle()
-        setupEmptyStageView()
+        
+        if trackers.isEmpty {
+            setupEmptyStageView()
+        } else {
+            setupCollectionView()
+        }
     }
 }
 
+// MARK: - Private methods
 private extension TrackersViewController {
     func setupNavButton() {
         setupAddTrackerButton()
@@ -80,8 +103,6 @@ private extension TrackersViewController {
         emptyStageView.addSubview(emptyStageLabel)
         view.addSubview(emptyStageView)
         
-//        guard let titleLabel else { return }
-        
         NSLayoutConstraint.activate([
             emptyStageImage.centerXAnchor.constraint(equalTo: emptyStageView.centerXAnchor),
             emptyStageImage.centerYAnchor.constraint(equalTo: emptyStageView.centerYAnchor),
@@ -94,7 +115,25 @@ private extension TrackersViewController {
             emptyStageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             emptyStageView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
+    }
+    
+    func setupCollectionView() {
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(collectionView)
         
+        helper = SupplementaryCollection(count: 10, using: params)
+        collectionView.dataSource = helper
+        collectionView.delegate = helper
+        collectionView.register(
+            TrackersCell.self,
+            forCellWithReuseIdentifier: SupplementaryCollection.trackerCellIdentifier
+        )
         
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
     }
 }
