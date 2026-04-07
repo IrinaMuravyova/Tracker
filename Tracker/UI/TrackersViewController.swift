@@ -27,7 +27,8 @@ final class TrackersViewController: UIViewController {
     
     private var categories: [TrackerCategory] = []
     private var completedTrackers: [TrackerRecord] = []
-    private var trackers: [Tracker] = []
+    
+    private let trackersFactory = TrackersFactoryMoc()
     
     // MARK: - Public properties
     let params = GeometricParams(cellCount: 2,
@@ -42,7 +43,9 @@ final class TrackersViewController: UIViewController {
         setupNavButton()
         setupTitle()
         
-        if trackers.isEmpty {
+        categories = trackersFactory.getTrackersCategory()
+        
+        if categories.isEmpty {
             setupEmptyStageView()
         } else {
             setupCollectionView()
@@ -121,7 +124,7 @@ private extension TrackersViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
         
-        helper = SupplementaryCollection(count: 10, using: params)
+        helper = SupplementaryCollection(count: categories.count, using: params)
         collectionView.dataSource = helper
         collectionView.delegate = helper
         collectionView.register(

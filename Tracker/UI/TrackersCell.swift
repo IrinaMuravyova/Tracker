@@ -10,7 +10,7 @@ import UIKit
 class TrackersCell: UICollectionViewCell {
     // MARK: - UI
     private let habitView = UIView()
-    private let emojiImageView = UIImageView()
+    private let emojiLabel = UILabel()
     private let titleLabel = UILabel()
     
     private let quantityView = UIView()
@@ -29,6 +29,17 @@ class TrackersCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
+    
+    func configureCell(with tracker: Tracker) {
+        let color = tracker.color.uiColor
+        habitView.backgroundColor = color
+        
+        guard var config = addButton.configuration else { return }
+        config.baseForegroundColor = color
+        addButton.configuration = config
+        
+        emojiLabel.text = tracker.emoji
+    }
 }
 
 // MARK: - Private functions
@@ -44,7 +55,6 @@ private extension TrackersCell {
         contentView.addSubview(habitView)
         
         habitView.layer.cornerRadius = 16
-        habitView.backgroundColor = .colorSelection1
  
         setupEmoji()
         setupLabel()
@@ -64,16 +74,13 @@ private extension TrackersCell {
     }
     
     func setupEmoji() {
-        emojiImageView.image = UIImage(systemName: "person.fill")
-        emojiImageView.frame.size = CGSize(width: emojiSize, height: emojiSize)
-        emojiImageView.layer.cornerRadius = 68
-        
-        emojiImageView.translatesAutoresizingMaskIntoConstraints = false
-        habitView.addSubview(emojiImageView)
+        emojiLabel.frame.size = CGSize(width: emojiSize, height: emojiSize)
+        emojiLabel.translatesAutoresizingMaskIntoConstraints = false
+        habitView.addSubview(emojiLabel)
     }
     
     func setupLabel() {
-        titleLabel.text = "Текст привычки такой длинный текс"
+        titleLabel.text = "Текст привычки такой длинный текст"
         titleLabel.font = .systemFont(ofSize: 12, weight: .medium)
         titleLabel.textColor = .white
         titleLabel.numberOfLines = 0
@@ -88,12 +95,12 @@ private extension TrackersCell {
             habitView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             habitView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
-            emojiImageView.topAnchor.constraint(equalTo: habitView.topAnchor, constant: 12),
-            emojiImageView.leadingAnchor.constraint(equalTo: habitView.leadingAnchor, constant: 12),
-            emojiImageView.widthAnchor.constraint(equalToConstant: CGFloat(emojiSize)),
-            emojiImageView.heightAnchor.constraint(equalToConstant: CGFloat(emojiSize)),
+            emojiLabel.topAnchor.constraint(equalTo: habitView.topAnchor, constant: 12),
+            emojiLabel.leadingAnchor.constraint(equalTo: habitView.leadingAnchor, constant: 12),
+            emojiLabel.widthAnchor.constraint(equalToConstant: CGFloat(emojiSize)),
+            emojiLabel.heightAnchor.constraint(equalToConstant: CGFloat(emojiSize)),
             
-            titleLabel.topAnchor.constraint(equalTo: emojiImageView.bottomAnchor, constant: 8),
+            titleLabel.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 8),
             titleLabel.leadingAnchor.constraint(equalTo: habitView.leadingAnchor, constant: 12),
             titleLabel.trailingAnchor.constraint(equalTo: habitView.trailingAnchor, constant: -12),
             titleLabel.bottomAnchor.constraint(equalTo: habitView.bottomAnchor, constant: -12)
@@ -114,9 +121,7 @@ private extension TrackersCell {
         quantityView.addSubview(addButton)
         
         var config = UIButton.Configuration.plain()
-            config.image = UIImage(resource: .plus).withRenderingMode(.alwaysTemplate)
-            config.baseForegroundColor = .colorSelection1
-        
+        config.image = UIImage(resource: .plus).withRenderingMode(.alwaysTemplate)        
         addButton.configuration = config
     }
     

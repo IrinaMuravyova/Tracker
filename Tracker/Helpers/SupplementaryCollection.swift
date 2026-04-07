@@ -27,12 +27,15 @@ final class SupplementaryCollection: NSObject {
     static let trackerCellIdentifier = "TrackersCell"
     
     private let params: GeometricParams
+    private let categories: [TrackerCategory]
     
     let count: Int
     
     init(count: Int, using params: GeometricParams) {
         self.count = count
         self.params = params
+        
+        categories = TrackersFactoryMoc().getTrackersCategory()
     }
 }
 
@@ -42,7 +45,7 @@ extension SupplementaryCollection: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        count
+        categories[section].trackers.count
     }
     
     func collectionView(
@@ -52,7 +55,13 @@ extension SupplementaryCollection: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: SupplementaryCollection.trackerCellIdentifier,
             for: indexPath) as! TrackersCell
+        let tracker = categories[indexPath.section].trackers[indexPath.row]
+        cell.configureCell(with: tracker)
         return cell
+    }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        count
     }
 }
 
