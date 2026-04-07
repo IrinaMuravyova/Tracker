@@ -124,13 +124,18 @@ private extension TrackersViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
         
-        helper = SupplementaryCollection(count: categories.count, using: params)
+        helper = SupplementaryCollection(categories: categories, using: params)
         collectionView.dataSource = helper
         collectionView.delegate = helper
         collectionView.register(
             TrackersCell.self,
             forCellWithReuseIdentifier: SupplementaryCollection.trackerCellIdentifier
         )
+        
+        collectionView.register(
+            SupplementaryView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: SupplementaryView.reuseHeaderId)
         
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),

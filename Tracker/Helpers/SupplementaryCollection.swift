@@ -29,13 +29,9 @@ final class SupplementaryCollection: NSObject {
     private let params: GeometricParams
     private let categories: [TrackerCategory]
     
-    let count: Int
-    
-    init(count: Int, using params: GeometricParams) {
-        self.count = count
+    init(categories: [TrackerCategory], using params: GeometricParams) {
+        self.categories = categories
         self.params = params
-        
-        categories = TrackersFactoryMoc().getTrackersCategory()
     }
 }
 
@@ -61,7 +57,24 @@ extension SupplementaryCollection: UICollectionViewDataSource {
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        count
+        categories.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            assertionFailure("[SupplementaryCollection] elementKindSectionHeader has not been implemented")
+            return UICollectionReusableView()
+        }
+        
+        let header = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: SupplementaryView.reuseHeaderId,
+            for: indexPath
+        ) as! SupplementaryView
+        
+        header.configure(title: categories[indexPath.section].title)
+        return header
     }
 }
 
@@ -79,5 +92,22 @@ extension SupplementaryCollection: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         UIEdgeInsets(top: 16, left: params.leftInset, bottom: 16, right: params.rightInset)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        
+        let header = SupplementaryView(frame: .zero)
+        header.configure(title: "пример для расчета высоты")
+        
+        let targetSize = CGSize(
+            width: collectionView.frame.width,
+            height: UIView.layoutFittingExpandedSize.height
+        )
+        
+        return header.systemLayoutSizeFitting(
+            targetSize,
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel
+        )
     }
 }
