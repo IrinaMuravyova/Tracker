@@ -44,6 +44,7 @@ final class TrackersViewController: UIViewController {
         setupTitle()
         
         categories = trackersFactory.getTrackersCategory()
+        completedTrackers = trackersFactory.getCompletedTrackers()
         
         if categories.isEmpty {
             setupEmptyStageView()
@@ -124,7 +125,7 @@ private extension TrackersViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
         
-        helper = SupplementaryCollection(categories: categories, using: params)
+        helper = SupplementaryCollection(categories: categories, completedTrackers: completedTrackers, using: params)
         collectionView.dataSource = helper
         collectionView.delegate = helper
         collectionView.register(

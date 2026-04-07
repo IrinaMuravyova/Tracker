@@ -31,7 +31,7 @@ class TrackersCell: UICollectionViewCell {
         fatalError("[TrackersCell] init(coder:) has not been implemented")
     }
     
-    func configureCell(with tracker: Tracker) {
+    func configureCell(with tracker: Tracker, completedCount: Int) {
         let color = tracker.color.uiColor
         habitView.backgroundColor = color
         
@@ -40,6 +40,7 @@ class TrackersCell: UICollectionViewCell {
         addButton.configuration = config
         
         emojiLabel.text = tracker.emoji
+        quantityLabel.text = "\(completedCount) дней"
     }
 }
 

@@ -28,9 +28,11 @@ final class SupplementaryCollection: NSObject {
     
     private let params: GeometricParams
     private let categories: [TrackerCategory]
+    private let completedTrackers: [TrackerRecord]
     
-    init(categories: [TrackerCategory], using params: GeometricParams) {
+    init(categories: [TrackerCategory], completedTrackers: [TrackerRecord], using params: GeometricParams) {
         self.categories = categories
+        self.completedTrackers = completedTrackers
         self.params = params
     }
 }
@@ -51,8 +53,12 @@ extension SupplementaryCollection: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: SupplementaryCollection.trackerCellIdentifier,
             for: indexPath) as! TrackersCell
+        
         let tracker = categories[indexPath.section].trackers[indexPath.row]
-        cell.configureCell(with: tracker)
+        let completedCount = completedTrackers.filter({$0.trackerId == tracker.id}).count
+        
+        cell.configureCell(with: tracker, completedCount: completedCount)
+        
         return cell
     }
     
