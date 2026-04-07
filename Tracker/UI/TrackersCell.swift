@@ -28,6 +28,7 @@ class TrackersCell: UICollectionViewCell {
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        fatalError("[TrackersCell] init(coder:) has not been implemented")
     }
     
     func configureCell(with tracker: Tracker) {

@@ -14,8 +14,6 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         switchToTabBarController()
     }
-
-
 }
 
 private extension ViewController {
