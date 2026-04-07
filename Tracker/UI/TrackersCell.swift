@@ -40,7 +40,7 @@ class TrackersCell: UICollectionViewCell {
         addButton.configuration = config
         
         emojiLabel.text = tracker.emoji
-        quantityLabel.text = "\(completedCount) дней"
+        quantityLabel.text = "\(daysString(completedCount))"
     }
 }
 
@@ -143,5 +143,23 @@ private extension TrackersCell {
             addButton.bottomAnchor.constraint(equalTo: quantityView.bottomAnchor, constant: -16),
             addButton.trailingAnchor.constraint(equalTo: quantityView.trailingAnchor, constant: 0),
         ])
+    }
+    
+    func daysString(_ count: Int) -> String {
+        let remainder100 = count % 100
+        let remainder10 = count % 10
+        
+        if remainder100 >= 11 && remainder100 <= 14 {
+            return "\(count) дней"
+        }
+        
+        switch remainder10 {
+        case 1:
+            return "\(count) день"
+        case 2, 3, 4:
+            return "\(count) дня"
+        default:
+            return "\(count) дней"
+        }
     }
 }
