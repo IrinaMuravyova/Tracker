@@ -22,8 +22,9 @@ final class TrackersViewController: UIViewController {
     }()
     
     // MARK: - Private properties
-    private var titleLabel: UILabel?
-    private var emptyStageView: UIView?
+    private let titleLabel = UILabel()
+    private let emptyStageView = UIView()
+    private let searchBar = UIView()
     
     private var categories: [TrackerCategory] = []
     private var completedTrackers: [TrackerRecord] = []
@@ -42,6 +43,7 @@ final class TrackersViewController: UIViewController {
         super.viewDidLoad( )
         setupNavButton()
         setupTitle()
+        setupSearchBar()
         
         categories = trackersFactory.getTrackersCategory()
         completedTrackers = trackersFactory.getCompletedTrackers()
@@ -74,8 +76,6 @@ private extension TrackersViewController {
     }
     
     func setupTitle() {
-        titleLabel = UILabel()
-        guard let titleLabel else { return }
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = "Трекеры"
         titleLabel.font = UIFont.systemFont(ofSize: 34, weight: .bold)
@@ -99,8 +99,6 @@ private extension TrackersViewController {
         emptyStageLabel.text = "Что будем отслеживать?"
         emptyStageLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         
-        emptyStageView = UIView()
-        guard let emptyStageView else { return }
         emptyStageView.translatesAutoresizingMaskIntoConstraints = false
         
         emptyStageView.addSubview(emptyStageImage)
@@ -139,10 +137,55 @@ private extension TrackersViewController {
             withReuseIdentifier: SupplementaryView.reuseHeaderId)
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
+    
+    func setupSearchBar() {
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(searchBar)
+        
+        searchBar.backgroundColor = .innerFields
+        searchBar.layer.cornerRadius = 10
+        
+        let searchIconIV = UIImageView()
+        searchIconIV.frame.size = CGSize(width: 30, height: 30)
+        searchIconIV.contentMode = .scaleAspectFit
+        searchIconIV.image = UIImage(systemName: "magnifyingglass")
+        searchIconIV.tintColor = .gray
+        searchIconIV.image = searchIconIV.image?.withRenderingMode(.alwaysTemplate)
+        searchIconIV.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.addSubview(searchIconIV)
+        
+        let textFieldInsideSearchBar = UITextField()
+        textFieldInsideSearchBar.textColor = .gray
+        textFieldInsideSearchBar.font = .systemFont(ofSize: 17, weight: .regular)
+        textFieldInsideSearchBar.attributedPlaceholder = NSAttributedString(
+            string: "Поиск",
+            attributes: [.foregroundColor: UIColor.gray]
+        )
+        textFieldInsideSearchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.addSubview(textFieldInsideSearchBar)
+        
+        
+        NSLayoutConstraint.activate([
+            searchBar.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 7),
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            searchBar.heightAnchor.constraint(equalToConstant: 40),
+            
+            searchIconIV.leadingAnchor.constraint(equalTo: searchBar.leadingAnchor, constant: 8),
+            searchIconIV.topAnchor.constraint(equalTo: searchBar.topAnchor, constant: 0),
+            searchIconIV.bottomAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 0),
+
+            textFieldInsideSearchBar.leadingAnchor.constraint(equalTo: searchIconIV.trailingAnchor, constant: 6),
+            textFieldInsideSearchBar.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor, constant: -7),
+            textFieldInsideSearchBar.topAnchor.constraint(equalTo: searchBar.topAnchor, constant: 7),
+            textFieldInsideSearchBar.bottomAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: -7)
+        ])
+    }
 }
+
