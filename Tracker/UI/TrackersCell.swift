@@ -7,7 +7,15 @@
 
 import UIKit
 
-class TrackersCell: UICollectionViewCell {
+protocol TrackersCellDelegate: AnyObject {
+    func didTapAddButton(in cell: TrackersCell)
+}
+
+final class TrackersCell: UICollectionViewCell {
+    // MARK: - Public properties
+    weak var delegate: TrackersCellDelegate?
+    var suppCollection: SupplementaryCollection?
+    
     // MARK: - UI
     private let habitView = UIView()
     private let emojiLabel = UILabel()
@@ -19,11 +27,15 @@ class TrackersCell: UICollectionViewCell {
     
     // MARK: - Private properties
     private let emojiSize = 24
+    private var currentTrackerId: UUID?
+    private var trackerIsDone: Bool = false
     
     // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
+        
+        addButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
     }
     
     required init?(coder: NSCoder) {
@@ -31,14 +43,29 @@ class TrackersCell: UICollectionViewCell {
         fatalError("[TrackersCell] init(coder:) has not been implemented")
     }
     
-    func configureCell(with tracker: Tracker, completedCount: Int) {
+    @objc func buttonTapped(_ sender: UIButton) {
+        delegate?.didTapAddButton(in: self)
+    }
+    
+    // MARK: - Public functions
+    func configureCell(
+        with tracker: Tracker,
+        completedCount: Int,
+        isDone: Bool
+    ) {
+        currentTrackerId = tracker.id
+        
         let color = tracker.color.uiColor
         habitView.backgroundColor = color
         
+        let image = isDone
+        ? UIImage(resource: .done).withRenderingMode(.alwaysTemplate)
+        : UIImage(resource: .plus).withRenderingMode(.alwaysTemplate)
+        addButton.setImage(image, for: .normal)
         guard var config = addButton.configuration else { return }
         config.baseForegroundColor = color
         addButton.configuration = config
-        
+   
         emojiLabel.text = tracker.emoji
         quantityLabel.text = "\(daysString(completedCount))"
     }
@@ -118,12 +145,14 @@ private extension TrackersCell {
         quantityLabel.text = "0 дней"
     }
     
-    func setupAddButton() {
+    func setupAddButton(_ isDone: Bool = false) {
         addButton.translatesAutoresizingMaskIntoConstraints = false
         quantityView.addSubview(addButton)
         
         var config = UIButton.Configuration.plain()
-        config.image = UIImage(resource: .plus).withRenderingMode(.alwaysTemplate)        
+        config.image = isDone
+        ? UIImage(resource: .done).withRenderingMode(.alwaysTemplate)
+        : UIImage(resource: .plus).withRenderingMode(.alwaysTemplate)
         addButton.configuration = config
     }
     

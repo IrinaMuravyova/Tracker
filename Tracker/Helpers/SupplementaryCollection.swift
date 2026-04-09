@@ -23,12 +23,23 @@ struct GeometricParams {
     }
 }
 
+protocol SupplementaryCollectionDelegate: AnyObject {
+    func getSelectedData() -> Date
+//    func getSelectedTrackerId() -> UUID
+    func updateCell(with index: IndexPath)
+}
+
 final class SupplementaryCollection: NSObject {
     static let trackerCellIdentifier = "TrackersCell"
     
     private let params: GeometricParams
-    private let categories: [TrackerCategory]
-    private let completedTrackers: [TrackerRecord]
+    private var categories: [TrackerCategory]
+    private var completedTrackers: [TrackerRecord]
+    private var selectedDate = Date()
+    private var trackersFactory = TrackersFactory.shared
+    
+    weak var delegate: SupplementaryCollectionDelegate?
+    weak var collectionView: UICollectionView?
     
     init(categories: [TrackerCategory], completedTrackers: [TrackerRecord], using params: GeometricParams) {
         self.categories = categories
@@ -57,7 +68,14 @@ extension SupplementaryCollection: UICollectionViewDataSource {
         let tracker = categories[indexPath.section].trackers[indexPath.row]
         let completedCount = completedTrackers.filter({$0.trackerId == tracker.id}).count
         
-        cell.configureCell(with: tracker, completedCount: completedCount)
+        cell.delegate = self
+        guard let delegate else { return UICollectionViewCell()}
+        let isDone = !(completedTrackers.filter({
+            $0.trackerId == tracker.id
+            && Calendar.current.startOfDay(for: $0.date) == Calendar.current.startOfDay(for:(delegate.getSelectedData()))
+        }).first == nil)
+   
+        cell.configureCell(with: tracker, completedCount: completedCount, isDone: isDone)
         
         return cell
     }
@@ -117,3 +135,61 @@ extension SupplementaryCollection: UICollectionViewDelegateFlowLayout {
         )
     }
 }
+
+extension SupplementaryCollection: TrackersCellDelegate {
+
+    func didTapAddButton(in cell: TrackersCell) {
+        guard let collectionView,
+              let indexPath = collectionView.indexPath(for: cell),
+              let delegate else { return }
+
+        let tracker = categories[indexPath.section].trackers[indexPath.row]
+        
+        let isDone = !(completedTrackers.filter({
+            $0.trackerId == tracker.id
+            && Calendar.current.startOfDay(for: $0.date) == Calendar.current.startOfDay(for:(delegate.getSelectedData()))
+        }).first == nil)
+        
+        if isDone {
+            deleteTrackerRecord(trackerId: tracker.id)
+        } else {
+            addTrackerRecord(trackerId: tracker.id)
+        }
+        
+        updateCell(with: indexPath)
+    }
+    
+    private func addTrackerRecord(trackerId: UUID) {
+        guard let delegate else { return }
+        selectedDate = delegate.getSelectedData()
+       
+        let newRecord = TrackerRecord(trackerId: trackerId, date: selectedDate)
+        completedTrackers.append(newRecord)
+        
+        trackersFactory.trackerRecordsDidUpdated(with: newRecord)
+    }
+    
+    private func deleteTrackerRecord(trackerId: UUID) {
+        guard let delegate else { return }
+        selectedDate = delegate.getSelectedData()
+        
+        let index = completedTrackers.firstIndex(where: {
+            $0.trackerId == trackerId
+            && Calendar.current.startOfDay(for: $0.date) == Calendar.current.startOfDay(for:(delegate.getSelectedData()))
+        })
+                                                 
+        guard let index else { return }
+        completedTrackers.remove(at: index)
+        
+        trackersFactory.trackerRecordDidCanceled(for: trackerId, at: selectedDate)
+    }
+    
+    private func updateCell(with indexPath: IndexPath) {
+        categories = trackersFactory.getTrackersCategory()
+        completedTrackers = trackersFactory.getCompletedTrackers()
+        
+        delegate?.updateCell(with: indexPath)
+    }
+}
+
+
