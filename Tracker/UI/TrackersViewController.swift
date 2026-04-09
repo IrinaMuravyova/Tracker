@@ -9,27 +9,21 @@ import UIKit
 
 final class TrackersViewController: UIViewController {
     // MARK: - UI
-    var datePicker: UIDatePicker = {
-        let datePicker = UIDatePicker()
-        datePicker.datePickerMode = .date
-        datePicker.preferredDatePickerStyle = .compact
-        return datePicker
-    }()
-    
-    var collectionView: UICollectionView = {
+    private var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         return UICollectionView(frame: .zero, collectionViewLayout: layout)
     }()
-    
-    // MARK: - Private properties
+    private let datePicker = UIDatePicker()
     private let titleLabel = UILabel()
     private let emptyStageView = UIView()
     private let searchBar = UIView()
+    private var addTrackerButtonItem = UIBarButtonItem()
     
+    // MARK: - Private properties
     private var categories: [TrackerCategory] = []
     private var completedTrackers: [TrackerRecord] = []
-    
-    private let trackersFactory = TrackersFactoryMoc()
+    private var changedTrackerId: UUID?
+    private let trackersFactory = TrackersFactory.shared
     
     // MARK: - Public properties
     let params = GeometricParams(cellCount: 2,
@@ -38,12 +32,11 @@ final class TrackersViewController: UIViewController {
                                  cellSpacing: 8)
     var helper: SupplementaryCollection?
     
+    
     // MARK: - Life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad( )
-        setupNavButton()
-        setupTitle()
-        setupSearchBar()
+        setupUI()
         
         categories = trackersFactory.getTrackersCategory()
         completedTrackers = trackersFactory.getCompletedTrackers()
@@ -53,26 +46,71 @@ final class TrackersViewController: UIViewController {
         } else {
             setupCollectionView()
         }
+        
+        helper?.delegate = self
+
+        
+    }
+    
+    @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
+        let selectedDate = sender.date
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        let formattedDate = dateFormatter.string(from: selectedDate)
+        print("Выбранная дата: \(formattedDate)")
+    }
+    
+    @objc private func addTrackerButtonTapped() {
+        guard navigationController?.visibleViewController == self else { return }
+        let createTrackerNavVC = UINavigationController(rootViewController: CreateTrackerViewController())
+        self.present(createTrackerNavVC, animated: true)
     }
 }
 
 // MARK: - Private methods
 private extension TrackersViewController {
+    func setupUI() {
+        setupNavButton()
+        setupTitle()
+        setupSearchBar()
+        setupDatePicker()
+    }
+    
+    func setupDatePicker() {
+        let container = UIView()
+        container.backgroundColor = .innerFields
+        container.layer.cornerRadius = 10
+        container.clipsToBounds = true
+
+        datePicker.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(datePicker)
+
+        NSLayoutConstraint.activate([
+            datePicker.topAnchor.constraint(equalTo: container.topAnchor, constant: 8),
+            datePicker.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -8),
+            datePicker.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
+            datePicker.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -8)
+        ])
+        
+        datePicker.datePickerMode = .date
+        datePicker.preferredDatePickerStyle = .compact
+    
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
+        
+        datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
+    }
+    
     func setupNavButton() {
         setupAddTrackerButton()
         setupDatePicker()
     }
     
     func setupAddTrackerButton() {
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            image: UIImage(systemName: "plus"),
-            style: .plain,
-            target: nil,
-            action: nil)
-    }
-    
-    func setupDatePicker() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
+        addTrackerButtonItem.style = .plain
+        addTrackerButtonItem.image = UIImage(systemName: "plus")
+        addTrackerButtonItem.target = self
+        addTrackerButtonItem.action = #selector(addTrackerButtonTapped)
+        navigationItem.leftBarButtonItem = addTrackerButtonItem
     }
     
     func setupTitle() {
@@ -124,6 +162,8 @@ private extension TrackersViewController {
         view.addSubview(collectionView)
         
         helper = SupplementaryCollection(categories: categories, completedTrackers: completedTrackers, using: params)
+        helper?.collectionView = collectionView
+        
         collectionView.dataSource = helper
         collectionView.delegate = helper
         collectionView.register(
@@ -189,3 +229,22 @@ private extension TrackersViewController {
     }
 }
 
+extension TrackersViewController: SupplementaryCollectionDelegate {
+    func getSelectedData() -> Date {
+        datePicker.date
+    }
+    
+//    func getSelectedTrackerId() -> UUID {
+//        UUID()
+//    }
+    
+    func updateCell(with index: IndexPath) {
+        fetchData()
+        collectionView.reloadItems(at: [index])
+    }
+    
+    private func fetchData() {
+        categories = trackersFactory.getTrackersCategory()
+        completedTrackers = trackersFactory.getCompletedTrackers()
+    }
+}
