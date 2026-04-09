@@ -25,7 +25,6 @@ struct GeometricParams {
 
 protocol SupplementaryCollectionDelegate: AnyObject {
     func getSelectedData() -> Date
-//    func getSelectedTrackerId() -> UUID
     func updateCell(with index: IndexPath)
 }
 

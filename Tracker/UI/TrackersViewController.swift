@@ -233,11 +233,7 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     func getSelectedData() -> Date {
         datePicker.date
     }
-    
-//    func getSelectedTrackerId() -> UUID {
-//        UUID()
-//    }
-    
+
     func updateCell(with index: IndexPath) {
         fetchData()
         collectionView.reloadItems(at: [index])
