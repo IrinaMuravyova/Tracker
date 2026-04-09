@@ -1,5 +1,5 @@
 //
-//  CreateTrackerViewController.swift
+//  TrackerTypeSelectionViewController.swift
 //  Tracker
 //
 //  Created by Irina Muravyeva on 09.04.2026.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class CreateTrackerViewController: UIViewController {
+final class TrackerTypeSelectionViewController: UIViewController {
     //MARK: - UI
     private let habitButton: UIButton = {
         let button = UIButton()

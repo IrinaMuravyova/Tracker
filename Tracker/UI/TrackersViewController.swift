@@ -62,7 +62,7 @@ final class TrackersViewController: UIViewController {
     
     @objc private func addTrackerButtonTapped() {
         guard navigationController?.visibleViewController == self else { return }
-        let createTrackerNavVC = UINavigationController(rootViewController: CreateTrackerViewController())
+        let createTrackerNavVC = UINavigationController(rootViewController: TrackerTypeSelectionViewController())
         self.present(createTrackerNavVC, animated: true)
     }
 }
