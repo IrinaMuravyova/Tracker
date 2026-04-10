@@ -35,6 +35,14 @@ final class TrackerTypeSelectionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        
+        habitButton.addTarget(self, action: #selector(habitButtonDidTap), for: .touchUpInside)
+    }
+    
+    @objc private func habitButtonDidTap() {
+        let trackerDetailsVC = TrackerDetailsViewController(trackerType: .habit)
+        trackerDetailsVC.title = "Новая привычка"
+        navigationController?.setViewControllers([trackerDetailsVC], animated: true)
     }
     
     // MARK: - Private functions
