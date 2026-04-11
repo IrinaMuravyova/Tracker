@@ -34,6 +34,9 @@ final class BaseDetailsItem: UIView {
         return imageView
     }()
     
+    // MARK: - Public methods
+    var onTap: (() -> Void) = {}
+    
     // MARK: - Initializes
     init(withTitle: String, subTitle: String) {
         super.init(frame: .zero)
@@ -41,10 +44,25 @@ final class BaseDetailsItem: UIView {
         self.titleLabel.text = withTitle
         self.subTitleLabel.text = subTitle
         setupUI()
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        addGestureRecognizer(tapGesture)
     }
     
     required init?(coder: NSCoder) {
         fatalError("[BaseDetailsItem] init(coder:) has not been implemented")
+    }
+    
+    @objc private func handleTap() {
+        onTap()
+    }
+    
+    func getTitle() -> String {
+        titleLabel.text ?? ""
+    }
+    
+    func setSubtitle(_ text: String) {
+        subTitleLabel.text = text
     }
     
     // MARK: - Private functions

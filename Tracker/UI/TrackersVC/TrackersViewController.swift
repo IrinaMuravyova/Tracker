@@ -18,6 +18,7 @@ final class TrackersViewController: UIViewController {
     private let emptyStageView = UIView()
     private let searchBar = UIView()
     private var addTrackerButtonItem = UIBarButtonItem()
+    private let filterButton = UIButton()
     
     // MARK: - Private properties
     private var categories: [TrackerCategory] = []
@@ -74,6 +75,25 @@ private extension TrackersViewController {
         setupTitle()
         setupSearchBar()
         setupDatePicker()
+        setupFilterButton()
+    }
+    
+    func setupFilterButton() {
+        filterButton.setTitle("Фильтры", for: .normal)
+        filterButton.setTitleColor(.white, for: .normal)
+        filterButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        filterButton.backgroundColor = .onTintSwitch
+        filterButton.layer.cornerRadius = 16
+        
+        filterButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(filterButton)
+        
+        NSLayoutConstraint.activate([
+            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filterButton.heightAnchor.constraint(equalToConstant: 50),
+            filterButton.widthAnchor.constraint(equalToConstant: 114),
+        ])
     }
     
     func setupDatePicker() {
@@ -177,8 +197,8 @@ private extension TrackersViewController {
             withReuseIdentifier: SupplementaryView.reuseHeaderId)
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 24),
+            collectionView.bottomAnchor.constraint(equalTo: filterButton.topAnchor, constant: -16),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])

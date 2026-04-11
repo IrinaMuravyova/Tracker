@@ -20,7 +20,7 @@ final class TrackerTypeSelectionViewController: UIViewController {
         return button
     }()
     
-    private let irregularHabitButton: UIButton = {
+    private let irregularEventButton: UIButton = {
         let button = UIButton()
         button.frame.size = CGSize(width: 335, height: 60)
         button.layer.cornerRadius = 16
@@ -36,13 +36,14 @@ final class TrackerTypeSelectionViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         
-        habitButton.addTarget(self, action: #selector(habitButtonDidTap), for: .touchUpInside)
+        habitButton.addTarget(self, action: #selector(buttonDidTap), for: .touchUpInside)
+        irregularEventButton.addTarget(self, action: #selector(buttonDidTap), for: .touchUpInside)
     }
     
-    @objc private func habitButtonDidTap() {
-        let trackerDetailsVC = TrackerDetailsViewController(trackerType: .habit)
-        trackerDetailsVC.title = "Новая привычка"
-        navigationController?.setViewControllers([trackerDetailsVC], animated: true)
+    @objc private func buttonDidTap(_ sender: UIButton) {
+        let type = sender == habitButton ? TrackerType.habit : TrackerType.irregular
+        let trackerDetailsVC = TrackerDetailsViewController(trackerType: type)
+        navigationController?.pushViewController(trackerDetailsVC, animated: true)
     }
     
     // MARK: - Private functions
@@ -59,8 +60,8 @@ final class TrackerTypeSelectionViewController: UIViewController {
         
         habitButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(habitButton)
-        irregularHabitButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(irregularHabitButton)
+        irregularEventButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(irregularEventButton)
         
         NSLayoutConstraint.activate([
             habitButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -68,10 +69,10 @@ final class TrackerTypeSelectionViewController: UIViewController {
             habitButton.widthAnchor.constraint(equalToConstant: 335),
             habitButton.heightAnchor.constraint(equalToConstant: 60),
 
-            irregularHabitButton.topAnchor.constraint(equalTo: habitButton.bottomAnchor, constant: 16),
-            irregularHabitButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            irregularHabitButton.widthAnchor.constraint(equalToConstant: 335),
-            irregularHabitButton.heightAnchor.constraint(equalToConstant: 60)
+            irregularEventButton.topAnchor.constraint(equalTo: habitButton.bottomAnchor, constant: 16),
+            irregularEventButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            irregularEventButton.widthAnchor.constraint(equalToConstant: 335),
+            irregularEventButton.heightAnchor.constraint(equalToConstant: 60)
         ])
     }
 }
