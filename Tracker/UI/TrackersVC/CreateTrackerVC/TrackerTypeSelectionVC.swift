@@ -40,6 +40,7 @@ final class TrackerTypeSelectionViewController: UIViewController {
         irregularEventButton.addTarget(self, action: #selector(buttonDidTap), for: .touchUpInside)
     }
     
+    // MARK: - Objc methods
     @objc private func buttonDidTap(_ sender: UIButton) {
         let type = sender == habitButton ? TrackerType.habit : TrackerType.irregular
         let trackerDetailsVC = TrackerDetailsViewController(trackerType: type)

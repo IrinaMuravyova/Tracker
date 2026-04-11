@@ -9,14 +9,16 @@ import UIKit
 
 class WeekdayCell: UITableViewCell {
     static let reusedIdentifier = "WeekdayCell"
+    
     private let dayLabel = UILabel()
     private let isSelectedSwitch = UISwitch()
     private let separator = UIView()
     
     private var currentDay: Weekday?
-
+    
     var onToggle: ((Weekday, Bool) -> Void)?
     
+    // MARK: - Initializes
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
@@ -32,11 +34,13 @@ class WeekdayCell: UITableViewCell {
         fatalError("[WeekdayCell] init(coder:) has not been implemented")
     }
     
+    // MARK: - Objc methods
     @objc private func switchChanged(_ sender: UISwitch) {
         guard let day = currentDay else { return }
         onToggle?(day, sender.isOn)
     }
     
+    // MARK: - Public methods
     func configure(with index: IndexPath.Index, isOn: Bool) {
         currentDay = Weekday.allCases[index]
         
@@ -57,6 +61,7 @@ class WeekdayCell: UITableViewCell {
     }
 }
 
+// MARK: - Private methods
 private extension WeekdayCell {
     func setupUI() {
         dayLabel.font = .systemFont(ofSize: 17, weight: .regular)

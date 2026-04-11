@@ -75,7 +75,7 @@ extension SupplementaryCollection: UICollectionViewDataSource {
         }).first == nil)
    
         cell.configureCell(with: tracker, completedCount: completedCount, isDone: isDone)
-        
+
         return cell
     }
     

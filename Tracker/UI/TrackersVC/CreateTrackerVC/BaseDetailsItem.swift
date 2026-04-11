@@ -34,9 +34,6 @@ final class BaseDetailsItem: UIView {
         return imageView
     }()
     
-    // MARK: - Public methods
-    var onTap: (() -> Void) = {}
-    
     // MARK: - Initializes
     init(withTitle: String, subTitle: String) {
         super.init(frame: .zero)
@@ -53,9 +50,13 @@ final class BaseDetailsItem: UIView {
         fatalError("[BaseDetailsItem] init(coder:) has not been implemented")
     }
     
+    // MARK: - Objc methods
     @objc private func handleTap() {
         onTap()
     }
+    
+    // MARK: - Public methods
+    var onTap: (() -> Void) = {}
     
     func getTitle() -> String {
         titleLabel.text ?? ""
@@ -64,9 +65,11 @@ final class BaseDetailsItem: UIView {
     func setSubtitle(_ text: String) {
         subTitleLabel.text = text
     }
-    
-    // MARK: - Private functions
-    private func setupUI() {
+}
+
+// MARK: - UI settings functions
+private extension BaseDetailsItem {
+    func setupUI() {
         let stackView = UIStackView(arrangedSubviews: [titleLabel, subTitleLabel])
         stackView.axis = .vertical
         stackView.translatesAutoresizingMaskIntoConstraints = false

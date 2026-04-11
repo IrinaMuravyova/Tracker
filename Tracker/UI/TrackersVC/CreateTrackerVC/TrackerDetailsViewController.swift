@@ -87,7 +87,7 @@ final class TrackerDetailsViewController: UIViewController {
         titleTF.addTarget(self, action: #selector(titleDidChange(_:)), for: .editingChanged)
     }
     
-    // MARK: - Selectors
+    // MARK: - Objc methods
     @objc private func cancelButtonDidTap() {
         dismiss(animated: true)
     }
@@ -101,7 +101,10 @@ final class TrackerDetailsViewController: UIViewController {
         viewModel.title = textField.text ?? ""
         updateSaveButtonState()
     }
-    
+}
+
+// MARK: - Private methods
+private extension TrackerDetailsViewController {
     private func updateSaveButtonState() {
         print("updateSaveButtonState CALLED")
         let isValid: Bool = {
@@ -120,7 +123,7 @@ final class TrackerDetailsViewController: UIViewController {
     }
 }
 
-// MARK: - Private methods
+// MARK: - UI settings methods
 private extension TrackerDetailsViewController {
     func setupUI() {
         setupScrollView()
@@ -200,7 +203,10 @@ private extension TrackerDetailsViewController {
         guard
             let categoryView = categoryView as? UIView,
             let scheduleView = scheduleView as? UIView
-        else { return }
+        else {
+            fatalError("[TrackerDetailsViewController] categoryView or scheduleView is not UIView")
+            return
+        }
         
         detailsStackView = UIStackView(
             arrangedSubviews: [categoryView, separator,  scheduleView]
@@ -240,7 +246,6 @@ private extension TrackerDetailsViewController {
         cancelButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         saveButton.setTitleColor(.white, for: .normal)
         saveButtonSetupColors()
-//        saveButton.backgroundColor = saveButton.isEnabled ? .blackDay : .gray
         saveButton.layer.cornerRadius = 16
     }
     
@@ -289,8 +294,6 @@ private extension TrackerDetailsViewController {
             saveButton.heightAnchor.constraint(equalToConstant: 60),
             saveButton.widthAnchor.constraint(equalToConstant: 161),
             
-//            buttonStackView.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 20),
-//            buttonStackView.trailingAnchor.constraint(greaterThanOrEqualTo: view.trailingAnchor, constant: -20),
             buttonStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             buttonStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20)
         ])
@@ -323,6 +326,7 @@ extension TrackerDetailsViewController: UITextFieldDelegate {
     }
 }
 
+// MARK: - ScheduleSettingsVCProtocol
 extension TrackerDetailsViewController: ScheduleSettingsVCProtocol {
     func scheduleDidSetup(for days: Set<Weekday>) {
         viewModel.schedule = days

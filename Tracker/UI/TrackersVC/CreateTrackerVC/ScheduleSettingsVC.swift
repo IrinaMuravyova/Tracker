@@ -34,13 +34,14 @@ final class ScheduleSettingsVC: UIViewController {
         saveButton.addTarget(self, action: #selector(saveButtonDidTap), for: .touchUpInside)
     }
     
+    // MARK: - Objc methods
     @objc private func saveButtonDidTap() {
         delegate?.scheduleDidSetup(for: selectedDays)
         navigationController?.popViewController(animated: true)
     }
 }
 
-// MARK: - Private methods
+// MARK: - UI setting methods
 private extension ScheduleSettingsVC {
     func setupUI() {
         tableView.separatorStyle = .none
@@ -81,11 +82,14 @@ extension ScheduleSettingsVC: UITableViewDataSource, UITableViewDelegate {
         
         let day = Weekday.allCases[indexPath.row]
 
-        guard let cell else { return UITableViewCell() }
+        guard let cell else {
+            fatalError("[ScheduleSettingsVC] WeekCell has not been implemented")
+            return UITableViewCell()
+        }
         cell.configure(with: indexPath.row, isOn: selectedDays.contains(day))
         
         cell.onToggle = { [weak self] day, isOn in
-            guard let self = self else { return }
+            guard let self else { return }
 
             if isOn {
                 self.selectedDays.insert(day)

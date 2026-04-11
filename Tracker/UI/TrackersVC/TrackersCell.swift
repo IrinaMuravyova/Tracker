@@ -65,10 +65,20 @@ final class TrackersCell: UICollectionViewCell {
         guard var config = addButton.configuration else { return }
         config.baseForegroundColor = color
         addButton.configuration = config
-   
+        
         emojiLabel.text = tracker.emoji
         quantityLabel.text = "\(daysString(completedCount))"
     }
+    
+//    func updateQuantity(completedCount: Int, isDone: Bool) {
+//        quantityLabel.text = "\(daysString(completedCount))"
+//        
+//        let image = isDone
+//        ? UIImage(resource: .done).withRenderingMode(.alwaysTemplate)
+//        : UIImage(resource: .plus).withRenderingMode(.alwaysTemplate)
+//        
+//        addButton.setImage(image, for: .normal)
+//    }
 }
 
 // MARK: - Private functions
@@ -84,7 +94,7 @@ private extension TrackersCell {
         contentView.addSubview(habitView)
         
         habitView.layer.cornerRadius = 16
- 
+        
         setupEmoji()
         setupLabel()
     }
