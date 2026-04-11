@@ -7,9 +7,17 @@
 
 import UIKit
 
+struct ViewModel {
+    var title: String
+    let category: String
+    let schedule: String
+}
+
 final class TrackerDetailsViewController: UIViewController {
     // MARK: - UI
     private let titleTF = UITextField()
+    private let titleFooter = UILabel()
+    private var titleStack = UIStackView()
     private var detailsStackView = UIStackView()
     private var categoryView = UIView()
     private var scheduleView = UIView()
@@ -27,6 +35,7 @@ final class TrackerDetailsViewController: UIViewController {
     
     // MARK: - Private properties
     private let trackerType: TrackerType
+    private var viewModel: ViewModel?
     
     // MARK: - Initializes
     init(trackerType: TrackerType) {
@@ -41,7 +50,7 @@ final class TrackerDetailsViewController: UIViewController {
     // MARK: - Life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("tracker type = ", trackerType)
+        
         let isHabit = trackerType == .habit
         title = isHabit
             ? "Новая привычка"
@@ -73,12 +82,24 @@ final class TrackerDetailsViewController: UIViewController {
 // MARK: - Private methods
 private extension TrackerDetailsViewController {
     func setupUI() {
-        setupTitleTF()
+        setupTitleStack()
         setupDetailsView()
         setupButtons()
         setupConstraints()
     }
 
+    func setupTitleStack() {
+        setupTitleTF()
+        setupTitleFooter()
+        
+        titleStack = UIStackView(arrangedSubviews: [titleTF, titleFooter])
+        titleStack.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(titleStack)
+        
+        titleStack.axis = .vertical
+        titleStack.spacing = 8
+    }
+    
     func setupTitleTF() {
         titleTF.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(titleTF)
@@ -93,6 +114,24 @@ private extension TrackerDetailsViewController {
 
         titleTF.leftViewMode = .always
         titleTF.rightViewMode = .always
+        
+        titleTF.keyboardType = .default
+        titleTF.returnKeyType = .go
+        
+        titleTF.delegate = self
+        titleTF.enablesReturnKeyAutomatically = true
+        titleTF.autocapitalizationType = .sentences
+    }
+    
+    func setupTitleFooter() {
+        titleFooter.font = .systemFont(ofSize: 17, weight: .regular)
+        titleFooter.textColor = .redFigma
+        titleFooter.text = "Ограничение 38 символов"
+        titleFooter.textAlignment = .center
+        titleFooter.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(titleFooter)
+        
+        titleFooter.isHidden = true
     }
     
     func setupDetailsView() {
@@ -149,16 +188,17 @@ private extension TrackerDetailsViewController {
     
     func setupConstraints() {
         NSLayoutConstraint.activate([
-            titleTF.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            titleTF.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            titleTF.topAnchor.constraint(equalTo:  view.safeAreaLayoutGuide.topAnchor, constant: 24),
             titleTF.heightAnchor.constraint(equalToConstant: 75),
+            
+            titleStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            titleStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            titleStack.topAnchor.constraint(equalTo:  view.safeAreaLayoutGuide.topAnchor, constant: 24),
             
             separator.leadingAnchor.constraint(equalTo: detailsStackView.leadingAnchor, constant: 16),
             separator.trailingAnchor.constraint(equalTo: detailsStackView.trailingAnchor, constant: -16),
             separator.heightAnchor.constraint(equalToConstant: 1),
             
-            detailsStackView.topAnchor.constraint(equalTo: titleTF.bottomAnchor, constant: 24),
+            detailsStackView.topAnchor.constraint(equalTo: titleStack.bottomAnchor, constant: 24),
             detailsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             detailsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
@@ -169,7 +209,35 @@ private extension TrackerDetailsViewController {
             
             buttonStackView.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 20),
             buttonStackView.trailingAnchor.constraint(greaterThanOrEqualTo: view.trailingAnchor, constant: -20),
-            buttonStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+            buttonStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20)
         ])
+    }
+}
+
+// MARK: - UITextFieldDelegate
+extension TrackerDetailsViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField,
+                   shouldChangeCharactersIn range: NSRange,
+                   replacementString string: String) -> Bool {
+        
+        let currentText = textField.text ?? ""
+        guard let stringRange = Range(range, in: currentText) else { return false }
+        
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
+        
+        titleFooter.isHidden = updatedText.count != 39
+        
+        return updatedText.count <= 38
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        guard let text = textField.text, !text.isEmpty else {
+            return false
+        }
+        
+        print("Нажали Go с текстом: \(text)")
+        viewModel?.title = text
+        textField.resignFirstResponder()
+        return true
     }
 }
