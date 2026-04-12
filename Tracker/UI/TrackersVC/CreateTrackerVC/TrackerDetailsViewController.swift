@@ -43,6 +43,7 @@ final class TrackerDetailsViewController: UIViewController {
         schedule: []
     )
     private var scheduleSettingsVC = ScheduleSettingsVC()
+    private let trackerFactory = TrackersFactory.shared
     
     // MARK: - Initializes
     init(trackerType: TrackerType) {
@@ -94,7 +95,16 @@ final class TrackerDetailsViewController: UIViewController {
     
     @objc private func saveButtonDidTap() {
         //TODO: сохранить в базу в фоне
-        navigationController?.popToRootViewController(animated: true)
+        let newTracker = Tracker(
+            id: UUID(),
+            name: viewModel.title,
+            color: TrackerColor.colorselection1,
+            emoji: "",
+            schedule: TrackerSchedule.daysOfWeek(viewModel.schedule),
+            type: trackerType)
+        
+        trackerFactory.trackerDidAdd(newTracker, category: viewModel.category)
+        dismiss(animated: true)
     }
     
     @objc private func titleDidChange(_ textField: UITextField) {
