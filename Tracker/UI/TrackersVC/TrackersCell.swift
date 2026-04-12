@@ -58,6 +58,8 @@ final class TrackersCell: UICollectionViewCell {
         let color = tracker.color.uiColor
         habitView.backgroundColor = color
         
+        titleLabel.text = tracker.name
+        
         let image = isDone
         ? UIImage(resource: .done).withRenderingMode(.alwaysTemplate)
         : UIImage(resource: .plus).withRenderingMode(.alwaysTemplate)
@@ -69,16 +71,6 @@ final class TrackersCell: UICollectionViewCell {
         emojiLabel.text = tracker.emoji
         quantityLabel.text = "\(daysString(completedCount))"
     }
-    
-//    func updateQuantity(completedCount: Int, isDone: Bool) {
-//        quantityLabel.text = "\(daysString(completedCount))"
-//        
-//        let image = isDone
-//        ? UIImage(resource: .done).withRenderingMode(.alwaysTemplate)
-//        : UIImage(resource: .plus).withRenderingMode(.alwaysTemplate)
-//        
-//        addButton.setImage(image, for: .normal)
-//    }
 }
 
 // MARK: - Private functions
