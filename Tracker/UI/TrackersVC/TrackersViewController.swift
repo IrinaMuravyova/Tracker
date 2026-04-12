@@ -44,7 +44,7 @@ final class TrackersViewController: UIViewController {
         completedTrackers = trackersFactory.getCompletedTrackers()
         
         setupUI()
-
+        
         if categories.isEmpty {
             collectionView.isHidden = true
             setupEmptyStageView()
@@ -77,10 +77,23 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     func getSelectedData() -> Date {
         datePicker.date
     }
-
+    
     func updateCell(with index: IndexPath) {
         fetchData()
         collectionView.reloadItems(at: [index])
+    }
+    
+    func showNotAllowFutureDateAlert() {
+        let alert = UIAlertController(
+            title: "Упс.. Что-то пошло не так",
+            message: "Нельзя отметить привычку для будущей даты",
+            preferredStyle: .alert
+        )
+        
+        let okAction = UIAlertAction(title: "ОК", style: .default)
+        alert.addAction(okAction)
+        
+        present(alert, animated: true)
     }
     
     private func fetchData() {
@@ -156,10 +169,10 @@ private extension TrackersViewController {
         datePickerContainer.backgroundColor = .innerFields
         datePickerContainer.layer.cornerRadius = 10
         datePickerContainer.clipsToBounds = true
-
+        
         datePicker.translatesAutoresizingMaskIntoConstraints = false
         datePickerContainer.addSubview(datePicker)
-
+        
         NSLayoutConstraint.activate([
             datePicker.topAnchor.constraint(equalTo: datePickerContainer.topAnchor, constant: 8),
             datePicker.bottomAnchor.constraint(equalTo: datePickerContainer.bottomAnchor, constant: -8),
@@ -169,7 +182,7 @@ private extension TrackersViewController {
         
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .compact
-    
+        
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
         
         datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
@@ -226,7 +239,7 @@ private extension TrackersViewController {
             searchIconIV.centerYAnchor.constraint(equalTo: searchBar.centerYAnchor),
             searchIconIV.heightAnchor.constraint(equalTo: searchBar.heightAnchor, multiplier: 0.6),
             searchIconIV.widthAnchor.constraint(equalTo: searchIconIV.heightAnchor),
-
+            
             textFieldInsideSearchBar.leadingAnchor.constraint(equalTo: searchIconIV.trailingAnchor, constant: 6),
             textFieldInsideSearchBar.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor, constant: -7),
             textFieldInsideSearchBar.topAnchor.constraint(equalTo: searchBar.topAnchor, constant: 7),
@@ -236,7 +249,7 @@ private extension TrackersViewController {
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
             titleLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
             titleLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -105),
-
+            
             // filterButton
             filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),

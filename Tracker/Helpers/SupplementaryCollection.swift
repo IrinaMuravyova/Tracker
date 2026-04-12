@@ -27,6 +27,7 @@ struct GeometricParams {
 protocol SupplementaryCollectionDelegate: AnyObject {
     func getSelectedData() -> Date
     func updateCell(with index: IndexPath)
+    func showNotAllowFutureDateAlert()
 }
 
 // MARK: - SupplementaryCollection
@@ -153,6 +154,14 @@ extension SupplementaryCollection: UICollectionViewDelegateFlowLayout {
 extension SupplementaryCollection: TrackersCellDelegate {
 
     func didTapAddButton(in cell: TrackersCell) {
+        guard
+            let selectedDate = delegate?.getSelectedData(),
+            !isFutureDate(selectedDate)
+        else {
+            delegate?.showNotAllowFutureDateAlert()
+            return
+        }
+        
         guard let collectionView,
               let indexPath = collectionView.indexPath(for: cell),
               let delegate else { return }
@@ -171,6 +180,15 @@ extension SupplementaryCollection: TrackersCellDelegate {
         }
         
         updateCell(with: indexPath)
+    }
+    
+    private func isFutureDate(_ selectedDate: Date) -> Bool {
+        let calendar = Calendar.current
+        
+        let today = calendar.startOfDay(for: Date())
+        let selected = calendar.startOfDay(for: selectedDate)
+        
+        return selected > today
     }
     
     private func addTrackerRecord(trackerId: UUID) {
