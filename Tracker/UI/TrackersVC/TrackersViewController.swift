@@ -64,7 +64,10 @@ final class TrackersViewController: UIViewController {
     
     @objc private func addTrackerButtonTapped() {
         guard navigationController?.visibleViewController == self else { return }
-        let createTrackerNavVC = UINavigationController(rootViewController: TrackerTypeSelectionViewController())
+        
+        let trackerTypeVC = TrackerTypeSelectionViewController()
+        trackerTypeVC.delegate = self
+        let createTrackerNavVC = UINavigationController(rootViewController: trackerTypeVC)
         self.present(createTrackerNavVC, animated: true)
     }
 }
@@ -83,6 +86,20 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     private func fetchData() {
         categories = trackersFactory.getTrackersCategory()
         completedTrackers = trackersFactory.getCompletedTrackers()
+    }
+}
+
+// MARK: - TrackerTypeSelectionViewControllerDelegate
+extension TrackersViewController: TrackerTypeSelectionViewControllerDelegate {
+    func reloadCollectionView() {
+        fetchData()
+        
+        helper?.updateData(
+            categories: categories,
+            completed: completedTrackers
+        )
+        
+        collectionView.reloadData()
     }
 }
 

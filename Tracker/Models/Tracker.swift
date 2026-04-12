@@ -6,12 +6,12 @@
 //
 import UIKit
 
-struct Tracker {
+struct Tracker{
     let id: UUID,
         name: String,
         color: TrackerColor,
         emoji: String,
-        schedule: [TrackerSchedule],
+        schedule: TrackerSchedule,
         type: TrackerType
 }
 

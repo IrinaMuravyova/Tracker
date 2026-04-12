@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol TrackerTypeSelectionViewControllerDelegate: AnyObject {
+    func reloadCollectionView()
+}
+
 final class TrackerTypeSelectionViewController: UIViewController {
     //MARK: - UI
     private let habitButton: UIButton = {
@@ -31,6 +35,9 @@ final class TrackerTypeSelectionViewController: UIViewController {
         return button
     }()
     
+    // MARK: - Public properties
+    weak var delegate: TrackerTypeSelectionViewControllerDelegate?
+    
     // MARK: - Life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,6 +51,7 @@ final class TrackerTypeSelectionViewController: UIViewController {
     @objc private func buttonDidTap(_ sender: UIButton) {
         let type = sender == habitButton ? TrackerType.habit : TrackerType.irregular
         let trackerDetailsVC = TrackerDetailsViewController(trackerType: type)
+        trackerDetailsVC.delegate = self
         navigationController?.pushViewController(trackerDetailsVC, animated: true)
     }
     
@@ -75,5 +83,11 @@ final class TrackerTypeSelectionViewController: UIViewController {
             irregularEventButton.widthAnchor.constraint(equalToConstant: 335),
             irregularEventButton.heightAnchor.constraint(equalToConstant: 60)
         ])
+    }
+}
+
+extension TrackerTypeSelectionViewController: TrackerDetailsViewControllerDelegate {
+    func trackersDidChanged() {
+        delegate?.reloadCollectionView()
     }
 }

@@ -23,27 +23,41 @@ struct GeometricParams {
     }
 }
 
+// MARK: - SupplementaryCollectionDelegate
 protocol SupplementaryCollectionDelegate: AnyObject {
     func getSelectedData() -> Date
     func updateCell(with index: IndexPath)
 }
 
+// MARK: - SupplementaryCollection
 final class SupplementaryCollection: NSObject {
+    // MARK: - Static properties
     static let trackerCellIdentifier = "TrackersCell"
     
+    // MARK: - Private properties
     private let params: GeometricParams
     private var categories: [TrackerCategory]
+    private var isNotEmptyCategory: [TrackerCategory] {
+        categories.filter({ !$0.trackers.isEmpty })}
     private var completedTrackers: [TrackerRecord]
     private var selectedDate = Date()
     private var trackersFactory = TrackersFactory.shared
     
+    // MARK: - Public properties
     weak var delegate: SupplementaryCollectionDelegate?
     weak var collectionView: UICollectionView?
     
+    // MARK: - Initializes
     init(categories: [TrackerCategory], completedTrackers: [TrackerRecord], using params: GeometricParams) {
         self.categories = categories
         self.completedTrackers = completedTrackers
         self.params = params
+    }
+    
+    // MARK: - Public methods
+    func updateData(categories: [TrackerCategory], completed: [TrackerRecord]) {
+        self.categories = categories
+        self.completedTrackers = completed
     }
 }
 
@@ -53,7 +67,7 @@ extension SupplementaryCollection: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        categories[section].trackers.count
+        isNotEmptyCategory[section].trackers.count
     }
     
     func collectionView(
@@ -63,8 +77,8 @@ extension SupplementaryCollection: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: SupplementaryCollection.trackerCellIdentifier,
             for: indexPath) as! TrackersCell
-        
-        let tracker = categories[indexPath.section].trackers[indexPath.row]
+
+        let tracker = isNotEmptyCategory[indexPath.section].trackers[indexPath.row]
         let completedCount = completedTrackers.filter({$0.trackerId == tracker.id}).count
         
         cell.delegate = self
@@ -80,7 +94,7 @@ extension SupplementaryCollection: UICollectionViewDataSource {
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        categories.count
+        isNotEmptyCategory.count
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -96,7 +110,7 @@ extension SupplementaryCollection: UICollectionViewDataSource {
             for: indexPath
         ) as! SupplementaryView
         
-        header.configure(title: categories[indexPath.section].title)
+        header.configure(title: isNotEmptyCategory[indexPath.section].title)
         return header
     }
 }
@@ -135,14 +149,15 @@ extension SupplementaryCollection: UICollectionViewDelegateFlowLayout {
     }
 }
 
+// MARK: - TrackersCellDelegate
 extension SupplementaryCollection: TrackersCellDelegate {
 
     func didTapAddButton(in cell: TrackersCell) {
         guard let collectionView,
               let indexPath = collectionView.indexPath(for: cell),
               let delegate else { return }
-
-        let tracker = categories[indexPath.section].trackers[indexPath.row]
+        
+        let tracker = isNotEmptyCategory[indexPath.section].trackers[indexPath.row]
         
         let isDone = !(completedTrackers.filter({
             $0.trackerId == tracker.id
@@ -190,5 +205,3 @@ extension SupplementaryCollection: TrackersCellDelegate {
         delegate?.updateCell(with: indexPath)
     }
 }
-
-

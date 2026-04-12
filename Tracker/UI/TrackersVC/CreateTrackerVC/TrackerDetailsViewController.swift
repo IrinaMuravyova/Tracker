@@ -13,6 +13,10 @@ private struct ViewModel {
     var schedule: Set<Weekday>
 }
 
+protocol TrackerDetailsViewControllerDelegate: AnyObject {
+    func trackersDidChanged()
+}
+
 final class TrackerDetailsViewController: UIViewController {
     // MARK: - UI
     private let titleTF = UITextField()
@@ -44,6 +48,7 @@ final class TrackerDetailsViewController: UIViewController {
     )
     private var scheduleSettingsVC = ScheduleSettingsVC()
     private let trackerFactory = TrackersFactory.shared
+    weak var delegate: TrackerDetailsViewControllerDelegate?
     
     // MARK: - Initializes
     init(trackerType: TrackerType) {
@@ -104,6 +109,7 @@ final class TrackerDetailsViewController: UIViewController {
             type: trackerType)
         
         trackerFactory.trackerDidAdd(newTracker, category: viewModel.category)
+        delegate?.trackersDidChanged()
         dismiss(animated: true)
     }
     
@@ -116,7 +122,6 @@ final class TrackerDetailsViewController: UIViewController {
 // MARK: - Private methods
 private extension TrackerDetailsViewController {
     private func updateSaveButtonState() {
-        print("updateSaveButtonState CALLED")
         let isValid: Bool = {
             if trackerType == .habit {
                 return !viewModel.title.isEmpty &&

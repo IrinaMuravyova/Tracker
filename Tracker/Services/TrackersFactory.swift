@@ -23,7 +23,7 @@ class TrackersFactory {
                 name: "Поливать растение",
                 color: .colorselection5,
                 emoji: "❤️",
-                schedule: [],
+                schedule: TrackerSchedule.daysOfWeek([]),
                 type: .habit
             ),
             Tracker(
@@ -31,7 +31,7 @@ class TrackersFactory {
                 name: "Кошка заслонила камеру на созвоне",
                 color: .colorselection2,
                 emoji: "😻",
-                schedule: [],
+                schedule: TrackerSchedule.daysOfWeek([]),
                 type: .habit
             ),
             Tracker(
@@ -39,7 +39,7 @@ class TrackersFactory {
                 name: "Бабушка прислала открытку в ватсапе",
                 color: .colorselection1,
                 emoji: "🌺",
-                schedule: [],
+                schedule: TrackerSchedule.daysOfWeek([]),
                 type: .habit
             ),
             Tracker(
@@ -47,12 +47,13 @@ class TrackersFactory {
                 name: "Свидание в апреле",
                 color: .colorselection14,
                 emoji: "❤️",
-                schedule: [],
+                schedule: TrackerSchedule.daysOfWeek([]),
                 type: .habit
             )
         ]
         
         trackerCategory = [
+            TrackerCategory(title: "Важное", trackers: []),
             TrackerCategory(title: "Домашний уют", trackers: [trackers[0]]),
             TrackerCategory(title: "Радостные мелочи", trackers: [trackers[1], trackers[2], trackers[3]])
         ]
@@ -109,5 +110,19 @@ extension TrackersFactory {
         
         guard let index else { return }
         self.trackersRecords.remove(at: index)
+    }
+    
+    func trackerDidAdd(_ tracker: Tracker,  category: String) {
+        if let index = trackerCategory.firstIndex(where: {$0.title == category}) {
+            self.trackerCategory[index].trackers.append(tracker)
+            self.trackers.append(tracker)
+            
+        } else {
+            let newCategory = TrackerCategory(
+                title: category,
+                trackers: [tracker]
+            )
+            self.trackerCategory.append(newCategory)
+        }
     }
 }
