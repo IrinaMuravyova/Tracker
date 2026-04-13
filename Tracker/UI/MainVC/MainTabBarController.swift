@@ -10,13 +10,16 @@ import UIKit
 class MainTabBarController: UITabBarController {
     
     override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        setupAppearance()
         
         let trackersVC = TrackersViewController()
         trackersVC.tabBarItem = UITabBarItem(
             title: "Трекеры",
             image: UIImage(systemName: "record.circle.fill"),
             selectedImage: nil
-            )
+        )
         let trackersNavVC = UINavigationController(rootViewController: trackersVC)
         
         let statisticsVC = StatisticsViewController()
@@ -28,5 +31,33 @@ class MainTabBarController: UITabBarController {
         let statisticsNavVC = UINavigationController(rootViewController: statisticsVC)
         
         viewControllers = [trackersNavVC, statisticsNavVC]
+    }
+    
+    private func setupAppearance() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()
+        
+        // icon
+        appearance.stackedLayoutAppearance.selected.iconColor = .systemBlue
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
+            .foregroundColor: UIColor.tintSwitch,
+        ]
+        
+        appearance.stackedLayoutAppearance.normal.iconColor = .gray
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
+            .foregroundColor: UIColor.gray
+        ]
+        
+        // text
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
+            .foregroundColor: UIColor.gray
+        ]
+        
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
+            .foregroundColor: UIColor.systemBlue
+        ]
+        
+        tabBar.standardAppearance = appearance
+        tabBar.scrollEdgeAppearance = appearance
     }
 }
