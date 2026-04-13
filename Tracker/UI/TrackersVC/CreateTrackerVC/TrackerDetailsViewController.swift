@@ -82,7 +82,9 @@ final class TrackerDetailsViewController: UIViewController {
         
         scheduleSettingsVC.delegate = self
         
-        scheduleView?.onTap = {
+        scheduleView?.onTap = { [weak self] in
+            guard let self else { return }
+            
             self.scheduleSettingsVC.title = self.scheduleView?.getTitle()
             self.navigationController?.pushViewController(self.scheduleSettingsVC, animated: true)
         }
