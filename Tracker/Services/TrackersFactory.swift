@@ -23,7 +23,7 @@ class TrackersFactory {
                 name: "Поливать растение",
                 color: .colorselection5,
                 emoji: "❤️",
-                schedule: TrackerSchedule.daysOfWeek([]),
+                schedule: TrackerSchedule.daysOfWeek([.monday]),
                 type: .habit
             ),
             Tracker(
@@ -31,7 +31,7 @@ class TrackersFactory {
                 name: "Кошка заслонила камеру на созвоне",
                 color: .colorselection2,
                 emoji: "😻",
-                schedule: TrackerSchedule.daysOfWeek([]),
+                schedule: TrackerSchedule.daysOfWeek([.tuesday]),
                 type: .habit
             ),
             Tracker(
@@ -39,7 +39,7 @@ class TrackersFactory {
                 name: "Бабушка прислала открытку в ватсапе",
                 color: .colorselection1,
                 emoji: "🌺",
-                schedule: TrackerSchedule.daysOfWeek([]),
+                schedule: TrackerSchedule.daysOfWeek([.monday, .thursday]),
                 type: .habit
             ),
             Tracker(
@@ -47,7 +47,7 @@ class TrackersFactory {
                 name: "Свидание в апреле",
                 color: .colorselection14,
                 emoji: "❤️",
-                schedule: TrackerSchedule.daysOfWeek([]),
+                schedule: TrackerSchedule.daysOfWeek([.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]),
                 type: .habit
             )
         ]

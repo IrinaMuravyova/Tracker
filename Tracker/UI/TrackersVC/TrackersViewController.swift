@@ -13,6 +13,12 @@ final class TrackersViewController: UIViewController {
         let layout = UICollectionViewFlowLayout()
         return UICollectionView(frame: .zero, collectionViewLayout: layout)
     }()
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy"
+        return formatter
+    }()
+    
     private let datePicker = UIDatePicker()
     private let titleLabel = UILabel()
     private let emptyStageView = UIView()
@@ -21,7 +27,6 @@ final class TrackersViewController: UIViewController {
     private let textFieldInsideSearchBar = UITextField()
     private var addTrackerButtonItem = UIBarButtonItem()
     private let filterButton = UIButton()
-    private let datePickerContainer = UIView()
     
     // MARK: - Private properties
     private var categories: [TrackerCategory] = []
@@ -36,13 +41,10 @@ final class TrackersViewController: UIViewController {
                                  cellSpacing: 8)
     var helper: SupplementaryCollection?
     
-    
     // MARK: - Life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad( )
-        categories = trackersFactory.getTrackersCategory()
-        completedTrackers = trackersFactory.getCompletedTrackers()
-        
+        fetchData()
         setupUI()
         
         if categories.isEmpty {
@@ -56,10 +58,8 @@ final class TrackersViewController: UIViewController {
     // MARK: - Objc methods
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         let selectedDate = sender.date
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd.MM.yyyy"
-        let formattedDate = dateFormatter.string(from: selectedDate)
-        print("Выбранная дата: \(formattedDate)")
+        print("Выбранная дата: \(formatDate(selectedDate))")
+        collectionView.reloadData()
     }
     
     @objc private func addTrackerButtonTapped() {
@@ -74,7 +74,7 @@ final class TrackersViewController: UIViewController {
 
 // MARK: - SupplementaryCollectionDelegate
 extension TrackersViewController: SupplementaryCollectionDelegate {
-    func getSelectedData() -> Date {
+    func getSelectedDate() -> Date {
         datePicker.date
     }
     
@@ -166,26 +166,17 @@ private extension TrackersViewController {
     }
     
     func setupDatePicker() {
-        datePickerContainer.backgroundColor = .innerFields
-        datePickerContainer.layer.cornerRadius = 10
-        datePickerContainer.clipsToBounds = true
-        
-        datePicker.translatesAutoresizingMaskIntoConstraints = false
-        datePickerContainer.addSubview(datePicker)
-        
-        NSLayoutConstraint.activate([
-            datePicker.topAnchor.constraint(equalTo: datePickerContainer.topAnchor, constant: 8),
-            datePicker.bottomAnchor.constraint(equalTo: datePickerContainer.bottomAnchor, constant: -8),
-            datePicker.leadingAnchor.constraint(equalTo: datePickerContainer.leadingAnchor, constant: 8),
-            datePicker.trailingAnchor.constraint(equalTo: datePickerContainer.trailingAnchor, constant: -8)
-        ])
-        
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .compact
+        datePicker.date = Date()
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
         
         datePicker.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .valueChanged)
+    }
+    
+    func formatDate(_ date: Date) -> String {
+        dateFormatter.string(from: date)
     }
     
     func setupFilterButton() {
@@ -208,6 +199,7 @@ private extension TrackersViewController {
         
         collectionView.dataSource = helper
         collectionView.delegate = helper
+        
         collectionView.register(
             TrackersCell.self,
             forCellWithReuseIdentifier: SupplementaryCollection.trackerCellIdentifier
