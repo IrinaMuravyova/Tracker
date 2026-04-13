@@ -62,8 +62,6 @@ final class SupplementaryCollection: NSObject {
     // MARK: - Public methods
     func updateData(categories: [TrackerCategory], completed: [TrackerRecord]) {
         self.categories = categories
-        guard let date = delegate?.getSelectedDate() else { return }
-        self.categories = filteredCategories(for: date)
         self.completedTrackers = completed
     }
     
