@@ -46,7 +46,7 @@ final class SupplementaryCollection: NSObject {
     private let params: GeometricParams
     private var categories: [TrackerCategory]
     private var completedTrackers: [TrackerRecord]
-    private var trackersFactory = TrackersFactory.shared
+    private var trackersFactory: TrackersFactoryProtocol? = TrackersFactory.shared
     
     // MARK: - Public properties
     weak var delegate: SupplementaryCollectionDelegate?
@@ -228,7 +228,7 @@ extension SupplementaryCollection: TrackersCellDelegate {
         let newRecord = TrackerRecord(trackerId: trackerId, date: date)
         completedTrackers.append(newRecord)
         
-        trackersFactory.trackerRecordsDidUpdated(with: newRecord)
+        trackersFactory?.trackerRecordsDidUpdated(with: newRecord)
     }
     
     private func deleteTrackerRecord(trackerId: UUID) {
@@ -243,10 +243,11 @@ extension SupplementaryCollection: TrackersCellDelegate {
         guard let index else { return }
         completedTrackers.remove(at: index)
         
-        trackersFactory.trackerRecordDidCanceled(for: trackerId, at: date)
+        trackersFactory?.trackerRecordDidCanceled(for: trackerId, at: date)
     }
     
     private func updateCell(with indexPath: IndexPath) {
+        guard let trackersFactory else { return }
         categories = trackersFactory.getTrackersCategory()
         completedTrackers = trackersFactory.getCompletedTrackers()
         

@@ -32,7 +32,7 @@ final class TrackersViewController: UIViewController {
     private var categories: [TrackerCategory] = []
     private var completedTrackers: [TrackerRecord] = []
     private var changedTrackerId: UUID?
-    private let trackersFactory = TrackersFactory.shared
+    private let trackersFactory: TrackersFactoryProtocol? = TrackersFactory.shared
     
     // MARK: - Public properties
     let params = GeometricParams(cellCount: 2,
@@ -97,6 +97,7 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     }
     
     private func fetchData() {
+        guard let trackersFactory else { return }
         categories = trackersFactory.getTrackersCategory()
         completedTrackers = trackersFactory.getCompletedTrackers()
     }

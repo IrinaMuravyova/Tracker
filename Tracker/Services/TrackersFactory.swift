@@ -8,13 +8,17 @@
 import UIKit
 
 class TrackersFactory {
+    // MARK: - Static properties
     static let shared = TrackersFactory()
+    
+    // MARK: - Private properties
     private let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
     private var trackersId: [UUID] = []
     private var trackers: [Tracker] = []
     private var trackerCategory: [TrackerCategory] = []
     private var trackersRecords: [TrackerRecord] = []
     
+    // MARK: - Initializes
     private init () {
         setId()
         self.trackers = [
@@ -77,6 +81,7 @@ class TrackersFactory {
         ]
     }
     
+    // MARK: - Private functions
     private func setId() {
         self.trackersId = [
         UUID(uuidString: "F8A3AFEF-0D47-4EBF-8070-D8DC1D119D04")!,
@@ -85,8 +90,10 @@ class TrackersFactory {
         UUID(uuidString:"CD4E5590-C456-4ABB-91BA-C95D76250DE5")!
         ]
     }
+}
 
-    // MARK: - Public functions
+// MARK: - TrackersFactoryProtocol
+extension TrackersFactory: TrackersFactoryProtocol {
     func getTrackersCategory() -> [TrackerCategory] {
         return trackerCategory
     }
@@ -94,9 +101,7 @@ class TrackersFactory {
     func getCompletedTrackers() -> [TrackerRecord] {
         return trackersRecords
     }
-}
-
-extension TrackersFactory {
+    
     func trackerRecordsDidUpdated(with record: TrackerRecord) {
         self.trackersRecords.append(record)
     }

@@ -47,7 +47,7 @@ final class TrackerDetailsViewController: UIViewController {
         schedule: []
     )
     private var scheduleSettingsVC = ScheduleSettingsVC()
-    private let trackerFactory = TrackersFactory.shared
+    private let trackerFactory: TrackersFactoryProtocol? = TrackersFactory.shared
     weak var delegate: TrackerDetailsViewControllerDelegate?
     
     // MARK: - Initializes
@@ -99,6 +99,8 @@ final class TrackerDetailsViewController: UIViewController {
     }
     
     @objc private func saveButtonDidTap() {
+        guard let trackerFactory else { return }
+        
         //TODO: сохранить в базу в фоне
         let newTracker = Tracker(
             id: UUID(),
