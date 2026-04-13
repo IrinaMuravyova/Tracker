@@ -17,7 +17,7 @@ class MainTabBarController: UITabBarController {
         let trackersVC = TrackersViewController()
         trackersVC.tabBarItem = UITabBarItem(
             title: "Трекеры",
-            image: UIImage(systemName: "record.circle.fill"),
+            image: UIImage(systemName: "record.circle.fill")?.withRenderingMode(.alwaysOriginal),
             selectedImage: nil
         )
         let trackersNavVC = UINavigationController(rootViewController: trackersVC)
@@ -25,7 +25,7 @@ class MainTabBarController: UITabBarController {
         let statisticsVC = StatisticsViewController()
         statisticsVC.tabBarItem = UITabBarItem(
             title: "Статистика",
-            image: UIImage(systemName: "hare.fill"),
+            image: UIImage(systemName: "hare.fill")?.withRenderingMode(.alwaysOriginal),
             selectedImage: nil
         )
         let statisticsNavVC = UINavigationController(rootViewController: statisticsVC)
@@ -40,7 +40,7 @@ class MainTabBarController: UITabBarController {
         // icon
         appearance.stackedLayoutAppearance.selected.iconColor = .systemBlue
         appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
-            .foregroundColor: UIColor.tintSwitch,
+            .foregroundColor: UIColor.onTintSwitch,
         ]
         
         appearance.stackedLayoutAppearance.normal.iconColor = .gray
