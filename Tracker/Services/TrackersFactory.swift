@@ -53,11 +53,19 @@ class TrackersFactory {
                 emoji: "❤️",
                 schedule: TrackerSchedule.daysOfWeek([.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]),
                 type: .habit
+            ),
+            Tracker(
+                id: trackersId[4],
+                name: "Сдать проект",
+                color: .colorselection14,
+                emoji: "❤️",
+                schedule: TrackerSchedule.daysOfWeek([]),
+                type: .irregular
             )
         ]
         
         trackerCategory = [
-            TrackerCategory(title: "Важное", trackers: []),
+            TrackerCategory(title: "Важное", trackers: [trackers[4]]),
             TrackerCategory(title: "Домашний уют", trackers: [trackers[0]]),
             TrackerCategory(title: "Радостные мелочи", trackers: [trackers[1], trackers[2], trackers[3]])
         ]
@@ -87,7 +95,8 @@ class TrackersFactory {
         UUID(uuidString: "F8A3AFEF-0D47-4EBF-8070-D8DC1D119D04")!,
         UUID(uuidString: "107C3003-CAC0-4299-B468-B05AB3F6675D")!,
         UUID(uuidString: "7C072853-EF2D-4EF0-A10D-6EE73339CDC8")!,
-        UUID(uuidString:"CD4E5590-C456-4ABB-91BA-C95D76250DE5")!
+        UUID(uuidString: "CD4E5590-C456-4ABB-91BA-C95D76250DE5")!,
+        UUID(uuidString: "A3F1C2B4-9D6E-4C8A-8F12-7E5B3D91A6C0")!
         ]
     }
 }

@@ -71,9 +71,23 @@ final class SupplementaryCollection: NSObject {
         
         return categories.compactMap { category in
             let filteredTrackers = category.trackers.filter { tracker in
-                switch tracker.schedule {
-                case .daysOfWeek(let days):
-                    return days.contains(currentWeekday)
+                
+                switch tracker.type {
+                    
+                case .habit:
+                    switch tracker.schedule {
+                    case .daysOfWeek(let days):
+                        return days.contains(currentWeekday)
+                    }
+                    
+                case .irregular:
+                    guard let selectedDate = delegate?.getSelectedDate() else { return false }
+                    
+                    let trackerRecords = completedTrackers.filter { $0.trackerId == tracker.id }
+                    
+                    if let record = trackerRecords.first {
+                        return isOnOrAfter(record.date, selectedDate)
+                    } else { return true }
                 }
             }
             
@@ -81,6 +95,12 @@ final class SupplementaryCollection: NSObject {
             
             return TrackerCategory(title: category.title, trackers: filteredTrackers)
         }
+    }
+    func isOnOrAfter(_ date1: Date, _ date2: Date) -> Bool {
+        let calendar = Calendar.current
+        let d1 = calendar.startOfDay(for: date1)
+        let d2 = calendar.startOfDay(for: date2)
+        return d1 == d2
     }
 }
 
