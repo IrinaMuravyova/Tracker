@@ -44,6 +44,8 @@ final class ScheduleSettingsVC: UIViewController {
 // MARK: - UI setting methods
 private extension ScheduleSettingsVC {
     func setupUI() {
+        view.backgroundColor = .white
+        
         tableView.separatorStyle = .none
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
