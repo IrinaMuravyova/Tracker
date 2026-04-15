@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		88F7A7B92F75277900FAFC29 /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8868C9442F8941D70060D85B /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -46,16 +46,8 @@
 			isa = PBXGroup;
 			children = (
 				88F7A7BB2F75277900FAFC29 /* Tracker */,
-				88F7A7BA2F75277900FAFC29 /* Products */,
+				8868C9442F8941D70060D85B /* Tracker.app */,
 			);
-			sourceTree = "<group>";
-		};
-		88F7A7BA2F75277900FAFC29 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				88F7A7B92F75277900FAFC29 /* Tracker.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -80,7 +72,7 @@
 			packageProductDependencies = (
 			);
 			productName = Tracker;
-			productReference = 88F7A7B92F75277900FAFC29 /* Tracker.app */;
+			productReference = 8868C9442F8941D70060D85B /* Tracker.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -108,7 +100,7 @@
 			mainGroup = 88F7A7B02F75277900FAFC29;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 88F7A7BA2F75277900FAFC29 /* Products */;
+			productRefGroup = 88F7A7B02F75277900FAFC29;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -151,7 +143,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -186,7 +178,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
