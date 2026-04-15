@@ -42,6 +42,13 @@ final class SupplementaryCollection: NSObject {
         self.completedTrackers = completed
     }
     
+    func isOnOrAfter(_ date1: Date, _ date2: Date) -> Bool {
+        let calendar = Calendar.current
+        let d1 = calendar.startOfDay(for: date1)
+        let d2 = calendar.startOfDay(for: date2)
+        return d1 == d2
+    }
+    
     // MARK: - Private methods
     private func filteredCategories(for date: Date) -> [TrackerCategory] {
         let currentWeekday = date.weekday()
@@ -72,12 +79,6 @@ final class SupplementaryCollection: NSObject {
             
             return TrackerCategory(title: category.title, trackers: filteredTrackers)
         }
-    }
-    func isOnOrAfter(_ date1: Date, _ date2: Date) -> Bool {
-        let calendar = Calendar.current
-        let d1 = calendar.startOfDay(for: date1)
-        let d2 = calendar.startOfDay(for: date2)
-        return d1 == d2
     }
 }
 
