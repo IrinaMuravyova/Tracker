@@ -41,12 +41,13 @@ final class TrackerDetailsViewController: UIViewController {
     
     // MARK: - Private properties
     private let trackerType: TrackerType
-    private var viewModel = TrackerDraft(
+    private var trackerDraft = TrackerDraft(
         title: "",
         category: "",
         schedule: []
     )
-    private var scheduleSettingsVC = ScheduleSettingsVC()
+    private let scheduleSettingsVC = ScheduleSettingsVC()
+    private let categoriesSettingsVC = CategoriesViewController()
     private let trackerFactory: TrackersFactoryProtocol? = TrackersFactory.shared
     weak var delegate: TrackerDetailsViewControllerDelegate?
     
@@ -81,6 +82,14 @@ final class TrackerDetailsViewController: UIViewController {
         }
         
         scheduleSettingsVC.delegate = self
+        categoriesSettingsVC.delegate = self
+        
+        categoryView?.onTap = { [weak self] in
+            guard let self else { return }
+            
+            self.categoriesSettingsVC.title = self.categoryView?.getTitle()
+            self.navigationController?.pushViewController(self.categoriesSettingsVC, animated: true)
+        }
         
         scheduleView?.onTap = { [weak self] in
             guard let self else { return }
@@ -106,19 +115,19 @@ final class TrackerDetailsViewController: UIViewController {
         //TODO: сохранить в базу в фоне
         let newTracker = Tracker(
             id: UUID(),
-            name: viewModel.title,
+            name: trackerDraft.title,
             color: TrackerColor.colorselection1,
             emoji: "",
-            schedule: TrackerSchedule.daysOfWeek(viewModel.schedule),
+            schedule: TrackerSchedule.daysOfWeek(trackerDraft.schedule),
             type: trackerType)
         
-        trackerFactory.trackerDidAdd(newTracker, category: viewModel.category)
+        trackerFactory.trackerDidAdd(newTracker, category: trackerDraft.category)
         delegate?.trackersDidChanged()
         dismiss(animated: true)
     }
     
     @objc private func titleDidChange(_ textField: UITextField) {
-        viewModel.title = textField.text ?? ""
+        trackerDraft.title = textField.text ?? ""
         updateSaveButtonState()
     }
 }
@@ -128,12 +137,12 @@ private extension TrackerDetailsViewController {
     private func updateSaveButtonState() {
         let isValid: Bool = {
             if trackerType == .habit {
-                return !viewModel.title.isEmpty &&
-                       !viewModel.category.isEmpty &&
-                       !viewModel.schedule.isEmpty
+                return !trackerDraft.title.isEmpty &&
+                       !trackerDraft.category.isEmpty &&
+                       !trackerDraft.schedule.isEmpty
             } else {
-                return !viewModel.title.isEmpty &&
-                       !viewModel.category.isEmpty
+                return !trackerDraft.title.isEmpty &&
+                       !trackerDraft.category.isEmpty
             }
         }()
         
@@ -212,9 +221,6 @@ private extension TrackerDetailsViewController {
             subTitle: ""
         )
         
-        categoryView?.setSubtitle("Важное")
-        viewModel.category = "Важное"
-     
         scheduleView = BaseDetailsItem(
             withTitle: "Расписание",
             subTitle: ""
@@ -340,7 +346,7 @@ extension TrackerDetailsViewController: UITextFieldDelegate {
         guard let text = textField.text, !text.isEmpty else {
             return false
         }
-        viewModel.title = text
+        trackerDraft.title = text
         textField.resignFirstResponder()
         return true
     }
@@ -349,19 +355,32 @@ extension TrackerDetailsViewController: UITextFieldDelegate {
 // MARK: - ScheduleSettingsVCProtocol
 extension TrackerDetailsViewController: ScheduleSettingsVCProtocol {
     func scheduleDidSetup(for days: Set<Weekday>) {
-        viewModel.schedule = days
+        trackerDraft.schedule = days
         updateScheduleView()
         updateSaveButtonState()
     }
     
     private func updateScheduleView() {
-        let daysString = viewModel.schedule.count == Weekday.allCases.count
+        let daysString = trackerDraft.schedule.count == Weekday.allCases.count
         ? "Каждый день"
-        : viewModel.schedule
+        : trackerDraft.schedule
             .sorted(by: { $0.rawValue < $1.rawValue })
             .map(\.shortTitle)
             .joined(separator: ", ")
         scheduleView?.setSubtitle(daysString)
         scheduleView?.reloadInputViews()
+    }
+}
+
+extension TrackerDetailsViewController: CategoriesViewControllerProtocol {
+    func categoryDidSelected(for category: String) {
+        trackerDraft.category = category
+        updateCategoryView(with: category)
+        updateSaveButtonState()
+    }
+    
+    private func updateCategoryView(with category: String) {
+        categoryView?.setSubtitle(category)
+        categoryView?.reloadInputViews()
     }
 }
