@@ -20,13 +20,6 @@ final class SupplementaryCollection: NSObject {
     static let trackerCellIdentifier = "TrackersCell"
     
     // MARK: - Private properties
-    private func weekday(from date: Date) -> Weekday {
-        let calendar = Calendar.current
-        let weekdayNumber = calendar.component(.weekday, from: date)
-        let mappedValue = weekdayNumber == 1 ? 7 : weekdayNumber - 1
-        return Weekday(rawValue: mappedValue)!
-    }
-    
     private let params: GeometricParams
     private var categories: [TrackerCategory]
     private var completedTrackers: [TrackerRecord]
@@ -51,7 +44,7 @@ final class SupplementaryCollection: NSObject {
     
     // MARK: - Private methods
     private func filteredCategories(for date: Date) -> [TrackerCategory] {
-        let currentWeekday = weekday(from: date)
+        let currentWeekday = date.weekday()
         
         return categories.compactMap { category in
             let filteredTrackers = category.trackers.filter { tracker in
