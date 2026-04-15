@@ -32,6 +32,7 @@ final class TrackersViewController: UIViewController {
     private var categories: [TrackerCategory] = []
     private var completedTrackers: [TrackerRecord] = []
     private var changedTrackerId: UUID?
+    private var currentDate: Date = Date()
     private let trackersFactory: TrackersFactoryProtocol? = TrackersFactory.shared
     
     // MARK: - Public properties
@@ -57,8 +58,7 @@ final class TrackersViewController: UIViewController {
     
     // MARK: - Objc methods
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
-        let selectedDate = sender.date
-        print("Выбранная дата: \(formatDate(selectedDate))")
+        currentDate = sender.date
         collectionView.reloadData()
     }
     
@@ -75,7 +75,7 @@ final class TrackersViewController: UIViewController {
 // MARK: - SupplementaryCollectionDelegate
 extension TrackersViewController: SupplementaryCollectionDelegate {
     func getSelectedDate() -> Date {
-        datePicker.date
+        currentDate
     }
     
     func updateCell(with index: IndexPath) {
@@ -175,7 +175,7 @@ private extension TrackersViewController {
     func setupDatePicker() {
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .compact
-        datePicker.date = Date()
+        datePicker.date = currentDate
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
         
