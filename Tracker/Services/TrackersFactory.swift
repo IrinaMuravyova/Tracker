@@ -54,15 +54,14 @@ extension TrackersFactory: TrackersFactoryProtocol {
     
     func trackerDidAdd(_ tracker: Tracker,  category: String) {
         if let index = trackerCategory.firstIndex(where: {$0.title == category}) {
-            self.trackerCategory[index].trackers.append(tracker)
-            self.trackers.append(tracker)
-            
+            trackerCategory = trackerCategory.enumerated().map { i, cat in
+                i == index ? cat.addingTracker(tracker) : cat
+            }
         } else {
-            let newCategory = TrackerCategory(
-                title: category,
-                trackers: [tracker]
-            )
-            self.trackerCategory.append(newCategory)
+            trackerCategory = trackerCategory + [
+                TrackerCategory(title: category, trackers: [tracker])
+            ]
         }
+        trackers.append(tracker)
     }
 }

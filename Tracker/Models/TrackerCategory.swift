@@ -6,6 +6,13 @@
 //
 
 struct TrackerCategory {
-    let title: String
-    var trackers: [Tracker]
+    let title: String,
+        trackers: [Tracker]
+    
+    func addingTracker(_ tracker: Tracker) -> TrackerCategory {
+        return TrackerCategory(
+            title: self.title,
+            trackers: self.trackers + [tracker]
+        )
+    }
 }
