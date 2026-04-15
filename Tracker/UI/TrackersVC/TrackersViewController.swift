@@ -120,12 +120,18 @@ extension TrackersViewController: TrackerTypeSelectionViewControllerDelegate {
 // MARK: - UI settings methods
 private extension TrackersViewController {
     func setupUI() {
-        setupNavButton()
+        view.backgroundColor = .white
+        setupNavBar()
         setupTitle()
         setupSearchBar()
         setupFilterButton()
         setupCollectionView()
         setupConstraints()
+    }
+    
+    func setupNavBar() {
+        navigationController?.navigationBar.backgroundColor = .white
+        setupNavButton()
     }
     
     func setupNavButton() {
