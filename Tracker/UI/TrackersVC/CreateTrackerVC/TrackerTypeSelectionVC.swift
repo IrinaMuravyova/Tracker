@@ -60,6 +60,9 @@ final class TrackerTypeSelectionViewController: UIViewController {
         view.backgroundColor = .white
         
         let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.shadowColor = nil
+        
         appearance.titleTextAttributes = [
             .foregroundColor: UIColor.blackDay
         ]
