@@ -145,6 +145,7 @@ private extension TrackerDetailsViewController {
 // MARK: - UI settings methods
 private extension TrackerDetailsViewController {
     func setupUI() {
+        view.backgroundColor = .white
         setupScrollView()
         setupTitleStack()
         setupDetailsView()
