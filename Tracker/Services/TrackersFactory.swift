@@ -20,84 +20,10 @@ class TrackersFactory {
     
     // MARK: - Initializes
     private init () {
-        setId()
-        self.trackers = [
-            Tracker(
-                id: trackersId[0],
-                name: "Поливать растение",
-                color: .colorselection5,
-                emoji: "❤️",
-                schedule: TrackerSchedule.daysOfWeek([.monday]),
-                type: .habit
-            ),
-            Tracker(
-                id: trackersId[1],
-                name: "Кошка заслонила камеру на созвоне",
-                color: .colorselection2,
-                emoji: "😻",
-                schedule: TrackerSchedule.daysOfWeek([.tuesday]),
-                type: .habit
-            ),
-            Tracker(
-                id: trackersId[2],
-                name: "Бабушка прислала открытку в ватсапе",
-                color: .colorselection1,
-                emoji: "🌺",
-                schedule: TrackerSchedule.daysOfWeek([.monday, .thursday]),
-                type: .habit
-            ),
-            Tracker(
-                id: trackersId[3],
-                name: "Свидание в апреле",
-                color: .colorselection14,
-                emoji: "❤️",
-                schedule: TrackerSchedule.daysOfWeek([.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]),
-                type: .habit
-            ),
-            Tracker(
-                id: trackersId[4],
-                name: "Сдать проект",
-                color: .colorselection14,
-                emoji: "❤️",
-                schedule: TrackerSchedule.daysOfWeek([]),
-                type: .irregular
-            )
-        ]
-        
-        trackerCategory = [
-            TrackerCategory(title: "Важное", trackers: [trackers[4]]),
-            TrackerCategory(title: "Домашний уют", trackers: [trackers[0]]),
-            TrackerCategory(title: "Радостные мелочи", trackers: [trackers[1], trackers[2], trackers[3]])
-        ]
-        
-        trackersRecords = [
-            TrackerRecord(trackerId: trackersId[0], date: yesterday),
-            TrackerRecord(trackerId: trackersId[1], date: yesterday),
-            TrackerRecord(trackerId: trackersId[1], date: yesterday),
-            TrackerRecord(trackerId: trackersId[1], date: yesterday),
-            TrackerRecord(trackerId: trackersId[1], date: yesterday),
-            TrackerRecord(trackerId: trackersId[1], date: yesterday),
-            TrackerRecord(trackerId: trackersId[2], date: yesterday),
-            TrackerRecord(trackerId: trackersId[2], date: yesterday),
-            TrackerRecord(trackerId: trackersId[2], date: yesterday),
-            TrackerRecord(trackerId: trackersId[2], date: yesterday),
-            TrackerRecord(trackerId: trackersId[3], date: yesterday),
-            TrackerRecord(trackerId: trackersId[3], date: yesterday),
-            TrackerRecord(trackerId: trackersId[3], date: yesterday),
-            TrackerRecord(trackerId: trackersId[3], date: yesterday),
-            TrackerRecord(trackerId: trackersId[3], date: yesterday),
-        ]
-    }
-    
-    // MARK: - Private functions
-    private func setId() {
-        self.trackersId = [
-        UUID(uuidString: "F8A3AFEF-0D47-4EBF-8070-D8DC1D119D04")!,
-        UUID(uuidString: "107C3003-CAC0-4299-B468-B05AB3F6675D")!,
-        UUID(uuidString: "7C072853-EF2D-4EF0-A10D-6EE73339CDC8")!,
-        UUID(uuidString: "CD4E5590-C456-4ABB-91BA-C95D76250DE5")!,
-        UUID(uuidString: "A3F1C2B4-9D6E-4C8A-8F12-7E5B3D91A6C0")!
-        ]
+        self.trackersId = Tracker.mockId()
+        self.trackers = Tracker.mock(trackersId: trackersId)
+        self.trackerCategory = TrackerCategory.mock(trackers: trackers)
+        self.trackersRecords = TrackerRecord.mock(trackersId: trackersId, date: yesterday)
     }
 }
 
