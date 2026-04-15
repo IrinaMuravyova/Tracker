@@ -214,6 +214,7 @@ private extension TrackersViewController {
     
     func setupAddTrackerButton() {
         addTrackerButtonItem.style = .plain
+        addTrackerButtonItem.tintColor = .blackDay
         addTrackerButtonItem.image = UIImage(systemName: "plus")
         addTrackerButtonItem.target = self
         addTrackerButtonItem.action = #selector(addTrackerButtonTapped)
