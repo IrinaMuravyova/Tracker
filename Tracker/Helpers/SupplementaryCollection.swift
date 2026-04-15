@@ -7,22 +7,6 @@
 
 import UIKit
 
-struct GeometricParams {
-    let cellCount: Int
-    let leftInset: CGFloat
-    let rightInset: CGFloat
-    let cellSpacing: CGFloat
-    let paddingWidth: CGFloat
-    
-    init(cellCount: Int, leftInset: CGFloat, rightInset: CGFloat, cellSpacing: CGFloat) {
-        self.cellCount = cellCount
-        self.leftInset = leftInset
-        self.rightInset = rightInset
-        self.cellSpacing = cellSpacing
-        self.paddingWidth = leftInset + rightInset + CGFloat(cellCount - 1) * cellSpacing
-    }
-}
-
 // MARK: - SupplementaryCollectionDelegate
 protocol SupplementaryCollectionDelegate: AnyObject {
     func getSelectedDate() -> Date
@@ -177,14 +161,14 @@ extension SupplementaryCollection: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        UIEdgeInsets(top: 16, left: params.leftInset, bottom: 16, right: params.rightInset)
+        UIEdgeInsets(top: 12, left: params.leftInset, bottom: 16, right: params.rightInset)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         
         let header = SupplementaryView(frame: .zero)
         header.configure(title: "пример для расчета высоты")
-        
+
         let targetSize = CGSize(
             width: collectionView.frame.width,
             height: UIView.layoutFittingExpandedSize.height
