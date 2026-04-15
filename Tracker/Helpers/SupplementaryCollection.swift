@@ -42,7 +42,7 @@ final class SupplementaryCollection: NSObject {
         self.completedTrackers = completed
     }
     
-    func isOnOrAfter(_ date1: Date, _ date2: Date) -> Bool {
+    func isSameDay(_ date1: Date, _ date2: Date) -> Bool {
         let calendar = Calendar.current
         let d1 = calendar.startOfDay(for: date1)
         let d2 = calendar.startOfDay(for: date2)
@@ -70,7 +70,7 @@ final class SupplementaryCollection: NSObject {
                     let trackerRecords = completedTrackers.filter { $0.trackerId == tracker.id }
                     
                     if let record = trackerRecords.first {
-                        return isOnOrAfter(record.date, selectedDate)
+                        return isSameDay(record.date, selectedDate)
                     } else { return true }
                 }
             }
