@@ -7,7 +7,7 @@
 
 import UIKit
 
-private struct ViewModel {
+private struct TrackerDraft {
     var title: String
     var category: String
     var schedule: Set<Weekday>
@@ -41,7 +41,7 @@ final class TrackerDetailsViewController: UIViewController {
     
     // MARK: - Private properties
     private let trackerType: TrackerType
-    private var viewModel = ViewModel(
+    private var viewModel = TrackerDraft(
         title: "",
         category: "",
         schedule: []
