@@ -36,6 +36,7 @@ class MainTabBarController: UITabBarController {
     private func setupAppearance() {
         let appearance = UITabBarAppearance()
         appearance.configureWithDefaultBackground()
+        appearance.backgroundColor = .white
         
         // icon
         appearance.stackedLayoutAppearance.selected.iconColor = .systemBlue
