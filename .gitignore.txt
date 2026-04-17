@@ -2,6 +2,7 @@
 # Xcode user data
 xcuserdata/
 *.xcuserstate
+**/xcuserdata/
 
 # Build artifacts
 build/

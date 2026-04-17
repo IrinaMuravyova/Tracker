@@ -1,0 +1,18 @@
+//
+//  TrackerCategory.swift
+//  Tracker
+//
+//  Created by Irina Muravyeva on 05.04.2026.
+//
+
+struct TrackerCategory {
+    let title: String,
+        trackers: [Tracker]
+    
+    func addingTracker(_ tracker: Tracker) -> TrackerCategory {
+        return TrackerCategory(
+            title: self.title,
+            trackers: self.trackers + [tracker]
+        )
+    }
+}
