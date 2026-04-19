@@ -345,7 +345,7 @@ private extension TrackerDetailsViewController {
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -76),
+            scrollView.bottomAnchor.constraint(equalTo: buttonStackView.topAnchor, constant: -16),
 
             // contentView
             contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
