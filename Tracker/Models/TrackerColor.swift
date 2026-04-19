@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum TrackerColor: String {
+enum TrackerColor: String, CaseIterable {
     case colorselection1, colorselection2, colorselection3, colorselection4, colorselection5, colorselection6, colorselection7, colorselection8, colorselection9, colorselection10, colorselection11, colorselection12,
          colorselection13, colorselection14, colorselection15,
          colorselection16, colorselection17, colorselection18

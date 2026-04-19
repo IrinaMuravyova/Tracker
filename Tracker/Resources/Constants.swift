@@ -11,3 +11,11 @@ enum CornersType {
     case upperLeftAndUpperRight
     case bottomLeftAndBottomRight
 }
+
+class Constants {
+    static let emojis = [
+        "🙂", "😻", "🌺", "🐶", "❤️", "😱",
+        "😇", "😡", "🥶", "🤔", "🙌", "🍔",
+        "🥦", "🏓", "🥇", "🎸", "🏝", "😪"
+    ]
+}
