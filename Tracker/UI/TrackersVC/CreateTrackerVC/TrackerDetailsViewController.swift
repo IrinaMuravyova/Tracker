@@ -325,6 +325,7 @@ private extension TrackerDetailsViewController {
         cancelButton.layer.borderWidth = 1
         cancelButton.layer.borderColor = UIColor.redFigma.cgColor
         cancelButton.layer.cornerRadius = 16
+        cancelButton.backgroundColor = .white
         
         saveButton.translatesAutoresizingMaskIntoConstraints = false
         saveButton.setTitle("Создать", for: .normal)
