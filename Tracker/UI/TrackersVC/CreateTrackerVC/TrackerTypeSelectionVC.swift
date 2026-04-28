@@ -35,9 +35,19 @@ final class TrackerTypeSelectionViewController: UIViewController {
         return button
     }()
     
+    // MARK: - Private properties
+    private let container: CoreDataContainer
+    
     // MARK: - Public properties
     weak var delegate: TrackerTypeSelectionViewControllerDelegate?
     
+    init(container: CoreDataContainer) {
+        self.container = container
+        super.init(nibName: nil, bundle: nil)
+    }
+    required init?(coder: NSCoder) {
+        fatalError("[TrackerTypeSelectionViewController] init(coder:) has not been implemented")
+    }
     // MARK: - Life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,7 +60,7 @@ final class TrackerTypeSelectionViewController: UIViewController {
     // MARK: - Objc methods
     @objc private func buttonDidTap(_ sender: UIButton) {
         let type = sender == habitButton ? TrackerType.habit : TrackerType.irregular
-        let trackerDetailsVC = TrackerDetailsViewController(trackerType: type)
+        let trackerDetailsVC = TrackerDetailsViewController(trackerType: type, container: container)
         trackerDetailsVC.delegate = self
         navigationController?.pushViewController(trackerDetailsVC, animated: true)
     }

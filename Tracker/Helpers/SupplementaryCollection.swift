@@ -96,6 +96,7 @@ extension SupplementaryCollection: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
+        print("CELL LOAD:", indexPath)
         guard let date = delegate?.getSelectedDate() else { return UICollectionViewCell()}
         
         let cell = collectionView.dequeueReusableCell(

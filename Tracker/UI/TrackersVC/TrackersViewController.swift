@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import CoreData
 
 final class TrackersViewController: UIViewController {
     // MARK: - UI
@@ -35,7 +34,18 @@ final class TrackersViewController: UIViewController {
     private var changedTrackerId: UUID?
     private var currentDate: Date = Date()
     private let trackersFactory: TrackersFactoryProtocol? = TrackersFactory.shared
-    private let trackerStore = TrackerStore()
+    private let container: CoreDataContainer
+
+    init(
+        container: CoreDataContainer
+    ) {
+        self.container = container
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("[TrackersViewController] init(coder:) has not been implemented")
+    }
     
     // MARK: - Public properties
     let params = GeometricParams(cellCount: 2,
@@ -68,15 +78,15 @@ final class TrackersViewController: UIViewController {
     @objc private func addTrackerButtonTapped() {
         guard navigationController?.visibleViewController == self else { return }
         
-        let trackerTypeVC = TrackerTypeSelectionViewController()
+        let trackerTypeVC = TrackerTypeSelectionViewController(container: container)
         trackerTypeVC.delegate = self
         let createTrackerNavVC = UINavigationController(rootViewController: trackerTypeVC)
         self.present(createTrackerNavVC, animated: true)
     }
     
     private func setupTrackerStore() {
-        trackerStore.delegate = self
-        try? trackerStore.performFetch()
+        container.trackerStore.delegate = self
+        try? container.trackerStore.performFetch()
     }
 }
 
@@ -100,7 +110,7 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     }
 
     private func fetchData() {
-        try? trackerStore.performFetch()
+        try? container.trackerStore.performFetch()
         collectionView.reloadData()
     }
 }
@@ -297,9 +307,23 @@ private extension TrackersViewController {
     }
 }
 
-// MARK: - NSFetchedResultsControllerDelegate
-extension TrackersViewController: NSFetchedResultsControllerDelegate {
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        collectionView.reloadData()
+// MARK: - TrackerStoreDelegate
+extension TrackersViewController: TrackerStoreDelegate {
+    
+    func didUpdate(_ updates: [TrackerStoreUpdate]) {
+        collectionView.performBatchUpdates {
+            for update in updates {
+                switch update {
+                case .insert(let indexPath):
+                    collectionView.insertItems(at: [indexPath])
+                case .delete(let indexPath):
+                    collectionView.deleteItems(at: [indexPath])
+                case .update(let indexPath):
+                    collectionView.reloadItems(at: [indexPath])
+//                case .move(let from, let to):
+//                    collectionView.moveItem(at: from, to: to)
+                }
+            }
+        }
     }
 }

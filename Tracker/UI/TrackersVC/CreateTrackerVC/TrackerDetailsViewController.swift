@@ -54,17 +54,17 @@ final class TrackerDetailsViewController: UIViewController {
         schedule: []
     )
     private let scheduleSettingsVC = ScheduleSettingsVC()
-    private let categoriesSettingsVC = CategoriesViewController()
     private let trackerFactory: TrackersFactoryProtocol? = TrackersFactory.shared
     weak var delegate: TrackerDetailsViewControllerDelegate?
     private var selectedEmojiIndexPath: IndexPath?
     private var selectedColorIndexPath: IndexPath?
     
-    private let trackerStore = TrackerStore()
+    private let container: CoreDataContainer
     
     // MARK: - Initializes
-    init(trackerType: TrackerType) {
+    init(trackerType: TrackerType, container: CoreDataContainer) {
         self.trackerType = trackerType
+        self.container = container
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -93,13 +93,14 @@ final class TrackerDetailsViewController: UIViewController {
         }
         
         scheduleSettingsVC.delegate = self
+        let categoriesSettingsVC = CategoriesViewController(container: container)
         categoriesSettingsVC.delegate = self
         
         categoryView?.onTap = { [weak self] in
             guard let self else { return }
             
-            self.categoriesSettingsVC.title = self.categoryView?.getTitle()
-            self.navigationController?.pushViewController(self.categoriesSettingsVC, animated: true)
+            categoriesSettingsVC.title = self.categoryView?.getTitle()
+            self.navigationController?.pushViewController(categoriesSettingsVC, animated: true)
         }
         
         scheduleView?.onTap = { [weak self] in
@@ -144,7 +145,7 @@ final class TrackerDetailsViewController: UIViewController {
             type: trackerType)
         
         do {
-            try trackerStore.add(newTracker, to: trackerDraft.category)
+            try container.trackerStore.add(newTracker, to: trackerDraft.category)
         } catch {
             print("Failed to add newTracker: \(error)")
         }

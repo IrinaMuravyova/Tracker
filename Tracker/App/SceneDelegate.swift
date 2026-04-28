@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -18,7 +19,17 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     private func switchRootToTabBar() {
-        let tabBarController = MainTabBarController()
+        let context = (UIApplication.shared.delegate as! AppDelegate)
+            .persistentContainer.viewContext
+
+        let container = CoreDataContainer(context: context)
+//        let trackerStore = TrackerStore(context: context)
+//        let recordStore = TrackerRecordStore(context: context)
+//        let categoryStore = TrackerCategoryStore(context: context)
+
+        let tabBarController = MainTabBarController(container: container)
+
+//        let tabBarController = MainTabBarController()
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
     }

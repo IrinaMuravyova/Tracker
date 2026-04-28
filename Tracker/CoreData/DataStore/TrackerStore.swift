@@ -23,6 +23,17 @@ protocol TrackerStoreProtocol {
     func fetchAllTrackers() throws -> [Tracker]
 }
 
+enum TrackerStoreUpdate {
+    case insert(IndexPath)
+    case delete(IndexPath)
+    case update(IndexPath)
+//    case move(from: IndexPath, to: IndexPath)
+}
+
+protocol TrackerStoreDelegate: AnyObject {
+    func didUpdate(_ updates: [TrackerStoreUpdate])
+}
+
 final class TrackerStore: NSObject {
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
         
@@ -39,14 +50,17 @@ final class TrackerStore: NSObject {
             sectionNameKeyPath: "category.title",
             cacheName: nil)
         
-        try? fetchedResultsController.performFetch()
+//        try? fetchedResultsController.performFetch()
         
         return fetchedResultsController
     }()
     
     private let context: NSManagedObjectContext
-    weak var delegate: NSFetchedResultsControllerDelegate?
+    private var updates: [TrackerStoreUpdate] = []
     
+//    weak var delegate: NSFetchedResultsControllerDelegate?
+    weak var delegate: TrackerStoreDelegate?
+
     convenience override init() {
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         self.init(context: context)
@@ -77,6 +91,7 @@ extension TrackerStore: TrackerStoreProtocol {
        }
     
     func add(_ tracker: Tracker, to category: String) throws {
+        print("ADD CALLED")
         let request = TrackerCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "name == %@", tracker.name)
         
@@ -86,9 +101,6 @@ extension TrackerStore: TrackerStoreProtocol {
             
             let categoryStore = TrackerCategoryStore(context: context)
             let categoryCoreData = categoryStore.fetchCategory(by: category)
-
-            print(type(of: tracker.schedule))
-           
             
             let trackerCoreData = TrackerCoreData(context: context)
             trackerCoreData.id = UUID()
@@ -98,8 +110,12 @@ extension TrackerStore: TrackerStoreProtocol {
             trackerCoreData.emoji = tracker.emoji
             trackerCoreData.schedule = ScheduleWrapper(tracker.schedule)
             trackerCoreData.type = tracker.type.rawValue
-            try context.save()
-            
+            do {
+                try context.save()
+            } catch {
+                print("Save error:", error)
+            }
+        
             // add tracker to category
             
         } else {
@@ -132,7 +148,41 @@ private extension TrackerStore {
 }
 
 extension TrackerStore: NSFetchedResultsControllerDelegate {
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        updates.removeAll()
+    }
+    
+    func controller(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+        didChange anObject: Any,
+        at indexPath: IndexPath?,
+        for type: NSFetchedResultsChangeType,
+        newIndexPath: IndexPath?
+    ) {
+        
+        switch type {
+        case .insert:
+            if let newIndexPath {
+                updates.append(.insert(newIndexPath))
+            }
+        case .delete:
+            if let indexPath {
+                updates.append(.delete(indexPath))
+            }
+        case .update:
+            if let indexPath {
+                updates.append(.update(indexPath))
+            }
+//        case .move:
+//            if let from = indexPath, let to = newIndexPath {
+//                updates.append(.move(from: from, to: to))
+//            }
+        @unknown default:
+            break
+        }
+    }
+    
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        delegate?.controllerDidChangeContent?(controller)
+        delegate?.didUpdate(updates)
     }
 }

@@ -23,17 +23,26 @@ final class CategoriesViewController: UIViewController {
     private var selectedCategory: String?
     private var categories: [TrackerCategory] = []
     private var trackersFactory: TrackersFactoryProtocol?
-    private let categoryStore = TrackerCategoryStore()
+    private let container: CoreDataContainer
     
     // MARK: - Public Properties
     weak var delegate: CategoriesViewControllerProtocol?
+    
+    init(container: CoreDataContainer) {
+        self.container = container
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("[CategoriesViewController] init(coder:) has not been implemented")
+    }
     
     // MARK: - Life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         
         trackersFactory = TrackersFactory.shared
-        categories = categoryStore.fetchCategories()
+        categories = container.categoryStore.fetchCategories()
         
         setupUI()
     }
@@ -203,12 +212,12 @@ extension CategoriesViewController: CreateCategoryViewControllerProtocol {
         
         guard let category else { return }
         do {
-            try categoryStore.addCategory(category)
+            try container.categoryStore.addCategory(category)
         } catch {
             fatalError("[CategoriesVC] Category can't save to category Store")
         }
         
-        categories = categoryStore.fetchCategories()
+        categories = container.categoryStore.fetchCategories()
         
         updateUIForCurrentState()
         tableView.reloadData()
