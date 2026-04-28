@@ -23,19 +23,76 @@ final class TrackerCategoryStore {
     }
     
     // MARK: - CRUD functions
-    func addNewCategory(_ category: TrackerCategory) throws {
-        let categoriesCoreData = TrackerCategoryCoreData(context: context)
-        updateExistingCategory(categoriesCoreData, with: category)
-        try context.save()
+    func addCategory(_ category: String) throws {
+        let request = TrackerCategoryCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "title == %@", category)
+        
+        let existingCategories = try context.fetch(request)
+        
+        if existingCategories.isEmpty {
+            let categoryCoreData = TrackerCategoryCoreData(context: context)
+            categoryCoreData.title = category
+            try context.save()
+            
+        } else {
+            throw NSError(
+                domain: "TrackerCategoryStore",
+                code: 409,
+                userInfo: [NSLocalizedDescriptionKey: "Category already exists"]
+            )
+        }
     }
     
     func deleteCategory(_ category: NSManagedObject) throws {
         context.delete(category)
         try context.save()
     }
-
-    // MARK: - Helper functions
-    func updateExistingCategory(_ categoriesCoreData: TrackerCategoryCoreData, with category: TrackerCategory, with trackers: [Tracker]? = nil) {
-        categoriesCoreData.title = category.title
+    
+    func fetchCategories() -> [TrackerCategory] {
+        let request = TrackerCategoryCoreData.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
+        request.sortDescriptors = [sortDescriptor]
+        
+        do {
+            let existingCategories = try context.fetch(request)
+            
+            let categories = existingCategories.map { coreDataCategory in
+                TrackerCategory(
+                    title: coreDataCategory.title ?? "Без названия",
+                    trackers: []
+                )
+            }
+            return categories
+        } catch {
+            print("[TrackerCategoryStore] fetchCategories failed with error: \(error)")
+            return []
+        }
+    }
+    
+    func fetchCategory(by title: String) -> TrackerCategoryCoreData? {
+        let request = TrackerCategoryCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "title == %@", title)
+        request.fetchLimit = 1
+        
+        do {
+            return try context.fetch(request).first
+        } catch {
+            print("[TrackerCategoryStore] fetchCategory(by:) failed with error: \(error)")
+            return nil
+        }
+    }
+    
+    // Helpers
+    func categoryExists(with title: String) -> Bool {
+        let request = TrackerCategoryCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "title == %@", title)
+        request.fetchLimit = 1
+        
+        do {
+            let count = try context.count(for: request)
+            return count > 0
+        } catch {
+            return false
+        }
     }
 }

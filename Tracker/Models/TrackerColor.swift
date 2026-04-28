@@ -53,3 +53,16 @@ enum TrackerColor: String, CaseIterable {
         }
     }
 }
+
+// MARK: - Mapping for TrackerCoreData.color
+extension TrackerColor {
+    static func from(_ raw: String?) -> TrackerColor {
+        guard
+            let raw,
+            let color = TrackerColor(rawValue: raw)
+        else {
+            return .colorselection1
+        }
+        return color
+    }
+}

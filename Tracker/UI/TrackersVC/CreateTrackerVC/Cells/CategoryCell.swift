@@ -7,15 +7,24 @@
 
 import UIKit
 
+protocol CategoryCellDelegate: AnyObject {
+    func categoryDidUpdate(with title: String)
+}
+
 class CategoryCell: UITableViewCell {
+    // MARK: - Static properties
     static let reusedIdentifier = "CategoryCell"
-    
-    private let categoryLabel = UILabel()
+
+    // MARK: - UI Properties
+    private let categoryTextField = UITextField()
     private let selectionImageView = UIImageView ()
     private let separator = UIView()
     
-    private var categoryTitle: String = ""
+    // MARK: - Private properties
     private var trackersFactory: TrackersFactoryProtocol?
+    
+    // MARK: - Public properties
+    weak var delegate: CategoryCellDelegate?
     
     // MARK: - Initializes
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -24,7 +33,7 @@ class CategoryCell: UITableViewCell {
         contentView.backgroundColor = .backgroundDay
         
         trackersFactory = TrackersFactory.shared
-        
+  
         setupUI()
         setupConstraints()
     }
@@ -34,10 +43,29 @@ class CategoryCell: UITableViewCell {
         fatalError("[CategoryCell] init(coder:) has not been implemented")
     }
     
+    // MARK: - Override methods
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        guard !categoryTextField.isEnabled else {
+            selectionImageView.isHidden = true
+            return
+        }
+        
+        if selected {
+            selectionImageView.image = UIImage(systemName: "checkmark")
+        } else {
+            selectionImageView.image = UIImage()
+        }
+    }
+    
+    // MARK: - Objective-C methods
+    @objc private func titleDidChange(_ textField: UITextField) {
+        let category = textField.text ?? ""
+        delegate?.categoryDidUpdate(with: category)
+    }
+    
     // MARK: - Public methods
     func configureDefault() {
-        categoryTitle = "Важное"
-        categoryLabel.text = categoryTitle
+        categoryTextField.placeholder = "Введите название категории"
         selectionImageView.image = UIImage(systemName: "checkmark")
         
         contentView.layer.maskedCorners = [
@@ -48,16 +76,20 @@ class CategoryCell: UITableViewCell {
             separator.isHidden = true
     }
     
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        if selected {
-            selectionImageView.image = UIImage(systemName: "checkmark")
-        } else {
-            selectionImageView.image = UIImage()
-        }
+    func configure(with category: TrackerCategory) {
+        configureDefault()
+        categoryTextField.text = category.title
+        
+        categoryTextField.isEnabled = false
+        selectionImageView.isHidden = false
     }
     
     func getCategoryTitle() -> String {
-        return categoryTitle
+        guard let title = categoryTextField.text else {
+            print("[CategoryCell] categoryTextField.text is not String ")
+            return ""
+        }
+        return title
     }
 }
 
@@ -66,17 +98,33 @@ private extension CategoryCell {
     func setupUI() {
         selectionStyle = .none
         
-        categoryLabel.font = .systemFont(ofSize: 17, weight: .regular)
-        categoryLabel.textColor = .blackDay
-        categoryLabel.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(categoryLabel)
+        setupCategoryTF()
+        setupSelectionIV()
+        setupSeparator()
+    }
+    
+    func setupCategoryTF() {
+        categoryTextField.font = .systemFont(ofSize: 17, weight: .regular)
+        categoryTextField.textColor = .blackDay
+        categoryTextField.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(categoryTextField)
         
+        categoryTextField.becomeFirstResponder()
+        
+        categoryTextField.addTarget(self, action: #selector(titleDidChange(_:)), for: .editingChanged)
+    }
+    
+    func setupSelectionIV() {
         selectionImageView.backgroundColor = .clear
         selectionImageView.tintColor = .onTintSwitch
         selectionImageView.image = UIImage()
         selectionImageView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(selectionImageView)
         
+        selectionImageView.isHidden = categoryTextField.isEnabled
+    }
+    
+    func setupSeparator() {
         separator.backgroundColor = .lightGray
         contentView.addSubview(separator)
         separator.translatesAutoresizingMaskIntoConstraints = false
@@ -84,11 +132,12 @@ private extension CategoryCell {
     
     func setupConstraints() {
         NSLayoutConstraint.activate([
-            categoryLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            categoryLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            categoryTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            categoryTextField.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
             selectionImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            selectionImageView.leadingAnchor.constraint(equalTo: categoryLabel.trailingAnchor, constant: 1),
+
+            selectionImageView.leadingAnchor.constraint(equalTo: categoryTextField.trailingAnchor, constant: 1),
             selectionImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             selectionImageView.heightAnchor.constraint(equalToConstant: 24),
             selectionImageView.widthAnchor.constraint(equalToConstant: 24),

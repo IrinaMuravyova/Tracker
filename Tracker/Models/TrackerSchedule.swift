@@ -7,6 +7,6 @@
 
 import Foundation
 
-enum TrackerSchedule {
+enum TrackerSchedule: Codable {
     case daysOfWeek(Set<Weekday>)
 }

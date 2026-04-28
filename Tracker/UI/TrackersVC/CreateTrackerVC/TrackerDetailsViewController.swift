@@ -60,6 +60,8 @@ final class TrackerDetailsViewController: UIViewController {
     private var selectedEmojiIndexPath: IndexPath?
     private var selectedColorIndexPath: IndexPath?
     
+    private let trackerStore = TrackerStore()
+    
     // MARK: - Initializes
     init(trackerType: TrackerType) {
         self.trackerType = trackerType
@@ -128,7 +130,10 @@ final class TrackerDetailsViewController: UIViewController {
     
     @objc private func saveButtonDidTap() {
         guard let trackerFactory else { return }
-        
+        // сохранить трекер
+        // добавить трекер в массив в категории
+        // закрыть окно
+        // обновить UШ
         //TODO: сохранить в базу в фоне
         let newTracker = Tracker(
             id: UUID(),
@@ -138,7 +143,12 @@ final class TrackerDetailsViewController: UIViewController {
             schedule: TrackerSchedule.daysOfWeek(trackerDraft.schedule),
             type: trackerType)
         
-        trackerFactory.trackerDidAdd(newTracker, category: trackerDraft.category)
+        do {
+            try trackerStore.add(newTracker, to: trackerDraft.category)
+        } catch {
+            print("Failed to add newTracker: \(error)")
+        }
+        
         delegate?.trackersDidChanged()
         dismiss(animated: true)
     }

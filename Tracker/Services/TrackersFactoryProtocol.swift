@@ -13,4 +13,5 @@ protocol TrackersFactoryProtocol: AnyObject {
     func trackerRecordsDidUpdated(with record: TrackerRecord)
     func trackerRecordDidCanceled(for trackerId: UUID, at data: Date)
     func trackerDidAdd(_ tracker: Tracker,  category: String)
+    func addCategory(_ title: String)
 }

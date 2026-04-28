@@ -64,4 +64,8 @@ extension TrackersFactory: TrackersFactoryProtocol {
         }
         trackers.append(tracker)
     }
+    
+    func addCategory(_ title: String) {
+        trackerCategory.append(TrackerCategory(title: title, trackers: []))
+    }
 }

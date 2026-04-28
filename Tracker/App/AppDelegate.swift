@@ -10,6 +10,11 @@ import CoreData
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
+    override init() {
+        super.init()
+        TrackerScheduleTransformer.register()
+    }
+    
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "TrackerModel")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in

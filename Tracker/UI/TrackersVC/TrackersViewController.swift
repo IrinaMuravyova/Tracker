@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 final class TrackersViewController: UIViewController {
     // MARK: - UI
@@ -34,6 +35,7 @@ final class TrackersViewController: UIViewController {
     private var changedTrackerId: UUID?
     private var currentDate: Date = Date()
     private let trackersFactory: TrackersFactoryProtocol? = TrackersFactory.shared
+    private let trackerStore = TrackerStore()
     
     // MARK: - Public properties
     let params = GeometricParams(cellCount: 2,
@@ -45,6 +47,7 @@ final class TrackersViewController: UIViewController {
     // MARK: - Life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad( )
+        setupTrackerStore()
         fetchData()
         setupUI()
         
@@ -70,6 +73,11 @@ final class TrackersViewController: UIViewController {
         let createTrackerNavVC = UINavigationController(rootViewController: trackerTypeVC)
         self.present(createTrackerNavVC, animated: true)
     }
+    
+    private func setupTrackerStore() {
+        trackerStore.delegate = self
+        try? trackerStore.performFetch()
+    }
 }
 
 // MARK: - SupplementaryCollectionDelegate
@@ -84,22 +92,16 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     }
     
     func showNotAllowFutureDateAlert() {
-        let alert = UIAlertController(
+        AlertHelper.showAlertWith(
+            on: self,
             title: "Упс.. Что-то пошло не так",
-            message: "Нельзя отметить привычку для будущей даты",
-            preferredStyle: .alert
+            message: "Нельзя отметить привычку для будущей даты"
         )
-        
-        let okAction = UIAlertAction(title: "ОК", style: .default)
-        alert.addAction(okAction)
-        
-        present(alert, animated: true)
     }
-    
+
     private func fetchData() {
-        guard let trackersFactory else { return }
-        categories = trackersFactory.getTrackersCategory()
-        completedTrackers = trackersFactory.getCompletedTrackers()
+        try? trackerStore.performFetch()
+        collectionView.reloadData()
     }
 }
 
@@ -292,5 +294,12 @@ private extension TrackersViewController {
             emptyStageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             emptyStageView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
+    }
+}
+
+// MARK: - NSFetchedResultsControllerDelegate
+extension TrackersViewController: NSFetchedResultsControllerDelegate {
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        collectionView.reloadData()
     }
 }
