@@ -12,7 +12,7 @@ private struct TrackerDraft {
     var category: String
     var schedule: Set<Weekday>
     var selectedEmoji: String?
-    var selectedColor: UIColor?
+    var selectedColor: TrackerColor?
 }
 
 protocol TrackerDetailsViewControllerDelegate: AnyObject {
@@ -134,8 +134,8 @@ final class TrackerDetailsViewController: UIViewController {
         let newTracker = Tracker(
             id: UUID(),
             name: trackerDraft.title,
-            color: TrackerColor.colorselection1,
-            emoji: "",
+            color: trackerDraft.selectedColor ?? .colorselection1,
+            emoji: trackerDraft.selectedEmoji ?? "",
             schedule: TrackerSchedule.daysOfWeek(trackerDraft.schedule),
             type: trackerType)
         
@@ -507,6 +507,8 @@ extension TrackerDetailsViewController: UICollectionViewDataSource {
 
             selectedEmojiIndexPath = indexPath
             collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+            
+            trackerDraft.selectedEmoji = Constants.emojis[indexPath.row]
         } else if collectionView == colorCollection {
             if let previous = selectedColorIndexPath {
                 collectionView.deselectItem(at: previous, animated: false)
@@ -514,6 +516,8 @@ extension TrackerDetailsViewController: UICollectionViewDataSource {
             
             selectedColorIndexPath = indexPath
             collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+            
+            trackerDraft.selectedColor = TrackerColor.allCases[indexPath.row]
         }
     }
 }
