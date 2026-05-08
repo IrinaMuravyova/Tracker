@@ -14,7 +14,6 @@ protocol TrackersCellDelegate: AnyObject {
 final class TrackersCell: UICollectionViewCell {
     // MARK: - Public properties
     weak var delegate: TrackersCellDelegate?
-    var suppCollection: SupplementaryCollection?
     
     // MARK: - UI
     private let habitView = UIView()
@@ -43,13 +42,14 @@ final class TrackersCell: UICollectionViewCell {
         fatalError("[TrackersCell] init(coder:) has not been implemented")
     }
     
+    // MARK: - Objc methods
     @objc func buttonTapped(_ sender: UIButton) {
         delegate?.didTapAddButton(in: self)
     }
     
     // MARK: - Public functions
     func configureCell(
-        with tracker: Tracker,
+        with tracker: TrackerViewModel,
         completedCount: Int,
         isDone: Bool
     ) {

@@ -18,9 +18,21 @@ final class CreateCategoryViewController: UIViewController {
     
     // MARK: - Private properties
     private var newCategory: String?
+    private let container: CoreDataContainer
     
     // MARK: - Public properties
     weak var delegate: CreateCategoryViewControllerProtocol?
+    
+    // MARK: - Initializes
+    init(container: CoreDataContainer) {
+        self.container = container
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("[CreateCategoryViewController] init(coder:) has not been implemented")
+    }
     
     // MARK: - Life cycle
     override func viewDidLoad() {
@@ -111,7 +123,7 @@ extension CreateCategoryViewController: UITableViewDataSource, UITableViewDelega
             return UITableViewCell()
         }
         
-        cell.configureDefault()
+        cell.configureDefault(container: container)
         cell.delegate = self
 
         return cell

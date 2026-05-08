@@ -8,21 +8,15 @@
 import UIKit
 
 class MainTabBarController: UITabBarController {
-//    private let trackerStore: TrackerStore
-//    private let recordStore: TrackerRecordStore
-//    private let categoryStore: TrackerCategoryStore
     private let container: CoreDataContainer
+    private let viewModel: TrackerListViewModel
     
     init(
-        container: CoreDataContainer
-//        trackerStore: TrackerStore,
-//        recordStore: TrackerRecordStore,
-//        categoryStore: TrackerCategoryStore
+        container: CoreDataContainer,
+        viewModel: TrackerListViewModel
     ) {
         self.container = container
-//        self.trackerStore = trackerStore
-//        self.recordStore = recordStore
-//        self.categoryStore = categoryStore
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -35,11 +29,8 @@ class MainTabBarController: UITabBarController {
         
         setupAppearance()
         
-//        let trackersVC = TrackersViewController()
         let trackersVC = TrackersViewController(
-            container: container)
-//            trackerStore: container.trackerStore,
-//            trackerRecordStore: container.recordStore)
+            container: container, viewModel: viewModel)
         trackersVC.tabBarItem = UITabBarItem(
             title: "Трекеры",
             image: UIImage(systemName: "record.circle.fill")?.withRenderingMode(.alwaysOriginal),

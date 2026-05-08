@@ -29,17 +29,17 @@ final class TrackersViewController: UIViewController {
     private let filterButton = UIButton()
     
     // MARK: - Private properties
-    private var categories: [TrackerCategory] = []
-    private var completedTrackers: [TrackerRecord] = []
     private var changedTrackerId: UUID?
     private var currentDate: Date = Date()
-    private let trackersFactory: TrackersFactoryProtocol? = TrackersFactory.shared
     private let container: CoreDataContainer
+    private let viewModel: TrackerListViewModel
 
     init(
-        container: CoreDataContainer
+        container: CoreDataContainer,
+        viewModel: TrackerListViewModel
     ) {
         self.container = container
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -57,22 +57,19 @@ final class TrackersViewController: UIViewController {
     // MARK: - Life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad( )
-        setupTrackerStore()
-        fetchData()
         setupUI()
         
-        if categories.isEmpty {
-            collectionView.isHidden = true
-            setupEmptyStageView()
+        viewModel.onChange = { [weak self] in
+            self?.updateUI()
         }
         
-        helper?.delegate = self
+        updateUI()
     }
     
     // MARK: - Objc methods
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         currentDate = sender.date
-        collectionView.reloadData()
+        viewModel.setDate(sender.date)
     }
     
     @objc private func addTrackerButtonTapped() {
@@ -83,10 +80,14 @@ final class TrackersViewController: UIViewController {
         let createTrackerNavVC = UINavigationController(rootViewController: trackerTypeVC)
         self.present(createTrackerNavVC, animated: true)
     }
-    
-    private func setupTrackerStore() {
-        container.trackerStore.delegate = self
-        try? container.trackerStore.performFetch()
+
+    private func updateUI() {
+        collectionView.reloadData()
+
+        let isEmpty = viewModel.sections.isEmpty
+        
+        collectionView.isHidden = isEmpty
+        emptyStageView.isHidden = !isEmpty
     }
 }
 
@@ -97,7 +98,6 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     }
     
     func updateCell(with index: IndexPath) {
-        fetchData()
         collectionView.reloadItems(at: [index])
     }
     
@@ -108,24 +108,12 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
             message: "Нельзя отметить привычку для будущей даты"
         )
     }
-
-    private func fetchData() {
-        try? container.trackerStore.performFetch()
-        collectionView.reloadData()
-    }
 }
 
 // MARK: - TrackerTypeSelectionViewControllerDelegate
 extension TrackersViewController: TrackerTypeSelectionViewControllerDelegate {
     func reloadCollectionView() {
-        fetchData()
-        
-        helper?.updateData(
-            categories: categories,
-            completed: completedTrackers
-        )
-        
-        collectionView.reloadData()
+        updateUI()
     }
 }
 
@@ -138,6 +126,7 @@ private extension TrackersViewController {
         setupSearchBar()
         setupFilterButton()
         setupCollectionView()
+        setupEmptyStageView()
         setupConstraints()
     }
     
@@ -213,7 +202,12 @@ private extension TrackersViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
         
-        helper = SupplementaryCollection(categories: categories, completedTrackers: completedTrackers, using: params)
+        helper = SupplementaryCollection(
+            using: params,
+            container: container,
+            viewModel: viewModel
+        )
+        helper?.delegate = self
         helper?.collectionView = collectionView
         
         collectionView.dataSource = helper
@@ -304,26 +298,5 @@ private extension TrackersViewController {
             emptyStageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             emptyStageView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
-    }
-}
-
-// MARK: - TrackerStoreDelegate
-extension TrackersViewController: TrackerStoreDelegate {
-    
-    func didUpdate(_ updates: [TrackerStoreUpdate]) {
-        collectionView.performBatchUpdates {
-            for update in updates {
-                switch update {
-                case .insert(let indexPath):
-                    collectionView.insertItems(at: [indexPath])
-                case .delete(let indexPath):
-                    collectionView.deleteItems(at: [indexPath])
-                case .update(let indexPath):
-                    collectionView.reloadItems(at: [indexPath])
-//                case .move(let from, let to):
-//                    collectionView.moveItem(at: from, to: to)
-                }
-            }
-        }
     }
 }

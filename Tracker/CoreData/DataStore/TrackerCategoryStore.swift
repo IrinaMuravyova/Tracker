@@ -13,11 +13,6 @@ final class TrackerCategoryStore {
     private let context: NSManagedObjectContext
 
     // MARK: - Initializes
-//    convenience init() {
-//        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-//        self.init(context: context)
-//    }
-
     init(context: NSManagedObjectContext) {
         self.context = context
     }

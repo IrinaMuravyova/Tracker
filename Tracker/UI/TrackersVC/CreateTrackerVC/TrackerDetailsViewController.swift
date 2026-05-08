@@ -54,7 +54,7 @@ final class TrackerDetailsViewController: UIViewController {
         schedule: []
     )
     private let scheduleSettingsVC = ScheduleSettingsVC()
-    private let trackerFactory: TrackersFactoryProtocol? = TrackersFactory.shared
+    private let trackerFactory: TrackersFactoryProtocol?
     weak var delegate: TrackerDetailsViewControllerDelegate?
     private var selectedEmojiIndexPath: IndexPath?
     private var selectedColorIndexPath: IndexPath?
@@ -65,6 +65,7 @@ final class TrackerDetailsViewController: UIViewController {
     init(trackerType: TrackerType, container: CoreDataContainer) {
         self.trackerType = trackerType
         self.container = container
+        trackerFactory = TrackerRepository(container: container)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -130,12 +131,6 @@ final class TrackerDetailsViewController: UIViewController {
     }
     
     @objc private func saveButtonDidTap() {
-        guard let trackerFactory else { return }
-        // сохранить трекер
-        // добавить трекер в массив в категории
-        // закрыть окно
-        // обновить UШ
-        //TODO: сохранить в базу в фоне
         let newTracker = Tracker(
             id: UUID(),
             name: trackerDraft.title,
@@ -146,12 +141,12 @@ final class TrackerDetailsViewController: UIViewController {
         
         do {
             try container.trackerStore.add(newTracker, to: trackerDraft.category)
+            
+            delegate?.trackersDidChanged()
+            dismiss(animated: true)
         } catch {
-            print("Failed to add newTracker: \(error)")
+            print(" Save tracker error:", error)
         }
-        
-        delegate?.trackersDidChanged()
-        dismiss(animated: true)
     }
     
     @objc private func titleDidChange(_ textField: UITextField) {
@@ -463,6 +458,7 @@ extension TrackerDetailsViewController: ScheduleSettingsVCProtocol {
     }
 }
 
+// MARK: - CategoriesViewControllerProtocol
 extension TrackerDetailsViewController: CategoriesViewControllerProtocol {
     func categoryDidSelected(for category: String) {
         trackerDraft.category = category

@@ -33,6 +33,7 @@ final class CategoriesViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("[CategoriesViewController] init(coder:) has not been implemented")
     }
@@ -41,7 +42,7 @@ final class CategoriesViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        trackersFactory = TrackersFactory.shared
+        trackersFactory = TrackerRepository(container: container)
         categories = container.categoryStore.fetchCategories()
         
         setupUI()
@@ -49,7 +50,7 @@ final class CategoriesViewController: UIViewController {
     
     // MARK: - Objc methods
     @objc private func addButtonDidTap() {
-        let createCategoryVC = CreateCategoryViewController()
+        let createCategoryVC = CreateCategoryViewController(container: container)
         createCategoryVC.delegate = self
         navigationController?.pushViewController(createCategoryVC, animated: true)
     }
@@ -174,7 +175,7 @@ extension CategoriesViewController: UITableViewDataSource, UITableViewDelegate {
             return UITableViewCell()
         }
         
-        cell.configure(with: categories[indexPath.row])
+        cell.configure(with: categories[indexPath.row], container: container)
         
         if let selectedCategory,
            cell.getCategoryTitle() == selectedCategory {

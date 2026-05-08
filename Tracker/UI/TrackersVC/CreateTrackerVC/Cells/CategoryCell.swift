@@ -31,9 +31,7 @@ class CategoryCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         contentView.backgroundColor = .backgroundDay
-        
-        trackersFactory = TrackersFactory.shared
-  
+
         setupUI()
         setupConstraints()
     }
@@ -64,7 +62,9 @@ class CategoryCell: UITableViewCell {
     }
     
     // MARK: - Public methods
-    func configureDefault() {
+    func configureDefault(container: CoreDataContainer) {
+        trackersFactory = TrackerRepository(container: container)
+        
         categoryTextField.placeholder = "Введите название категории"
         selectionImageView.image = UIImage(systemName: "checkmark")
         
@@ -76,8 +76,8 @@ class CategoryCell: UITableViewCell {
             separator.isHidden = true
     }
     
-    func configure(with category: TrackerCategory) {
-        configureDefault()
+    func configure(with category: TrackerCategory, container: CoreDataContainer) {
+        configureDefault(container: container)
         categoryTextField.text = category.title
         
         categoryTextField.isEnabled = false
