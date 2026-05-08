@@ -145,7 +145,7 @@ final class TrackerDetailsViewController: UIViewController {
             delegate?.trackersDidChanged()
             dismiss(animated: true)
         } catch {
-            print(" Save tracker error:", error)
+            print("[TrackerDetailsViewController] Save tracker error:", error)
         }
     }
     
