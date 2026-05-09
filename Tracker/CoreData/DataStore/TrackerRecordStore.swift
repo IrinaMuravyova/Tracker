@@ -44,43 +44,11 @@ final class TrackerRecordStore {
         }
     }
     
-    func deleteRecord(_ record: TrackerRecord) throws {
-        guard let trackerRecordCoreData = try findRecord(record) else {
-            throw TrackerRecordStoreError.trackerNotFound
-        }
-        
-        context.delete(trackerRecordCoreData)
+    func deleteRecord(_ record: TrackerRecordCoreData) throws {
+        context.delete(record)
         try context.save()
     }
-    
-    func fetchAllRecords() -> [TrackerRecord] {
-        let request: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
-        do {
-            let results = try context.fetch(request)
-            return results.compactMap { recordCD in
-                guard let id = recordCD.tracker?.id,
-                      let date = recordCD.date else { return nil }
-                return TrackerRecord(trackerId: id, date: date)
-            }
-        } catch {
-            print("Failed to fetch records: \(error)")
-            return []
-        }
-    }
-    
-    func getRecordCoreData(for trackerId: UUID) -> [TrackerRecordCoreData] {
-        let request: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
-        
-        request.predicate = NSPredicate(format: "tracker.id == %@", trackerId as CVarArg)
-        
-        do {
-            return try context.fetch(request)
-        } catch {
-            print("Fetch error: \(error)")
-            return []
-        }
-    }
-    
+
     // MARK: - Helper functions
     func findRecord(_ record: TrackerRecord) throws -> TrackerRecordCoreData? {
         let request = TrackerRecordCoreData.fetchRequest()

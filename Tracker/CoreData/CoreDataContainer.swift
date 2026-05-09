@@ -12,11 +12,13 @@ final class CoreDataContainer {
     let categoryStore: TrackerCategoryStore
     let recordStore: TrackerRecordStore
     let trackerFetchedResultsController: TrackerFetchedResultsController
+    let recordFetchedResultsController: TrackerRecordFetchedResultsController
 
     init(context: NSManagedObjectContext) {
         self.categoryStore = TrackerCategoryStore(context: context)
         self.recordStore = TrackerRecordStore(context: context)
-        self.trackerStore = TrackerStore(context: context/*, recordStore: recordStore*/)
+        self.trackerStore = TrackerStore(context: context)
         self.trackerFetchedResultsController = TrackerFetchedResultsController(context: context)
+        self.recordFetchedResultsController = TrackerRecordFetchedResultsController(context: context)
     }
 }
