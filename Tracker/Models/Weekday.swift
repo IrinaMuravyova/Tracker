@@ -40,3 +40,11 @@ enum Weekday: Int, CaseIterable, Codable {
         }
     }
 }
+
+// MARK: - Extension for filtering on date
+extension Weekday {
+    init?(calendarWeekday: Int) {
+        let normalized = calendarWeekday == 1 ? 7 : calendarWeekday - 1
+        self.init(rawValue: normalized)
+    }
+}

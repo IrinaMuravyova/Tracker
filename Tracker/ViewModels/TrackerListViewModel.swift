@@ -43,13 +43,23 @@ final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
     
     func setDate(_ date: Date) {
         selectedDate = date
-        applyFilter()
+        reload()
     }
     
     // MARK: - Private methods
     private func reload() {
         var sections: [TrackerSectionViewModel] = []
 
+        let calendar = Calendar.current
+
+        let weekdayNumber = calendar.component(.weekday, from: selectedDate)
+
+        guard let currentWeekday = Weekday(calendarWeekday: weekdayNumber) else {
+            sections = []
+            onChange?()
+            return
+        }
+ 
         for sectionIndex in 0..<frc.numberOfSections {
 
             var items: [TrackerViewModel] = []
@@ -60,6 +70,40 @@ final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
                 let indexPath = IndexPath(row: row, section: sectionIndex)
 
                 let coreData = frc.object(at: indexPath)
+                let tracker = mapToTracker(coreData)
+
+                // MARK: - Filter by selected date
+                switch tracker.type {
+
+                case .habit:
+                    let shouldShow: Bool
+
+                    switch tracker.schedule {
+                    case .daysOfWeek(let days):
+                        shouldShow = days.contains(currentWeekday)
+                    }
+
+                    guard shouldShow else { continue }
+
+                case .irregular:
+                    let records = recordStore.getRecordCoreData(for: tracker.id)
+                    
+                    if records.isEmpty {
+                        break
+                    }
+                    
+                    let hasRecordForSelectedDate = records.contains {
+                        guard let recordDate = $0.date else { return false }
+
+                        return Calendar.current.isDate(
+                            recordDate,
+                            inSameDayAs: selectedDate
+                        )
+                    }
+
+                    guard hasRecordForSelectedDate else { continue }
+                }
+
                 items.append(makeVM(coreData))
             }
 
@@ -112,10 +156,5 @@ final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
             schedule: schedule,
             type: TrackerType(rawValue: coreData.type ?? "") ?? .habit
         )
-    }
-    
-    private func applyFilter() {
-        //TODO: позже добавить фильтрацию
-//        fetchedResultsController.applyFilter(for: currentDate)
     }
 }
