@@ -64,7 +64,6 @@ final class TrackerDetailsViewController: UIViewController {
     init(trackerType: TrackerType, container: CoreDataContainer) {
         self.trackerType = trackerType
         self.container = container
-//        trackerFactory = TrackerRepository(container: container)
         super.init(nibName: nil, bundle: nil)
     }
     

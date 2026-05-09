@@ -125,6 +125,10 @@ final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
                         $0.tracker?.id == tracker.id
                     }
 
+                    if trackerRecords.isEmpty {
+                        break
+                    }
+                    
                     let hasRecord = trackerRecords.contains {
                         guard let date = $0.date else { return false }
                         return Calendar.current.isDate(date, inSameDayAs: selectedDate)
