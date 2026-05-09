@@ -68,6 +68,8 @@ extension SupplementaryCollection: UICollectionViewDataSource {
 
         let vm = viewModel.sections[indexPath.section].trackers[indexPath.row]
 
+        cell.delegate = self
+        
         cell.configureCell(
             with: vm,
             completedCount: vm.completedCount,
@@ -126,5 +128,16 @@ extension SupplementaryCollection: UICollectionViewDelegateFlowLayout {
             withHorizontalFittingPriority: .required,
             verticalFittingPriority: .fittingSizeLevel
         )
+    }
+}
+
+// MARK: - TrackersCellDelegate
+extension SupplementaryCollection: TrackersCellDelegate {
+
+    func didTapAddButton(in cell: TrackersCell) {
+        guard let indexPath = collectionView?.indexPath(for: cell)
+        else { return }
+
+        viewModel.toggleTracker(at: indexPath)
     }
 }

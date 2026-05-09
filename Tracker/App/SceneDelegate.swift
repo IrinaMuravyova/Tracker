@@ -27,6 +27,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             container: container,
             viewModel: TrackerListViewModel(
                 frc: container.trackerFetchedResultsController,
+                recordFRC: container.recordFetchedResultsController,
                 recordStore: container.recordStore,
             )
         )

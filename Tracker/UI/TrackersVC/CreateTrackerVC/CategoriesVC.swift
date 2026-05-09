@@ -22,7 +22,6 @@ final class CategoriesViewController: UIViewController {
     // MARK: - Private properties
     private var selectedCategory: String?
     private var categories: [TrackerCategory] = []
-    private var trackersFactory: TrackersFactoryProtocol?
     private let container: CoreDataContainer
     
     // MARK: - Public Properties
@@ -41,10 +40,7 @@ final class CategoriesViewController: UIViewController {
     // MARK: - Life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        trackersFactory = TrackerRepository(container: container)
         categories = container.categoryStore.fetchCategories()
-        
         setupUI()
     }
     

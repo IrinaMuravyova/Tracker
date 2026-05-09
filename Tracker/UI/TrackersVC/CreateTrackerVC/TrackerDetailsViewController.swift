@@ -54,7 +54,6 @@ final class TrackerDetailsViewController: UIViewController {
         schedule: []
     )
     private let scheduleSettingsVC = ScheduleSettingsVC()
-    private let trackerFactory: TrackersFactoryProtocol?
     weak var delegate: TrackerDetailsViewControllerDelegate?
     private var selectedEmojiIndexPath: IndexPath?
     private var selectedColorIndexPath: IndexPath?
@@ -65,7 +64,7 @@ final class TrackerDetailsViewController: UIViewController {
     init(trackerType: TrackerType, container: CoreDataContainer) {
         self.trackerType = trackerType
         self.container = container
-        trackerFactory = TrackerRepository(container: container)
+//        trackerFactory = TrackerRepository(container: container)
         super.init(nibName: nil, bundle: nil)
     }
     

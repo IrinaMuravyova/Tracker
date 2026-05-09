@@ -63,7 +63,7 @@ class CategoryCell: UITableViewCell {
     
     // MARK: - Public methods
     func configureDefault(container: CoreDataContainer) {
-        trackersFactory = TrackerRepository(container: container)
+//        trackersFactory = TrackerRepository(container: container)
         
         categoryTextField.placeholder = "Введите название категории"
         selectionImageView.image = UIImage(systemName: "checkmark")
