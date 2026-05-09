@@ -251,8 +251,8 @@ private extension TrackerDetailsViewController {
         )
         
         guard
-            let categoryView = categoryView as? UIView,
-            let scheduleView = scheduleView as? UIView
+            let categoryView = categoryView,
+            let scheduleView = scheduleView
         else {
             fatalError("[TrackerDetailsViewController] categoryView or scheduleView is not UIView")
             return
