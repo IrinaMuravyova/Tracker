@@ -88,7 +88,12 @@ extension SupplementaryCollection: UICollectionViewDataSource {
             ofKind: kind,
             withReuseIdentifier: SupplementaryView.reuseHeaderId,
             for: indexPath
-        ) as! SupplementaryView
+        )
+        
+        guard let header = header as? SupplementaryView else {
+            assertionFailure("[SupplementaryCollection] Failed to attach UICollectionReusableView к SupplementaryView")
+            return UICollectionReusableView()
+        }
 
         let title = viewModel.sections[indexPath.section].title
         header.configure(title: title)
