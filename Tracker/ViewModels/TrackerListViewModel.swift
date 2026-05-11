@@ -140,6 +140,8 @@ final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
                 items.append(makeVM(coreData, records: records))
             }
 
+            guard !items.isEmpty else { continue }
+            
             let title = frc.titleForSection(sectionIndex)
 
             sections.append(
