@@ -12,7 +12,6 @@ final class TrackerStoreTest: XCTestCase {
     func testTrackerSaving() throws {
 
         // Arrange
-        let container = CoreDataContainer(inMemory: true)
         let repository = MockTrackerRepository()
         let store = TrackerStore(repository: repository)
 
