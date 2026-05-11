@@ -28,9 +28,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let tabBarController = MainTabBarController(
             container: container,
             viewModel: TrackerListViewModel(
-                frc: container.trackerFetchedResultsController,
-                recordFRC: container.recordFetchedResultsController,
-                recordStore: container.recordStore,
+                container: container
             )
         )
 
