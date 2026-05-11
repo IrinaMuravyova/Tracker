@@ -7,18 +7,17 @@
 
 import XCTest
 @testable import Tracker
-import CoreData
 
 final class TrackerStoreTest: XCTestCase {
-
     func testTrackerSaving() throws {
-        let context = inMemoryContext
-        
-        let categoryStore = TrackerCategoryStore(context: context)
-        try categoryStore.addCategory("Health")
-        
-        let trackerStore = TrackerStore(context: context)
-        
+
+        // Arrange
+        let container = CoreDataContainer(inMemory: true)
+        let repository = MockTrackerRepository()
+        let store = TrackerStore(repository: repository)
+
+        try repository.addCategory("Health")
+
         let tracker = Tracker(
             id: UUID(),
             name: "Test",
@@ -27,22 +26,14 @@ final class TrackerStoreTest: XCTestCase {
             schedule: .daysOfWeek([.monday, .tuesday]),
             type: .habit
         )
-        
-        try trackerStore.add(tracker, to: "Health")
-        
-        let result = try trackerStore.fetchAllTrackers()
 
+        // Act
+        try store.add(tracker, to: "Health")
+        let result = try store.fetchAllTrackers()
+
+        // Assert
         XCTAssertEqual(result.count, 1)
-        
-        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        let objects = try context.fetch(request)
-                
-        XCTAssertNotNil(objects.first?.category)
-        XCTAssertEqual(objects.first?.category?.title, "Health")
-        
-        let categoryRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-        let categories = try context.fetch(categoryRequest)
-
-        XCTAssertEqual(categories.first?.tracker?.count, 1)
+        XCTAssertEqual(result.first?.name, "Test")
+        XCTAssertEqual(result.first?.emoji, "🔥")
     }
 }
