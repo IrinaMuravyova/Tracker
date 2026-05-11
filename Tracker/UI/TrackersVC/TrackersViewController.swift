@@ -88,6 +88,7 @@ final class TrackersViewController: UIViewController {
         
         collectionView.isHidden = isEmpty
         emptyStageView.isHidden = !isEmpty
+        filterButton.isHidden = isEmpty
     }
 }
 
