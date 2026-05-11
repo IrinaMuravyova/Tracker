@@ -15,19 +15,19 @@ enum TrackerStoreError: Error {
 }
 
 // MARK: - TrackerFetchedResultsControllerProtocol
-protocol TrackerFetchedResultsControllerProtocol {
+protocol TrackerStoreProtocol {
     var numberOfSections: Int { get }
     
     func numberOfRowsInSection(_ section: Int) -> Int
-    func object(at indexPath: IndexPath) -> TrackerCoreData
+    func object(at indexPath: IndexPath) -> Tracker
     func performFetch() throws
     func titleForSection(_ section: Int) -> String
     
-    var delegate: TrackerFetchedResultsControllerDelegate? { get set }
+    var delegate: TrackerStoreDelegate? { get set }
 }
 
 // MARK: - TrackerFetchedResultsControllerDelegate
-protocol TrackerFetchedResultsControllerDelegate: AnyObject {
+protocol TrackerStoreDelegate: AnyObject {
     func trackerStoreDidChangeContent()
 }
 
@@ -54,7 +54,7 @@ final class TrackerStore: NSObject {
     }()
     
     // MARK: - Public properties
-    weak var delegate: TrackerFetchedResultsControllerDelegate?
+    weak var delegate: TrackerStoreDelegate?
 
     // MARK: - Initializes
     init(context: NSManagedObjectContext) {
@@ -104,7 +104,7 @@ extension TrackerStore {
     }
 }
 
-extension TrackerStore: TrackerFetchedResultsControllerProtocol {
+extension TrackerStore: TrackerStoreProtocol {
     var numberOfSections: Int {
         fetchedResultsController.sections?.count ?? 0
     }
@@ -113,8 +113,9 @@ extension TrackerStore: TrackerFetchedResultsControllerProtocol {
         fetchedResultsController.sections?[section].numberOfObjects ?? 0
     }
     
-    func object(at indexPath: IndexPath) -> TrackerCoreData {
-        fetchedResultsController.object(at: indexPath)
+    func object(at indexPath: IndexPath) -> Tracker {
+        let trackerCoreData = fetchedResultsController.object(at: indexPath)
+        return mapToTracker(trackerCoreData)
     }
     
     func performFetch() throws {
@@ -123,6 +124,29 @@ extension TrackerStore: TrackerFetchedResultsControllerProtocol {
     
     func titleForSection(_ section: Int) -> String {
         fetchedResultsController.sections?[section].name ?? ""
+    }
+}
+
+// MARK: - Private methods
+private extension TrackerStore {
+    func mapToTracker(_ coreData: TrackerCoreData) -> Tracker {
+        let schedule: TrackerSchedule = {
+            guard let data = coreData.schedule,
+                  let decoded = try? JSONDecoder().decode(TrackerSchedule.self, from: data)
+            else {
+                return .daysOfWeek([])
+            }
+            return decoded
+        }()
+        
+        return Tracker(
+            id: coreData.id ?? UUID(),
+            name: coreData.name ?? "",
+            color: TrackerColor.from(coreData.color),
+            emoji: coreData.emoji ?? "",
+            schedule: schedule,
+            type: TrackerType(rawValue: coreData.type ?? "") ?? .habit
+        )
     }
 }
 

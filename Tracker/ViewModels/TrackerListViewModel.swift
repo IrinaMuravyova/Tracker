@@ -7,11 +7,11 @@
 
 import UIKit
 
-final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
+final class TrackerListViewModel: TrackerStoreDelegate {
     // MARK: - Private properties
-    private var frc: TrackerFetchedResultsControllerProtocol
-    private var recordFRC: TrackerRecordFetchedResultsControllerProtocol
-    private let recordStore: TrackerRecordStore
+    private var trackerStore: TrackerStoreProtocol
+    private var recordStore: TrackerRecordStoreProtocol
+    private let container: CoreDataContainer
     
     private(set) var sections: [TrackerSectionViewModel] = []
     
@@ -21,19 +21,19 @@ final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
     var onChange: (() -> Void)?
     
     // MARK: - Initializes
-    init(frc: TrackerFetchedResultsControllerProtocol,
-         recordFRC: TrackerRecordFetchedResultsControllerProtocol,
-         recordStore: TrackerRecordStore) {
-        self.frc = frc
-        self.recordFRC = recordFRC
-        self.recordStore = recordStore
+    init(
+        container: CoreDataContainer
+    ) {
+        self.container = container
+        self.trackerStore = container.trackerStore
+        self.recordStore = container.recordStore
         
-        self.frc.delegate = self
-        self.recordFRC.delegate = self
+        self.trackerStore.delegate = self
+        self.recordStore.delegate = self
         
         do {
-            try frc.performFetch()
-            try recordFRC.performFetch()
+            try self.trackerStore.performFetch()
+            try self.recordStore.performFetch()
         } catch {
             print(error)
         }
@@ -62,7 +62,7 @@ final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
         )
         
         do {
-            let existingRecord = recordFRC.fetchRecord(
+            let existingRecord = recordStore.record(
                 trackerId: tracker.id,
                 date: selectedDate
             )
@@ -93,19 +93,18 @@ final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
             return
         }
         
-        let records = recordFRC.fetchedObjects()
+        let records = recordStore.records()
 
-        for sectionIndex in 0..<frc.numberOfSections {
+        for sectionIndex in 0..<trackerStore.numberOfSections {
 
             var items: [TrackerViewModel] = []
 
-            let rows = frc.numberOfRowsInSection(sectionIndex)
+            let rows = trackerStore.numberOfRowsInSection(sectionIndex)
 
             for row in 0..<rows {
                 let indexPath = IndexPath(row: row, section: sectionIndex)
 
-                let coreData = frc.object(at: indexPath)
-                let tracker = mapToTracker(coreData)
+                let tracker = trackerStore.object(at: indexPath)
 
                 // MARK: - Filter by selected date
                 switch tracker.type {
@@ -122,7 +121,7 @@ final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
 
                 case .irregular:
                     let trackerRecords = records.filter {
-                        $0.tracker?.id == tracker.id
+                        $0.trackerId == tracker.id
                     }
 
                     if trackerRecords.isEmpty {
@@ -130,19 +129,18 @@ final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
                     }
                     
                     let hasRecord = trackerRecords.contains {
-                        guard let date = $0.date else { return false }
-                        return Calendar.current.isDate(date, inSameDayAs: selectedDate)
+                        return Calendar.current.isDate($0.date, inSameDayAs: selectedDate)
                     }
 
                     guard hasRecord else { continue }
                 }
 
-                items.append(makeVM(coreData, records: records))
+                items.append(makeVM(tracker, records: records))
             }
 
             guard !items.isEmpty else { continue }
             
-            let title = frc.titleForSection(sectionIndex)
+            let title = trackerStore.titleForSection(sectionIndex)
 
             sections.append(
                 TrackerSectionViewModel(
@@ -156,18 +154,15 @@ final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
         onChange?()
     }
     
-    private func makeVM(_ coreData: TrackerCoreData,
-                        records: [TrackerRecordCoreData]) -> TrackerViewModel {
-        let tracker = mapToTracker(coreData)
-
+    private func makeVM(_ tracker: Tracker,
+                        records: [TrackerRecord]) -> TrackerViewModel {
+        
         let trackerRecords = records.filter {
-            $0.tracker?.id == tracker.id
+            $0.trackerId == tracker.id
         }
         
         let isDoneToday = trackerRecords.contains {
-            guard let date = $0.date else { return false }
-
-            return Calendar.current.isDate(date, inSameDayAs: selectedDate)
+            return Calendar.current.isDate($0.date, inSameDayAs: selectedDate)
         }
 
         return TrackerViewModel(
@@ -179,27 +174,7 @@ final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
             isDoneToday: isDoneToday
         )
     }
-    
-    private func mapToTracker(_ coreData: TrackerCoreData) -> Tracker {
-        let schedule: TrackerSchedule = {
-            guard let data = coreData.schedule,
-                  let decoded = try? JSONDecoder().decode(TrackerSchedule.self, from: data)
-            else {
-                return .daysOfWeek([])
-            }
-            return decoded
-        }()
-        
-        return Tracker(
-            id: coreData.id ?? UUID(),
-            name: coreData.name ?? "",
-            color: TrackerColor.from(coreData.color),
-            emoji: coreData.emoji ?? "",
-            schedule: schedule,
-            type: TrackerType(rawValue: coreData.type ?? "") ?? .habit
-        )
-    }
-    
+
     private func isFutureDate(_ date: Date) -> Bool {
         let calendar = Calendar.current
 
@@ -209,7 +184,7 @@ final class TrackerListViewModel: TrackerFetchedResultsControllerDelegate {
 }
 
 // MARK: - TrackerRecordFetchedResultsControllerDelegate
-extension TrackerListViewModel: TrackerRecordFetchedResultsControllerDelegate {
+extension TrackerListViewModel: TrackerRecordStoreDelegate {
     func trackerRecordStoreDidChangeContent() {
         reload()
     }
