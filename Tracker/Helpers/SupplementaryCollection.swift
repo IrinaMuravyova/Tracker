@@ -61,10 +61,13 @@ extension SupplementaryCollection: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(
+        guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: SupplementaryCollection.trackerCellIdentifier,
             for: indexPath
-        ) as! TrackersCell
+        ) as? TrackersCell else {
+            assertionFailure("[SupplementaryCollection] Failed to attach dequeueReusableCell к TrackersCell")
+            return UICollectionViewCell()
+        }
 
         let vm = viewModel.sections[indexPath.section].trackers[indexPath.row]
 
