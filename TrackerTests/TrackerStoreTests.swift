@@ -11,7 +11,7 @@ import XCTest
 final class TrackerStoreTest: XCTestCase {
     func testTrackerSaving() throws {
 
-        // Arrange
+        // Arrange  
         let repository = MockTrackerRepository()
         let store = TrackerStore(repository: repository)
 

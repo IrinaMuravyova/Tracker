@@ -22,14 +22,14 @@ final class SupplementaryCollection: NSObject {
     // MARK: - Private properties
     private let params: GeometricParams
     private let container: CoreDataContainer
-    private let viewModel: TrackerListViewModel
+    private let viewModel: TrackerListUIModel
     
     // MARK: - Public properties
     weak var delegate: SupplementaryCollectionDelegate?
     weak var collectionView: UICollectionView?
     
     // MARK: - Initializes
-    init(using params: GeometricParams, container: CoreDataContainer, viewModel: TrackerListViewModel) {
+    init(using params: GeometricParams, container: CoreDataContainer, viewModel: TrackerListUIModel) {
         self.params = params
         self.container = container
         self.viewModel = viewModel

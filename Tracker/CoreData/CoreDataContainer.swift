@@ -22,7 +22,7 @@ final class CoreDataContainer {
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
 #if DEBUG
-            fatalError("Unresolved error \(error), \(error.userInfo)")
+            assertionFailure("Unresolved error \(error), \(error.userInfo)")
 #else
             print("Core Data error: \(error), \(error.userInfo)")
 #endif
@@ -57,4 +57,3 @@ final class CoreDataContainer {
         }
     }
 }
-

@@ -32,11 +32,11 @@ final class TrackersViewController: UIViewController {
     private var changedTrackerId: UUID?
     private var currentDate: Date = Date()
     private let container: CoreDataContainer
-    private let viewModel: TrackerListViewModel
+    private let viewModel: TrackerListUIModel
 
     init(
         container: CoreDataContainer,
-        viewModel: TrackerListViewModel
+        viewModel: TrackerListUIModel
     ) {
         self.container = container
         self.viewModel = viewModel

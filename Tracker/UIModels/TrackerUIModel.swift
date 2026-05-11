@@ -1,5 +1,5 @@
 //
-//  TrackerViewModel.swift
+//  TrackerUIModel.swift
 //  Tracker
 //
 //  Created by Irina Muravyeva on 06.05.2026.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TrackerViewModel {
+struct TrackerUIModel {
     let id: UUID
     let name: String
     let emoji: String

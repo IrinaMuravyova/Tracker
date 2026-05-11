@@ -1,5 +1,5 @@
 //
-//  TrackerListViewModel.swift
+//  TrackerListUIModel.swift
 //  Tracker
 //
 //  Created by Irina Muravyeva on 06.05.2026.
@@ -7,13 +7,13 @@
 
 import UIKit
 
-final class TrackerListViewModel: TrackerStoreDelegate {
+final class TrackerListUIModel: TrackerStoreDelegate {
     // MARK: - Private properties
     private var trackerStore: TrackerStoreProtocol
     private var recordStore: TrackerRecordStoreProtocol
     private let container: CoreDataContainer
     
-    private(set) var sections: [TrackerSectionViewModel] = []
+    private(set) var sections: [TrackerSectionUIModel] = []
     
     private var selectedDate: Date = Date()
     
@@ -81,7 +81,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     
     // MARK: - Private methods
     private func reload() {
-        var sections: [TrackerSectionViewModel] = []
+        var sections: [TrackerSectionUIModel] = []
 
         let calendar = Calendar.current
 
@@ -97,7 +97,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
 
         for sectionIndex in 0..<trackerStore.numberOfSections {
 
-            var items: [TrackerViewModel] = []
+            var items: [TrackerUIModel] = []
 
             let rows = trackerStore.numberOfRowsInSection(sectionIndex)
 
@@ -143,7 +143,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
             let title = trackerStore.titleForSection(sectionIndex)
 
             sections.append(
-                TrackerSectionViewModel(
+                TrackerSectionUIModel(
                     title: title,
                     trackers: items
                 )
@@ -155,7 +155,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     }
     
     private func makeVM(_ tracker: Tracker,
-                        records: [TrackerRecord]) -> TrackerViewModel {
+                        records: [TrackerRecord]) -> TrackerUIModel {
         
         let trackerRecords = records.filter {
             $0.trackerId == tracker.id
@@ -165,7 +165,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
             return Calendar.current.isDate($0.date, inSameDayAs: selectedDate)
         }
 
-        return TrackerViewModel(
+        return TrackerUIModel(
             id: tracker.id,
             name: tracker.name,
             emoji: tracker.emoji,
@@ -184,7 +184,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
 }
 
 // MARK: - TrackerRecordFetchedResultsControllerDelegate
-extension TrackerListViewModel: TrackerRecordStoreDelegate {
+extension TrackerListUIModel: TrackerRecordStoreDelegate {
     func trackerRecordStoreDidChangeContent() {
         reload()
     }

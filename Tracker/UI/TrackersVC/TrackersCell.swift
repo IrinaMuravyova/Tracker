@@ -49,7 +49,7 @@ final class TrackersCell: UICollectionViewCell {
     
     // MARK: - Public functions
     func configureCell(
-        with tracker: TrackerViewModel,
+        with tracker: TrackerUIModel,
         completedCount: Int,
         isDone: Bool
     ) {

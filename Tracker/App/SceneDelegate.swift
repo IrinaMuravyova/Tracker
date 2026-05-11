@@ -27,7 +27,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let tabBarController = MainTabBarController(
             container: container,
-            viewModel: TrackerListViewModel(
+            viewModel: TrackerListUIModel(
                 container: container
             )
         )
