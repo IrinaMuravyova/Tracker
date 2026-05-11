@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import CoreData
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -23,8 +22,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             assertionFailure("[SceneDelegate] Unable to get AppDelegate")
             return
         }
-        let context = appDelegate.persistentContainer.viewContext
-        let container = CoreDataContainer(context: context)
+        
+        let container = CoreDataContainer()
         
         let tabBarController = MainTabBarController(
             container: container,
