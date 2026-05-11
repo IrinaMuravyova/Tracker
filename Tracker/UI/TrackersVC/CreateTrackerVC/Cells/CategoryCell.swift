@@ -19,10 +19,7 @@ class CategoryCell: UITableViewCell {
     private let categoryTextField = UITextField()
     private let selectionImageView = UIImageView ()
     private let separator = UIView()
-    
-    // MARK: - Private properties
-    private var trackersFactory: TrackersFactoryProtocol?
-    
+        
     // MARK: - Public properties
     weak var delegate: CategoryCellDelegate?
     
@@ -63,7 +60,6 @@ class CategoryCell: UITableViewCell {
     
     // MARK: - Public methods
     func configureDefault(container: CoreDataContainer) {
-//        trackersFactory = TrackerRepository(container: container)
         
         categoryTextField.placeholder = "Введите название категории"
         selectionImageView.image = UIImage(systemName: "checkmark")
