@@ -8,13 +8,29 @@
 import UIKit
 
 class MainTabBarController: UITabBarController {
+    private let container: CoreDataContainer
+    private let viewModel: TrackerListUIModel
+    
+    init(
+        container: CoreDataContainer,
+        viewModel: TrackerListUIModel
+    ) {
+        self.container = container
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupAppearance()
         
-        let trackersVC = TrackersViewController()
+        let trackersVC = TrackersViewController(
+            container: container, viewModel: viewModel)
         trackersVC.tabBarItem = UITabBarItem(
             title: "Трекеры",
             image: UIImage(systemName: "record.circle.fill")?.withRenderingMode(.alwaysOriginal),

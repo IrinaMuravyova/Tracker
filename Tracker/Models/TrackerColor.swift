@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum TrackerColor: String {
+enum TrackerColor: String, CaseIterable {
     case colorselection1, colorselection2, colorselection3, colorselection4, colorselection5, colorselection6, colorselection7, colorselection8, colorselection9, colorselection10, colorselection11, colorselection12,
          colorselection13, colorselection14, colorselection15,
          colorselection16, colorselection17, colorselection18
@@ -51,5 +51,18 @@ enum TrackerColor: String {
         case .colorselection18:
             return UIColor(resource: .colorSelection18)
         }
+    }
+}
+
+// MARK: - Mapping for TrackerCoreData.color
+extension TrackerColor {
+    static func from(_ raw: String?) -> TrackerColor {
+        guard
+            let raw,
+            let color = TrackerColor(rawValue: raw)
+        else {
+            return .colorselection1
+        }
+        return color
     }
 }

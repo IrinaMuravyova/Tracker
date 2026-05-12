@@ -18,7 +18,20 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     private func switchRootToTabBar() {
-        let tabBarController = MainTabBarController()
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            assertionFailure("[SceneDelegate] Unable to get AppDelegate")
+            return
+        }
+        
+        let container = CoreDataContainer()
+        
+        let tabBarController = MainTabBarController(
+            container: container,
+            viewModel: TrackerListUIModel(
+                container: container
+            )
+        )
+
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
     }

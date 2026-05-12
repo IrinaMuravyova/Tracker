@@ -72,6 +72,7 @@ private extension BaseDetailsItem {
     func setupUI() {
         let stackView = UIStackView(arrangedSubviews: [titleLabel, subTitleLabel])
         stackView.axis = .vertical
+        stackView.spacing = 2
         stackView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stackView)
         addSubview(chevronImageView)
@@ -83,7 +84,6 @@ private extension BaseDetailsItem {
             titleLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: stackView.trailingAnchor),
             
-            subTitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),
             subTitleLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor),
             subTitleLabel.trailingAnchor.constraint(equalTo: stackView.trailingAnchor),
             subTitleLabel.bottomAnchor.constraint(equalTo: stackView.bottomAnchor),

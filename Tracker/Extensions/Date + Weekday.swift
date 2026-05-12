@@ -12,6 +12,12 @@ extension Date {
         let calendar = Calendar.current
         let weekdayNumber = calendar.component(.weekday, from: self)
         let mappedValue = weekdayNumber == 1 ? 7 : weekdayNumber - 1
-        return Weekday(rawValue: mappedValue)!
+        
+        guard let weekday = Weekday(rawValue: mappedValue) else {
+            assertionFailure("[Date] Invalid weekday value: \(mappedValue)")
+            return .monday
+        }
+        
+        return weekday
     }
 }

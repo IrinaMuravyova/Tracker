@@ -29,11 +29,23 @@ final class TrackersViewController: UIViewController {
     private let filterButton = UIButton()
     
     // MARK: - Private properties
-    private var categories: [TrackerCategory] = []
-    private var completedTrackers: [TrackerRecord] = []
     private var changedTrackerId: UUID?
     private var currentDate: Date = Date()
-    private let trackersFactory: TrackersFactoryProtocol? = TrackersFactory.shared
+    private let container: CoreDataContainer
+    private let viewModel: TrackerListUIModel
+
+    init(
+        container: CoreDataContainer,
+        viewModel: TrackerListUIModel
+    ) {
+        self.container = container
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("[TrackersViewController] init(coder:) has not been implemented")
+    }
     
     // MARK: - Public properties
     let params = GeometricParams(cellCount: 2,
@@ -45,30 +57,38 @@ final class TrackersViewController: UIViewController {
     // MARK: - Life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad( )
-        fetchData()
         setupUI()
         
-        if categories.isEmpty {
-            collectionView.isHidden = true
-            setupEmptyStageView()
+        viewModel.onChange = { [weak self] in
+            self?.updateUI()
         }
         
-        helper?.delegate = self
+        updateUI()
     }
     
     // MARK: - Objc methods
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         currentDate = sender.date
-        collectionView.reloadData()
+        viewModel.setDate(sender.date)
     }
     
     @objc private func addTrackerButtonTapped() {
         guard navigationController?.visibleViewController == self else { return }
         
-        let trackerTypeVC = TrackerTypeSelectionViewController()
+        let trackerTypeVC = TrackerTypeSelectionViewController(container: container)
         trackerTypeVC.delegate = self
         let createTrackerNavVC = UINavigationController(rootViewController: trackerTypeVC)
         self.present(createTrackerNavVC, animated: true)
+    }
+
+    private func updateUI() {
+        collectionView.reloadData()
+
+        let isEmpty = viewModel.sections.isEmpty
+        
+        collectionView.isHidden = isEmpty
+        emptyStageView.isHidden = !isEmpty
+        filterButton.isHidden = isEmpty
     }
 }
 
@@ -79,41 +99,22 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     }
     
     func updateCell(with index: IndexPath) {
-        fetchData()
         collectionView.reloadItems(at: [index])
     }
     
     func showNotAllowFutureDateAlert() {
-        let alert = UIAlertController(
+        AlertHelper.showAlertWith(
+            on: self,
             title: "Упс.. Что-то пошло не так",
-            message: "Нельзя отметить привычку для будущей даты",
-            preferredStyle: .alert
+            message: "Нельзя отметить привычку для будущей даты"
         )
-        
-        let okAction = UIAlertAction(title: "ОК", style: .default)
-        alert.addAction(okAction)
-        
-        present(alert, animated: true)
-    }
-    
-    private func fetchData() {
-        guard let trackersFactory else { return }
-        categories = trackersFactory.getTrackersCategory()
-        completedTrackers = trackersFactory.getCompletedTrackers()
     }
 }
 
 // MARK: - TrackerTypeSelectionViewControllerDelegate
 extension TrackersViewController: TrackerTypeSelectionViewControllerDelegate {
     func reloadCollectionView() {
-        fetchData()
-        
-        helper?.updateData(
-            categories: categories,
-            completed: completedTrackers
-        )
-        
-        collectionView.reloadData()
+        updateUI()
     }
 }
 
@@ -126,6 +127,7 @@ private extension TrackersViewController {
         setupSearchBar()
         setupFilterButton()
         setupCollectionView()
+        setupEmptyStageView()
         setupConstraints()
     }
     
@@ -201,7 +203,12 @@ private extension TrackersViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
         
-        helper = SupplementaryCollection(categories: categories, completedTrackers: completedTrackers, using: params)
+        helper = SupplementaryCollection(
+            using: params,
+            container: container,
+            viewModel: viewModel
+        )
+        helper?.delegate = self
         helper?.collectionView = collectionView
         
         collectionView.dataSource = helper

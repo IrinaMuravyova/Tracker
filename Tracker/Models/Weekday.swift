@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Weekday: Int, CaseIterable {
+enum Weekday: Int, CaseIterable, Codable {
     case monday = 1
     case tuesday
     case wednesday
@@ -38,5 +38,13 @@ enum Weekday: Int, CaseIterable {
         case .saturday: return "Сб"
         case .sunday: return "Вс"
         }
+    }
+}
+
+// MARK: - Extension for filtering on date
+extension Weekday {
+    init?(calendarWeekday: Int) {
+        let normalized = calendarWeekday == 1 ? 7 : calendarWeekday - 1
+        self.init(rawValue: normalized)
     }
 }

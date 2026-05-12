@@ -11,3 +11,4 @@ enum TrackerType: String {
     case habit
     case irregular
 }
+
