@@ -7,25 +7,20 @@
 
 import UIKit
 
-protocol CreateCategoryViewControllerProtocol: AnyObject {
-    func categoryDidAdded(for category: String?)
-}
-
 final class CreateCategoryViewController: UIViewController {
     // MARK: - UI Properties
     private let tableView = UITableView()
     private let saveButton = UIButton()
     
     // MARK: - Private properties
-    private var newCategory: String?
-    private let container: CoreDataContainer
+    private let viewModel: CreateCategoryViewModel
     
     // MARK: - Public properties
-    weak var delegate: CreateCategoryViewControllerProtocol?
+    var onCategoryCreated: (() -> Void)?
     
     // MARK: - Initializes
-    init(container: CoreDataContainer) {
-        self.container = container
+    init(viewModel: CreateCategoryViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -37,19 +32,42 @@ final class CreateCategoryViewController: UIViewController {
     // MARK: - Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupUI()
+        bindViewModel()
     }
     
     // MARK: - Objective functions
     @objc private func saveButtonDidTap() {
-        delegate?.categoryDidAdded(for: newCategory)
-        navigationController?.popViewController(animated: true)
+        viewModel.createCategory()
     }
 }
 
 // MARK: - UI setup
 private extension CreateCategoryViewController {
-    
+    func bindViewModel() {
+        viewModel.buttonStateDidChange = { [weak self] isEnabled in
+            self?.saveButton.isEnabled = isEnabled
+            self?.saveButton.backgroundColor =
+            isEnabled ? .black : .grayButton
+        }
+
+        viewModel.categoryDidCreate = { [weak self] in
+            self?.onCategoryCreated?()
+            self?.navigationController?.popViewController(animated: true)
+        }
+
+        viewModel.showError = { [weak self] message in
+            guard let self else { return }
+
+            AlertHelper.showAlertWith(
+                on: self,
+                title: "Упс.. Что-то пошло не так",
+                message: message
+            )
+        }
+    }
+
     func setupUI() {
         setupView()
         setupNavigationBar()
@@ -122,9 +140,10 @@ extension CreateCategoryViewController: UITableViewDataSource, UITableViewDelega
             fatalError("[CreateCategoryViewController] WeekCell has not been implemented")
             return UITableViewCell()
         }
-        
-        cell.configureDefault(container: container)
+    
         cell.delegate = self
+        cell.configureDefault()
+        cell.configureAppearance(isFirst: true, isLast: true)
 
         return cell
     }
@@ -137,29 +156,6 @@ extension CreateCategoryViewController: UITableViewDataSource, UITableViewDelega
 // MARK: - CategoryCellDelegate
 extension CreateCategoryViewController: CategoryCellDelegate {
     func categoryDidUpdate(with title: String) {
-        checkAndReturnSelectedCategory(title)
-        newCategory = title
-        updateOKButton(for: title)
-    }
-   
-    private func updateOKButton(for title: String) {
-        if title.isEmpty {
-            saveButton.isEnabled = false
-            saveButton.backgroundColor = .grayButton
-        } else {
-            saveButton.isEnabled = true
-            saveButton.backgroundColor = .black
-        }
-    }
-    
-    private func checkAndReturnSelectedCategory(_ title: String) {
-        guard !title.isEmpty else {
-            AlertHelper.showAlertWith(
-                on: self,
-                title: "Упс.. Что-то пошло не так",
-                message: "Нужно выбрать категорию"
-            )
-            return
-        }
+        viewModel.updateCategoryTitle(title)
     }
 }

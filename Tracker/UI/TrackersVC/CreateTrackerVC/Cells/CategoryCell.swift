@@ -59,21 +59,13 @@ class CategoryCell: UITableViewCell {
     }
     
     // MARK: - Public methods
-    func configureDefault(container: CoreDataContainer) {
-        
+    func configureDefault() {
         categoryTextField.placeholder = "Введите название категории"
         selectionImageView.image = UIImage(systemName: "checkmark")
-        
-        contentView.layer.maskedCorners = [
-            .layerMinXMinYCorner, .layerMaxXMinYCorner,
-            .layerMinXMaxYCorner, .layerMaxXMaxYCorner
-        ]
-            contentView.layer.cornerRadius = 16
-            separator.isHidden = true
     }
     
-    func configure(with category: TrackerCategory, container: CoreDataContainer) {
-        configureDefault(container: container)
+    func configure(with category: TrackerCategory) {
+        configureDefault()
         categoryTextField.text = category.title
         
         categoryTextField.isEnabled = false
@@ -86,6 +78,28 @@ class CategoryCell: UITableViewCell {
             return ""
         }
         return title
+    }
+    
+    func configureAppearance(isFirst: Bool, isLast: Bool) {
+        // corners
+        var corners: CACornerMask = []
+
+        if isFirst {
+            corners.insert(.layerMinXMinYCorner)
+            corners.insert(.layerMaxXMinYCorner)
+        }
+
+        if isLast {
+            corners.insert(.layerMinXMaxYCorner)
+            corners.insert(.layerMaxXMaxYCorner)
+        }
+
+        contentView.layer.maskedCorners = corners
+        contentView.layer.cornerRadius = 16
+        contentView.clipsToBounds = true
+        
+        // separator
+        separator.isHidden = isLast
     }
 }
 
