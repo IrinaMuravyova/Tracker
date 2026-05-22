@@ -71,9 +71,7 @@ final class OnboardingViewController: UIPageViewController {
     
     // MARK: - Private methods
     private func finishOnboarding() {
-        guard let sceneDelegate = view.window?.windowScene?.delegate as? SceneDelegate else {
-            return
-        }
+        guard let sceneDelegate = view.window?.windowScene?.delegate as? SceneDelegate else { return }
         
         UserDefaults.standard.set(true, forKey: Constants.hasSeenOnboardingKey)
         sceneDelegate.onboardingDidFinished()
@@ -83,17 +81,14 @@ final class OnboardingViewController: UIPageViewController {
 // MARK: - UIPageViewControllerDataSource, UIPageViewControllerDelegate
 extension OnboardingViewController: UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        guard let viewControllerIndex = pages.firstIndex(of: viewController) else {
+        guard
+            let viewControllerIndex = pages.firstIndex(of: viewController),
+            viewControllerIndex - 1 >= 0
+        else {
             return nil
         }
         
-        let previousIndex = viewControllerIndex - 1
-        
-        guard previousIndex >= 0 else {
-            return nil
-        }
-        
-        return pages[previousIndex]
+        return pages[viewControllerIndex - 1]
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
