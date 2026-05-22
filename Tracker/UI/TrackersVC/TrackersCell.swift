@@ -28,9 +28,6 @@ final class TrackersCell: UICollectionViewCell {
     private let emojiSize = 24
     private var currentTrackerId: UUID?
     private var trackerIsDone: Bool = false
-    private let manyDaysString = NSLocalizedString(
-        "days_string_for_many_days",
-        comment: "Declension of the word Days in Russian")
     
     // MARK: - Initializers
     override init(frame: CGRect) {
@@ -147,7 +144,7 @@ private extension TrackersCell {
         
         quantityLabel.font = .systemFont(ofSize: 12, weight: .semibold)
         quantityLabel.textAlignment = .center
-        quantityLabel.text = "0 " + manyDaysString
+        quantityLabel.text = "0 " + daysString(0)
     }
     
     func setupAddButton(_ isDone: Bool = false) {
@@ -180,28 +177,10 @@ private extension TrackersCell {
     }
     
     func daysString(_ count: Int) -> String {
-        let remainder100 = count % 100
-        let remainder10 = count % 10
-        
-        if remainder100 >= 11 && remainder100 <= 14 {
-            return "\(count) \(manyDaysString)"
-        }
-        
-        let oneDayDeclections = NSLocalizedString(
-            "days_string_for_one_day",
-            comment: "Declensions for one 'day' in Russian"
+        let daysString = String.localizedStringWithFormat(
+            NSLocalizedString("dayString", comment: "Number of marked days for habit"),
+            count
         )
-        let twoDaysDeclections = NSLocalizedString(
-            "days_string_for_two_days",
-            comment: "Declensions for two 'day' in Russian"
-        )
-        switch remainder10 {
-        case 1:
-            return "\(count) \(oneDayDeclections)"
-        case 2, 3, 4:
-            return "\(count) \(twoDaysDeclections)"
-        default:
-            return "\(count) \(manyDaysString)"
-        }
+        return daysString
     }
 }

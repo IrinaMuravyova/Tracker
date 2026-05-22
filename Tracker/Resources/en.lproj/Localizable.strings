@@ -68,11 +68,6 @@
 "irregular_event_button_title" = "Irregular Event";
 "create_event_navigation_item_title" = "Create Tracker";
 
-// MARK: - TrackersCell
-"days_string_for_many_days" = "days";
-"days_string_for_one_day" = "day";
-"days_string_for_two_days" = "days";
-
 // MARK: - TrackersViewController
 "search" = "Search";
 "filters" = "Filters";

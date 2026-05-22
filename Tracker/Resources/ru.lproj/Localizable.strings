@@ -68,11 +68,6 @@
 "irregular_event_button_title" = "Нерегулярное событие";
 "create_event_navigation_item_title" = "Создание трекера";
 
-// MARK: - TrackersCell
-"days_string_for_many_days" = "дней";
-"days_string_for_one_day" = "день";
-"days_string_for_two_days" = "дня";
-
 // MARK: - TrackersViewController
 "search" = "Поиск";
 "filters" = "Фильтры";
