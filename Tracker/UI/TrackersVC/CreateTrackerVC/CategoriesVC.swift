@@ -181,7 +181,7 @@ private extension CategoriesViewController {
 // MARK: - UITableViewDataSource, UITableViewDelegate
 extension CategoriesViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.numberOfCategories
+        viewModel.numberOfCategories
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

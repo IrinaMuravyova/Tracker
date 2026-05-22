@@ -32,7 +32,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // MARK: - Private methods
     private func switchRootToTabBar() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            assertionFailure("[SceneDelegate] Unable to get AppDelegate")
+            print("[SceneDelegate] Unable to get AppDelegate")
             return
         }
         
@@ -51,7 +51,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private func switchRootToOnboarding() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            assertionFailure("[SceneDelegate] Unable to get AppDelegate")
+            print("[SceneDelegate] Unable to get AppDelegate")
             return
         }
 

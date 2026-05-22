@@ -80,6 +80,7 @@ final class OnboardingViewController: UIPageViewController {
     }
 }
 
+// MARK: - UIPageViewControllerDataSource, UIPageViewControllerDelegate
 extension OnboardingViewController: UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         guard let viewControllerIndex = pages.firstIndex(of: viewController) else {

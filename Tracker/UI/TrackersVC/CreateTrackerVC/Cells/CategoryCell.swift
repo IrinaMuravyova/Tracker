@@ -81,7 +81,6 @@ class CategoryCell: UITableViewCell {
     }
     
     func configureAppearance(isFirst: Bool, isLast: Bool) {
-        // corners
         var corners: CACornerMask = []
 
         if isFirst {
@@ -98,7 +97,6 @@ class CategoryCell: UITableViewCell {
         contentView.layer.cornerRadius = 16
         contentView.clipsToBounds = true
         
-        // separator
         separator.isHidden = isLast
     }
 }
