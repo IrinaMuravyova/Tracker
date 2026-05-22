@@ -20,15 +20,13 @@ final class CategoriesViewController: UIViewController {
     private let emptyStageLabel = UILabel()
     
     // MARK: - Private properties
-    private var selectedCategory: String?
-    private var categories: [TrackerCategory] = []
-    private let container: CoreDataContainer
+    private let viewModel: CategoriesViewModel
     
     // MARK: - Public Properties
     weak var delegate: CategoriesViewControllerProtocol?
-    
-    init(container: CoreDataContainer) {
-        self.container = container
+
+    init(viewModel: CategoriesViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -40,37 +38,60 @@ final class CategoriesViewController: UIViewController {
     // MARK: - Life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        categories = container.categoryStore.fetchCategories()
+        
         setupUI()
+        bindViewModel()
+        viewModel.fetchCategories()
     }
     
     // MARK: - Objc methods
     @objc private func addButtonDidTap() {
-        let createCategoryVC = CreateCategoryViewController(container: container)
-        createCategoryVC.delegate = self
-        navigationController?.pushViewController(createCategoryVC, animated: true)
-    }
-    
-    func updateUIForCurrentState() {
-        if categories.isEmpty {
-            setupEmptyStageView()
-            setupEmptyStageConstraints()
-        } else {
-            setupCategoriesTableView()
-            setupConstraints()
+        let createCategoryVC = CreateCategoryViewController(
+            viewModel: viewModel.makeCreateCategoryViewModel()
+        )
+
+        createCategoryVC.onCategoryCreated = { [weak self] in
+            self?.viewModel.fetchCategories()
         }
+
+        navigationController?.pushViewController(createCategoryVC, animated: true)
     }
 }
 
 // MARK: - UI setting methods
 private extension CategoriesViewController {
+    func bindViewModel() {
+        viewModel.categoriesDidChange = { [weak self] in
+            guard let self else { return }
+        
+            self.updateUI()
+            self.tableView.reloadData()
+        }
+
+        viewModel.selectedCategoryDidChange = { [weak self] category in
+            guard let self else { return }
+            self.delegate?.categoryDidSelected(for: category)
+        }
+    }
+    
+    func updateUI() {
+        emptyStageView.isHidden = !viewModel.isEmpty
+        tableView.isHidden = viewModel.isEmpty
+    }
+    
     func setupUI() {
         setupView()
         setupNavigationBar()
         setupSaveButton()
         setupSaveButtonConstraints()
         
-        updateUIForCurrentState()
+        setupEmptyStageView()
+        setupEmptyStageConstraints()
+        
+        setupCategoriesTableView()
+        setupConstraints()
+
+        updateUI()
     }
     
     func setupView() {
@@ -160,63 +181,33 @@ private extension CategoriesViewController {
 // MARK: - UITableViewDataSource, UITableViewDelegate
 extension CategoriesViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categories.count
+        viewModel.numberOfCategories
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reusedIdentifier, for: indexPath) as? CategoryCell
-        
-        guard let cell else {
-            fatalError("[CategoriesViewController] WeekCell has not been implemented")
+
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: CategoryCell.reusedIdentifier,
+            for: indexPath
+        ) as? CategoryCell else {
             return UITableViewCell()
         }
+  
+        let category = viewModel.category(at: indexPath.row)
+        cell.configure(with: category)
         
-        cell.configure(with: categories[indexPath.row], container: container)
-        
-        if let selectedCategory,
-           cell.getCategoryTitle() == selectedCategory {
-            cell.setSelected(true, animated: false)
-        }
-        
+        let isFirst = indexPath.row == 0
+        let isLast = indexPath.row == viewModel.numberOfCategories - 1
+        cell.configureAppearance(isFirst: isFirst, isLast: isLast)
+
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let cell = tableView.cellForRow(at: indexPath) as? CategoryCell else { return }
-        
-        selectedCategory = cell.getCategoryTitle()
-        
-        tableView.visibleCells.forEach { visibleCell in
-            if let categoryCell = visibleCell as? CategoryCell {
-                categoryCell.setSelected(false, animated: true)
-            }
-        }
-        cell.setSelected(true, animated: true)
-        
-        guard let category = selectedCategory else { return }
-        delegate?.categoryDidSelected(for: category)
-        navigationController?.popViewController(animated: true)
+        viewModel.selectCategory(at: indexPath.row)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         75
-    }
-}
-
-extension CategoriesViewController: CreateCategoryViewControllerProtocol {
-    func categoryDidAdded(for category: String?) {
-        selectedCategory = category
-        
-        guard let category else { return }
-        do {
-            try container.categoryStore.addCategory(category)
-        } catch {
-            fatalError("[CategoriesVC] Category can't save to category Store")
-        }
-        
-        categories = container.categoryStore.fetchCategories()
-        
-        updateUIForCurrentState()
-        tableView.reloadData()
     }
 }

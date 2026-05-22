@@ -18,4 +18,6 @@ class Constants {
         "😇", "😡", "🥶", "🤔", "🙌", "🍔",
         "🥦", "🏓", "🥇", "🎸", "🏝", "😪"
     ]
+    
+    static let hasSeenOnboardingKey = "hasSeenOnboarding"
 }

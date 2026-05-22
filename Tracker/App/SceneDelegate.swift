@@ -14,12 +14,25 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
+
+        let hasSeenOnboarding = UserDefaults.standard.bool(forKey: Constants.hasSeenOnboardingKey)
+
+        if hasSeenOnboarding {
+            switchRootToTabBar()
+        } else {
+            switchRootToOnboarding()
+        }
+    }
+    
+    // MARK: - Public methods
+    func onboardingDidFinished() {
         switchRootToTabBar()
     }
     
+    // MARK: - Private methods
     private func switchRootToTabBar() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            assertionFailure("[SceneDelegate] Unable to get AppDelegate")
+            print("[SceneDelegate] Unable to get AppDelegate")
             return
         }
         
@@ -33,6 +46,16 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
 
         window?.rootViewController = tabBarController
+        window?.makeKeyAndVisible()
+    }
+    
+    private func switchRootToOnboarding() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            print("[SceneDelegate] Unable to get AppDelegate")
+            return
+        }
+
+        window?.rootViewController = OnboardingViewController()
         window?.makeKeyAndVisible()
     }
 }

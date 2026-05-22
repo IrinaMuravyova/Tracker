@@ -40,7 +40,7 @@ final class TrackerDetailsViewController: UIViewController {
         view.frame.size.height = 1
         return view
     }()
-    
+
     private let emojiCollection = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private let colorCollection = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private let emojiLabel = UILabel()
@@ -92,7 +92,10 @@ final class TrackerDetailsViewController: UIViewController {
         }
         
         scheduleSettingsVC.delegate = self
-        let categoriesSettingsVC = CategoriesViewController(container: container)
+        let categoriesViewModel = CategoriesViewModel(
+            categoryStore: container.categoryStore
+        )
+        let categoriesSettingsVC = CategoriesViewController(viewModel: categoriesViewModel)
         categoriesSettingsVC.delegate = self
         
         categoryView?.onTap = { [weak self] in
@@ -462,6 +465,8 @@ extension TrackerDetailsViewController: CategoriesViewControllerProtocol {
         trackerDraft.category = category
         updateCategoryView(with: category)
         updateSaveButtonState()
+        
+        navigationController?.popViewController(animated: true)
     }
     
     private func updateCategoryView(with category: String) {
