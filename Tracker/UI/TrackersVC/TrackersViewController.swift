@@ -16,6 +16,7 @@ final class TrackersViewController: UIViewController {
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
+        formatter.locale = Locale.current
         return formatter
     }()
     
@@ -190,6 +191,7 @@ private extension TrackersViewController {
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .compact
         datePicker.date = currentDate
+        datePicker.locale = Locale.current
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
         
