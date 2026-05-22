@@ -43,10 +43,31 @@ final class OnboardingTemplateVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupUI()
+        setupConstraints()
+    }
+    
+    @objc private func nextTapped() {
+        onNextButtonTapped?()
+    }
+    
+    // MARK: - Public methods
+    func setImage(_ image: ImageResource) {
+        backgroundImage.image = UIImage(resource: image)
+    }
+    
+    func setTitle(_ title: String) {
+        titleLabel.text = title
+    }
+    
+    // MARK: - Private methods
+    private func setupUI() {
         view.addSubview(backgroundImage)
         view.addSubview(titleLabel)
         view.addSubview(button)
-        
+    }
+    
+    private func setupConstraints() {
         NSLayoutConstraint.activate([
             backgroundImage.topAnchor.constraint(equalTo: view.topAnchor),
             backgroundImage.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -62,18 +83,5 @@ final class OnboardingTemplateVC: UIViewController {
             button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             button.heightAnchor.constraint(equalToConstant: 60),
         ])
-    }
-    
-    @objc private func nextTapped() {
-        onNextButtonTapped?()
-    }
-    
-    // MARK: - Public methods
-    func setImage(_ image: ImageResource) {
-        backgroundImage.image = UIImage(resource: image)
-    }
-    
-    func setTitle(_ title: String) {
-        titleLabel.text = title
     }
 }
