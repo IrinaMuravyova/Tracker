@@ -179,7 +179,7 @@ extension SupplementaryCollection: UICollectionViewDelegate {
             let pinAction = UIAction(
                 title: pinTitle
             ) { _ in
-                // TODO: pin / unpin
+                self.viewModel.togglePinned(at: tracker.id)
             }
 
             let editAction = UIAction(

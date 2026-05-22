@@ -13,5 +13,23 @@ struct Tracker{
         emoji: String,
         schedule: TrackerSchedule,
         type: TrackerType,
+        isPinned: Bool 
+    
+    init(
+        id: UUID,
+        name: String,
+        color: TrackerColor,
+        emoji: String,
+        schedule: TrackerSchedule,
+        type: TrackerType,
         isPinned: Bool = false
+    ) {
+        self.id = id
+        self.name = name
+        self.color = color
+        self.emoji = emoji
+        self.schedule = schedule
+        self.type = type
+        self.isPinned = isPinned
+    }
 }

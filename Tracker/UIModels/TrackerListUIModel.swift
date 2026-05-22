@@ -79,6 +79,15 @@ final class TrackerListUIModel: TrackerStoreDelegate {
         }
     }
     
+    func togglePinned(at id: UUID) {
+        do {
+            try trackerStore.togglePinned(for: id)
+            onChange?()
+        } catch {
+            print(error)
+        }
+    }
+    
     // MARK: - Private methods
     private func reload() {
         var sections: [TrackerSectionUIModel] = []

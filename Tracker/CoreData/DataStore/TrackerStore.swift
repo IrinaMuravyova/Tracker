@@ -24,6 +24,8 @@ protocol TrackerStoreProtocol {
     func titleForSection(_ section: Int) -> String
     
     var delegate: TrackerStoreDelegate? { get set }
+    
+    func togglePinned(for id: UUID) throws
 }
 
 // MARK: - TrackerFetchedResultsControllerDelegate
@@ -40,6 +42,7 @@ final class TrackerStore: NSObject {
         let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         
         fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "isPinned", ascending: false),
             NSSortDescriptor(key: "category.title", ascending: true),
             NSSortDescriptor(key: "name", ascending: true)
         ]
@@ -47,7 +50,7 @@ final class TrackerStore: NSObject {
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
-            sectionNameKeyPath: "category.title",
+            sectionNameKeyPath: "sectionName",
             cacheName: nil)
          
         return fetchedResultsController
@@ -88,6 +91,7 @@ extension TrackerStore {
         trackerCoreData.emoji = tracker.emoji
         trackerCoreData.schedule = try? JSONEncoder().encode(tracker.schedule)
         trackerCoreData.type = tracker.type.rawValue
+        trackerCoreData.isPinned = tracker.isPinned
         
         try context.save()
     }
@@ -101,6 +105,19 @@ extension TrackerStore {
         let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         let results = try context.fetch(request)
         return results
+    }
+    
+    func togglePinned(for id: UUID) throws {
+        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+
+        guard let tracker = try context.fetch(request).first else {
+            throw TrackerStoreError.trackerNotFound
+        }
+
+        tracker.isPinned.toggle()
+        
+        try context.save()
     }
 }
 
@@ -145,7 +162,8 @@ private extension TrackerStore {
             color: TrackerColor.from(coreData.color),
             emoji: coreData.emoji ?? "",
             schedule: schedule,
-            type: TrackerType(rawValue: coreData.type ?? "") ?? .habit
+            type: TrackerType(rawValue: coreData.type ?? "") ?? .habit,
+            isPinned: coreData.isPinned
         )
     }
 }

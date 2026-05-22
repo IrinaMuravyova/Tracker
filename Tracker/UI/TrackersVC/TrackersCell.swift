@@ -24,8 +24,11 @@ final class TrackersCell: UICollectionViewCell {
     private let quantityLabel = UILabel()
     private let addButton = UIButton()
     
+    private let pinImageView = UIImageView()
+    
     // MARK: - Private properties
     private let emojiSize = 24
+    private let pinSize = 24
     private var currentTrackerId: UUID?
     private var trackerIsDone: Bool = false
     
@@ -53,6 +56,8 @@ final class TrackersCell: UICollectionViewCell {
         completedCount: Int,
         isDone: Bool
     ) {
+        pinImageView.isHidden = !tracker.isPinned
+        
         currentTrackerId = tracker.id
         
         let color = tracker.color.uiColor
@@ -78,6 +83,7 @@ private extension TrackersCell {
     func configure() {
         setupHabitView()
         setupQuantityView()
+        setupPinImageView()
         setupConstraints()
     }
     
@@ -119,12 +125,25 @@ private extension TrackersCell {
         habitView.addSubview(titleLabel)
     }
     
+    func setupPinImageView() {
+        pinImageView.translatesAutoresizingMaskIntoConstraints = false
+        pinImageView.image = UIImage(named: "pin")
+        pinImageView.isHidden = true
+
+        habitView.addSubview(pinImageView)
+    }
+    
     func setupHabitViewConstraints() {
         NSLayoutConstraint.activate([
             habitView.topAnchor.constraint(equalTo: contentView.topAnchor),
             habitView.heightAnchor.constraint(equalToConstant: 90),
             habitView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             habitView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            
+            pinImageView.topAnchor.constraint(equalTo: habitView.topAnchor, constant: 12),
+            pinImageView.rightAnchor.constraint(equalTo: habitView.rightAnchor, constant: -4),
+            pinImageView.widthAnchor.constraint(equalToConstant: CGFloat(pinSize)),
+            pinImageView.heightAnchor.constraint(equalToConstant: CGFloat(pinSize)),
             
             emojiLabel.topAnchor.constraint(equalTo: habitView.topAnchor, constant: 12),
             emojiLabel.leadingAnchor.constraint(equalTo: habitView.leadingAnchor, constant: 12),
