@@ -124,7 +124,7 @@ extension SupplementaryCollection: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         
         let header = SupplementaryView(frame: .zero)
-        header.configure(title: "пример для расчета высоты")
+        header.configure(title: "example for calculate height of header")
 
         let targetSize = CGSize(
             width: collectionView.frame.width,

@@ -62,7 +62,10 @@ private extension CreateCategoryViewController {
 
             AlertHelper.showAlertWith(
                 on: self,
-                title: "Упс.. Что-то пошло не так",
+                title: NSLocalizedString(
+                    "alert_title",
+                    comment: "Text for alert title"
+                ),
                 message: message
             )
         }
@@ -81,7 +84,10 @@ private extension CreateCategoryViewController {
     }
     
     func setupNavigationBar() {
-        title = "Новая категория"
+        title = NSLocalizedString(
+            "createcategory_navigationbar_title"
+            , comment: "Text for create category navigation bar title"
+        )
         navigationItem.hidesBackButton = true
     }
     
@@ -102,7 +108,13 @@ private extension CreateCategoryViewController {
         saveButton.backgroundColor = .grayButton
         saveButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         saveButton.setTitleColor(.white, for: .normal)
-        saveButton.setTitle("Готово", for: .normal)
+        saveButton.setTitle(
+            NSLocalizedString(
+                "createcategory_savebutton_title",
+                comment: "Text for create category save button"
+            ),
+            for: .normal
+        )
         
         saveButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(saveButton)

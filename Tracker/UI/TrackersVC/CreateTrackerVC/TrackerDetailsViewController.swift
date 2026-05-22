@@ -79,8 +79,14 @@ final class TrackerDetailsViewController: UIViewController {
         
         let isHabit = trackerType == .habit
         title = isHabit
-            ? "Новая привычка"
-            : "Новое нерегулярное событие"
+            ? NSLocalizedString(
+                "create_habit_title",
+                comment: "Title for create a new habit"
+            )
+            : NSLocalizedString(
+                "create_event_title",
+                comment: "Title for create a new irregular event"
+            )
         
         saveButton.isEnabled = false
         setupUI()
@@ -214,7 +220,10 @@ private extension TrackerDetailsViewController {
     func setupTitleTF() {
         titleTF.translatesAutoresizingMaskIntoConstraints = false
         
-        titleTF.placeholder = "Введите название трекера"
+        titleTF.placeholder = NSLocalizedString(
+            "habit_placeholder",
+            comment: "Text contained in the placeholder of creating a new habit"
+        )
         titleTF.layer.cornerRadius = 16
         titleTF.backgroundColor = .backgroundDay
         view.layer.cornerRadius = 16
@@ -236,7 +245,10 @@ private extension TrackerDetailsViewController {
     func setupTitleFooter() {
         titleFooter.font = .systemFont(ofSize: 17, weight: .regular)
         titleFooter.textColor = .redFigma
-        titleFooter.text = "Ограничение 38 символов"
+        titleFooter.text = NSLocalizedString(
+            "titlefooter_text",
+            comment: "Text for titleFooter for too long habit title"
+        )
         titleFooter.textAlignment = .center
         titleFooter.translatesAutoresizingMaskIntoConstraints = false
         titleFooter.isHidden = true
@@ -244,12 +256,16 @@ private extension TrackerDetailsViewController {
     
     func setupDetailsView() {
         categoryView = BaseDetailsItem(
-            withTitle: "Категория",
+            withTitle: NSLocalizedString(
+                "categoryview_title",
+                comment: "Text for categoryView title"),
             subTitle: ""
         )
         
         scheduleView = BaseDetailsItem(
-            withTitle: "Расписание",
+            withTitle: NSLocalizedString(
+                "scheduleview_title",
+                comment: "Text for scheduleView title"),
             subTitle: ""
         )
         
@@ -310,7 +326,10 @@ private extension TrackerDetailsViewController {
         contentView.addSubview(colorLabel)
         colorLabel.font = .systemFont(ofSize: 19, weight: .bold)
         colorLabel.textColor = .blackDay
-        colorLabel.text = "Цвет"
+        colorLabel.text = NSLocalizedString(
+            "colorlabel_text",
+            comment: "Text of the color label in the tracker details view controller"
+        )
     }
     
     func setupButtons() {
@@ -326,7 +345,12 @@ private extension TrackerDetailsViewController {
         view.addSubview(buttonStackView)
         
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
-        cancelButton.setTitle("Отменить", for: .normal)
+        cancelButton.setTitle(
+            NSLocalizedString(
+                "cancelbutton_title",
+                comment: "Text of the cancel button in the tracker details view controller"
+            ),
+            for: .normal)
         cancelButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         cancelButton.setTitleColor(.redFigma, for: .normal)
         cancelButton.layer.borderWidth = 1
@@ -335,7 +359,12 @@ private extension TrackerDetailsViewController {
         cancelButton.backgroundColor = .white
         
         saveButton.translatesAutoresizingMaskIntoConstraints = false
-        saveButton.setTitle("Создать", for: .normal)
+        saveButton.setTitle(
+            NSLocalizedString(
+                "savebutton_title",
+                comment: "Text of the save button in the tracker details view controller"
+            ),
+            for: .normal)
         cancelButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         saveButton.setTitleColor(.white, for: .normal)
         saveButtonSetupColors()
@@ -449,7 +478,10 @@ extension TrackerDetailsViewController: ScheduleSettingsVCProtocol {
     
     private func updateScheduleView() {
         let daysString = trackerDraft.schedule.count == Weekday.allCases.count
-        ? "Каждый день"
+        ? NSLocalizedString(
+            "days_string_text",
+            comment: "Text that shows when all days are selected in the schedule settings view"
+        )
         : trackerDraft.schedule
             .sorted(by: { $0.rawValue < $1.rawValue })
             .map(\.shortTitle)

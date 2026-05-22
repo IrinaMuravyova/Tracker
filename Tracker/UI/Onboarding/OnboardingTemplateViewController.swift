@@ -32,7 +32,13 @@ final class OnboardingTemplateVC: UIViewController {
         button.layer.cornerRadius = 16
         button.backgroundColor = .blackDay
         button.setTitleColor(.white, for: .normal)
-        button.setTitle("Вот это технологии!", for: .normal)
+        
+        let title = NSLocalizedString(
+            "onboarding_button_title",
+            comment: "Text displayed name button in onboarding screen"
+        )
+        button.setTitle(title, for: .normal)
+        
         button.translatesAutoresizingMaskIntoConstraints = false
         
         button.addTarget(self, action: #selector(nextTapped), for: .touchUpInside)

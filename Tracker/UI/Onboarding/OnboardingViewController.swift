@@ -9,16 +9,24 @@ import UIKit
 
 final class OnboardingViewController: UIPageViewController {
     lazy var pages: [UIViewController] = {
+        let firstScreenText = NSLocalizedString(
+            "onboarding_first_screen_text",
+            comment: "Text displayed text in onboarding screen"
+        )
         let first = OnboardingTemplateVC()
         first.setImage(.onboarding1)
-        first.setTitle("Отслеживайте только то, что хотите")
+        first.setTitle(firstScreenText)
         first.onNextButtonTapped = { [weak self] in
             self?.finishOnboarding()
         }
         
+        let secondScreenText = NSLocalizedString(
+            "onboarding_second_screen_text",
+            comment: "Text displayed text in onboarding screen"
+        )
         let second = OnboardingTemplateVC()
         second.setImage(.onboarding2)
-        second.setTitle("Даже если это не литры воды и йога")
+        second.setTitle(secondScreenText)
         second.onNextButtonTapped = { [weak self] in
             self?.finishOnboarding()
         }

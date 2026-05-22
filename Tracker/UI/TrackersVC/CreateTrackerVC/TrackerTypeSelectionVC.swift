@@ -18,7 +18,11 @@ final class TrackerTypeSelectionViewController: UIViewController {
         button.frame.size = CGSize(width: 335, height: 60)
         button.layer.cornerRadius = 16
         button.backgroundColor = .black
-        button.setTitle("Привычка", for: .normal)
+        button.setTitle(
+            NSLocalizedString(
+                "habitbutton_title",
+                comment: "Text for the button that allows to select a habit"),
+            for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         return button
@@ -29,7 +33,11 @@ final class TrackerTypeSelectionViewController: UIViewController {
         button.frame.size = CGSize(width: 335, height: 60)
         button.layer.cornerRadius = 16
         button.backgroundColor = .black
-        button.setTitle("Нерегулярное событие", for: .normal)
+        button.setTitle(
+            NSLocalizedString(
+                "irregular_event_button_title",
+                comment: "Text for the button that allows to select an irregular event"),
+            for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         return button
@@ -78,7 +86,10 @@ final class TrackerTypeSelectionViewController: UIViewController {
         ]
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        navigationItem.title = "Создание трекера"
+        navigationItem.title = NSLocalizedString(
+            "create_event_navigation_item_title",
+            comment: "Text for the title of the navigation item in the Tracker Type Selection View Controller"
+        )
         
         habitButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(habitButton)

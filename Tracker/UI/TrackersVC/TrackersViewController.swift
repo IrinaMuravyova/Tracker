@@ -105,8 +105,14 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     func showNotAllowFutureDateAlert() {
         AlertHelper.showAlertWith(
             on: self,
-            title: "Упс.. Что-то пошло не так",
-            message: "Нельзя отметить привычку для будущей даты"
+            title: NSLocalizedString(
+                "alert_title",
+                comment: "Title for alert"
+            ),
+            message: NSLocalizedString(
+                "alert_message_for_future_date",
+                comment: "Message about you can't mark a habit for a future date"
+            )
         )
     }
 }
@@ -143,7 +149,10 @@ private extension TrackersViewController {
     
     func setupTitle() {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "Трекеры"
+        titleLabel.text = NSLocalizedString(
+            "trackervc_title",
+            comment: "Title for main trackers list"
+        )
         titleLabel.font = UIFont.systemFont(ofSize: 34, weight: .bold)
         titleLabel.numberOfLines = 0
         view.addSubview(titleLabel)
@@ -167,7 +176,10 @@ private extension TrackersViewController {
         textFieldInsideSearchBar.textColor = .gray
         textFieldInsideSearchBar.font = .systemFont(ofSize: 17, weight: .regular)
         textFieldInsideSearchBar.attributedPlaceholder = NSAttributedString(
-            string: "Поиск",
+            string: NSLocalizedString(
+                "search",
+                comment: "Text for search bar placeholder"
+            ),
             attributes: [.foregroundColor: UIColor.gray]
         )
         textFieldInsideSearchBar.translatesAutoresizingMaskIntoConstraints = false
@@ -189,7 +201,13 @@ private extension TrackersViewController {
     }
     
     func setupFilterButton() {
-        filterButton.setTitle("Фильтры", for: .normal)
+        filterButton.setTitle(
+            NSLocalizedString(
+                "filters",
+                comment: "Title for filter button"
+            ),
+            for: .normal
+        )
         filterButton.setTitleColor(.white, for: .normal)
         filterButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
         filterButton.backgroundColor = .onTintSwitch
@@ -278,7 +296,10 @@ private extension TrackersViewController {
         
         let emptyStageLabel = UILabel()
         emptyStageLabel.translatesAutoresizingMaskIntoConstraints = false
-        emptyStageLabel.text = "Что будем отслеживать?"
+        emptyStageLabel.text = NSLocalizedString(
+            "empty_stage_label_text",
+            comment: "Text for label without any trackers"
+        )
         emptyStageLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         
         emptyStageView.translatesAutoresizingMaskIntoConstraints = false

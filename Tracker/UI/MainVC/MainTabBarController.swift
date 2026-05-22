@@ -29,18 +29,26 @@ class MainTabBarController: UITabBarController {
         
         setupAppearance()
         
+        let trackerTitle = NSLocalizedString(
+            "trackervc_title",
+            comment: "Text displayed title for tracker view controller"
+        )
         let trackersVC = TrackersViewController(
             container: container, viewModel: viewModel)
         trackersVC.tabBarItem = UITabBarItem(
-            title: "Трекеры",
+            title: trackerTitle,
             image: UIImage(systemName: "record.circle.fill")?.withRenderingMode(.alwaysOriginal),
             selectedImage: nil
         )
         let trackersNavVC = UINavigationController(rootViewController: trackersVC)
         
+        let statisticsTitle = NSLocalizedString(
+            "statisticvc_title",
+            comment: "Text displayed title for statistics view controller"
+        )
         let statisticsVC = StatisticsViewController()
         statisticsVC.tabBarItem = UITabBarItem(
-            title: "Статистика",
+            title: statisticsTitle,
             image: UIImage(systemName: "hare.fill")?.withRenderingMode(.alwaysOriginal),
             selectedImage: nil
         )

@@ -60,7 +60,12 @@ class CategoryCell: UITableViewCell {
     
     // MARK: - Public methods
     func configureDefault() {
-        categoryTextField.placeholder = "Введите название категории"
+        let placeholderText = NSLocalizedString(
+            "categorycell_placeholder",
+            comment: "Text in category text field placeholder"
+        )
+        
+        categoryTextField.placeholder = placeholderText
         selectionImageView.image = UIImage(systemName: "checkmark")
     }
     

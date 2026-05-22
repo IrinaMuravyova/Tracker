@@ -28,6 +28,9 @@ final class TrackersCell: UICollectionViewCell {
     private let emojiSize = 24
     private var currentTrackerId: UUID?
     private var trackerIsDone: Bool = false
+    private let manyDaysString = NSLocalizedString(
+        "days_string_for_many_days",
+        comment: "Declension of the word Days in Russian")
     
     // MARK: - Initializers
     override init(frame: CGRect) {
@@ -111,7 +114,7 @@ private extension TrackersCell {
     }
     
     func setupLabel() {
-        titleLabel.text = "Текст привычки такой длинный текст"
+        titleLabel.text = "Sample a very long maybe too long habit title"
         titleLabel.font = .systemFont(ofSize: 12, weight: .medium)
         titleLabel.textColor = .white
         titleLabel.numberOfLines = 0
@@ -144,7 +147,7 @@ private extension TrackersCell {
         
         quantityLabel.font = .systemFont(ofSize: 12, weight: .semibold)
         quantityLabel.textAlignment = .center
-        quantityLabel.text = "0 дней"
+        quantityLabel.text = "0 " + manyDaysString
     }
     
     func setupAddButton(_ isDone: Bool = false) {
@@ -181,16 +184,24 @@ private extension TrackersCell {
         let remainder10 = count % 10
         
         if remainder100 >= 11 && remainder100 <= 14 {
-            return "\(count) дней"
+            return "\(count) \(manyDaysString)"
         }
         
+        let oneDayDeclections = NSLocalizedString(
+            "days_string_for_one_day",
+            comment: "Declensions for one 'day' in Russian"
+        )
+        let twoDaysDeclections = NSLocalizedString(
+            "days_string_for_two_days",
+            comment: "Declensions for two 'day' in Russian"
+        )
         switch remainder10 {
         case 1:
-            return "\(count) день"
+            return "\(count) \(oneDayDeclections)"
         case 2, 3, 4:
-            return "\(count) дня"
+            return "\(count) \(twoDaysDeclections)"
         default:
-            return "\(count) дней"
+            return "\(count) \(manyDaysString)"
         }
     }
 }

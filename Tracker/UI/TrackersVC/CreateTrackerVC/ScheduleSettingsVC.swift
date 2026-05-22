@@ -54,7 +54,13 @@ private extension ScheduleSettingsVC {
         saveButton.backgroundColor = .blackDay
         saveButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         saveButton.setTitleColor(.white, for: .normal)
-        saveButton.setTitle("Готово", for: .normal)
+        saveButton.setTitle(
+            NSLocalizedString(
+                "schedule_savebutton_title",
+                comment: "Text for 'Save' button in ScheduleSettingsVC"
+            ),
+            for: .normal
+        )
         
         saveButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(saveButton)

@@ -40,7 +40,12 @@ final class CreateCategoryViewModel {
             .trimmingCharacters(in: .whitespaces)
 
         guard !trimmedTitle.isEmpty else {
-            showError?("Введите название категории")
+            let error = NSLocalizedString(
+                "error_message_empty_category",
+                comment: "Text displayed error's description about empty category"
+            )
+            
+            showError?(error)
             return
         }
 
@@ -49,7 +54,12 @@ final class CreateCategoryViewModel {
             categoryDidCreate?()
 
         } catch {
-            showError?("Такая категория уже существует")
+            let error = NSLocalizedString(
+                "error_message_category_exist",
+                comment: "Text displayed error's description about already existed category"
+            )
+            
+            showError?(error)
         }
     }
 }

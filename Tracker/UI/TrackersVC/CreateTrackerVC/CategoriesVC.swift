@@ -107,7 +107,12 @@ private extension CategoriesViewController {
         saveButton.backgroundColor = .blackDay
         saveButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         saveButton.setTitleColor(.white, for: .normal)
-        saveButton.setTitle("Добавить категорию", for: .normal)
+        
+        let saveButtonTitle = NSLocalizedString(
+            "savebutton_title",
+            comment: "Text on the button that saves the changes"
+        )
+        saveButton.setTitle(saveButtonTitle, for: .normal)
         
         saveButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(saveButton)
@@ -120,7 +125,10 @@ private extension CategoriesViewController {
         emptyStageImage.image = UIImage(resource: ._1)
         
         emptyStageLabel.translatesAutoresizingMaskIntoConstraints = false
-        emptyStageLabel.text = "Привычки и события можно объединить по смыслу"
+        emptyStageLabel.text = NSLocalizedString(
+            "emptystagelabel_text",
+            comment: "Text in the empty stage view"
+        )
         emptyStageLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         emptyStageLabel.numberOfLines = 0
         emptyStageLabel.textAlignment = .center
