@@ -23,6 +23,7 @@ final class SupplementaryCollection: NSObject {
     private let params: GeometricParams
     private let container: CoreDataContainer
     private let viewModel: TrackerListUIModel
+    private var contextMenuIndexPath: IndexPath?
     
     // MARK: - Public properties
     weak var delegate: SupplementaryCollectionDelegate?
@@ -147,5 +148,96 @@ extension SupplementaryCollection: TrackersCellDelegate {
         else { return }
 
         viewModel.toggleTracker(at: indexPath)
+    }
+}
+
+extension SupplementaryCollection: UICollectionViewDelegate {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        contextMenuIndexPath = indexPath
+        
+        let tracker = viewModel.sections[indexPath.section].trackers[indexPath.row]
+
+        let pinTitle = tracker.isPinned
+        ? NSLocalizedString(
+            "unpin",
+            comment: "Title for unpin action"
+        )
+        : NSLocalizedString(
+            "pin",
+            comment: "Title for pin action"
+        )
+
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: nil
+        ) { _ in
+
+            let pinAction = UIAction(
+                title: pinTitle
+            ) { _ in
+                // TODO: pin / unpin
+            }
+
+            let editAction = UIAction(
+                title: NSLocalizedString(
+                    "edit",
+                    comment: "Title for edit action"
+                )
+            ) { _ in
+                // TODO: edit tracker
+            }
+
+            let deleteAction = UIAction(
+                title: NSLocalizedString(
+                    "delete",
+                    comment: "Title for delete action"
+                ),
+                attributes: .destructive
+            ) { _ in
+                // TODO: delete tracker
+            }
+
+            return UIMenu(
+                title: "",
+                children: [
+                    pinAction,
+                    editAction,
+                    deleteAction
+                ]
+            )
+        }
+    }
+}
+
+// MARK: - Context Menu Preview
+extension SupplementaryCollection {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration
+    ) -> UITargetedPreview? {
+        
+        guard
+            let indexPath = contextMenuIndexPath,
+            let cell = collectionView.cellForItem(at: indexPath) as? TrackersCell
+        else {
+            return nil
+        }
+        
+        let parameters = UIPreviewParameters()
+        parameters.backgroundColor = .clear
+        
+        parameters.visiblePath = UIBezierPath(
+            roundedRect: cell.habitView.bounds,
+            cornerRadius: 16
+        )
+        
+        return UITargetedPreview(
+            view: cell.habitView,
+            parameters: parameters
+        )
     }
 }

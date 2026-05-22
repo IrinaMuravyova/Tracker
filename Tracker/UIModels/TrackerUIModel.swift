@@ -15,4 +15,6 @@ struct TrackerUIModel {
 
     let completedCount: Int
     let isDoneToday: Bool
+    
+    let isPinned: Bool
 }

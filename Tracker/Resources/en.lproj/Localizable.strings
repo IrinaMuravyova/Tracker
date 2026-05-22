@@ -76,3 +76,9 @@
 // MARK: - Errors
 "error_message_empty_category" = "Enter category name";
 "error_message_category_exist" = "This category already exists";
+
+// MARK: - SupplementaryCollection
+"pin" = "Pin";
+"unpin" = "Unpin";
+"edit" = "Edit";
+"delete" = "Delete";

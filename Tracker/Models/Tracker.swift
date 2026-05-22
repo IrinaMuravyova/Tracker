@@ -12,5 +12,6 @@ struct Tracker{
         color: TrackerColor,
         emoji: String,
         schedule: TrackerSchedule,
-        type: TrackerType
+        type: TrackerType,
+        isPinned: Bool = false
 }

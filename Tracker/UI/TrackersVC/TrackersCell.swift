@@ -16,7 +16,7 @@ final class TrackersCell: UICollectionViewCell {
     weak var delegate: TrackersCellDelegate?
     
     // MARK: - UI
-    private let habitView = UIView()
+    private(set) lazy var habitView = UIView()
     private let emojiLabel = UILabel()
     private let titleLabel = UILabel()
     

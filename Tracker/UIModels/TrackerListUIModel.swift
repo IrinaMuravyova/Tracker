@@ -171,7 +171,8 @@ final class TrackerListUIModel: TrackerStoreDelegate {
             emoji: tracker.emoji,
             color: tracker.color,
             completedCount: trackerRecords.count,
-            isDoneToday: isDoneToday
+            isDoneToday: isDoneToday,
+            isPinned: tracker.isPinned
         )
     }
 
