@@ -68,7 +68,11 @@ final class TrackerTypeSelectionViewController: UIViewController {
     // MARK: - Objc methods
     @objc private func buttonDidTap(_ sender: UIButton) {
         let type = sender == habitButton ? TrackerType.habit : TrackerType.irregular
-        let trackerDetailsVC = TrackerDetailsViewController(trackerType: type, container: container)
+
+        let viewModel = TrackerViewModel(trackerType: type, container: container)
+        let createViewModel = CreateTrackerViewModel(viewModel: viewModel)
+        let trackerDetailsVC = TrackerDetailsViewController(viewModel: createViewModel)
+
         trackerDetailsVC.delegate = self
         navigationController?.pushViewController(trackerDetailsVC, animated: true)
     }

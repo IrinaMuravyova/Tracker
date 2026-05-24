@@ -1,5 +1,5 @@
 //
-//  TrackerListUIModel.swift
+//  TrackerListViewModel.swift
 //  Tracker
 //
 //  Created by Irina Muravyeva on 06.05.2026.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TrackerListUIModel: TrackerStoreDelegate {
+final class TrackerListViewModel: TrackerStoreDelegate {
     // MARK: - Private properties
     private var trackerStore: TrackerStoreProtocol
     private var recordStore: TrackerRecordStoreProtocol
@@ -160,6 +160,7 @@ final class TrackerListUIModel: TrackerStoreDelegate {
         }
 
         self.sections = sections
+
         onChange?()
     }
     
@@ -194,7 +195,7 @@ final class TrackerListUIModel: TrackerStoreDelegate {
 }
 
 // MARK: - TrackerRecordFetchedResultsControllerDelegate
-extension TrackerListUIModel: TrackerRecordStoreDelegate {
+extension TrackerListViewModel: TrackerRecordStoreDelegate {
     func trackerRecordStoreDidChangeContent() {
         reload()
     }

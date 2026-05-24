@@ -22,7 +22,7 @@ final class SupplementaryCollection: NSObject {
     // MARK: - Private properties
     private let params: GeometricParams
     private let container: CoreDataContainer
-    private let viewModel: TrackerListUIModel
+    private let viewModel: TrackerListViewModel
     private var contextMenuIndexPath: IndexPath?
     
     // MARK: - Public properties
@@ -30,7 +30,7 @@ final class SupplementaryCollection: NSObject {
     weak var collectionView: UICollectionView?
     
     // MARK: - Initializes
-    init(using params: GeometricParams, container: CoreDataContainer, viewModel: TrackerListUIModel) {
+    init(using params: GeometricParams, container: CoreDataContainer, viewModel: TrackerListViewModel) {
         self.params = params
         self.container = container
         self.viewModel = viewModel

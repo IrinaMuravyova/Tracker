@@ -7,19 +7,11 @@
 
 import UIKit
 
-private struct TrackerDraft {
-    var title: String
-    var category: String
-    var schedule: Set<Weekday>
-    var selectedEmoji: String?
-    var selectedColor: TrackerColor?
-}
-
 protocol TrackerDetailsViewControllerDelegate: AnyObject {
     func trackersDidChanged()
 }
 
-final class TrackerDetailsViewController: UIViewController {
+class TrackerDetailsViewController: UIViewController {
     // MARK: - UI
     private let titleTF = UITextField()
     private let titleFooter = UILabel()
@@ -47,23 +39,16 @@ final class TrackerDetailsViewController: UIViewController {
     private let colorLabel = UILabel()
     
     // MARK: - Private properties
-    private let trackerType: TrackerType
-    private var trackerDraft = TrackerDraft(
-        title: "",
-        category: "",
-        schedule: []
-    )
     private let scheduleSettingsVC = ScheduleSettingsVC()
     weak var delegate: TrackerDetailsViewControllerDelegate?
     private var selectedEmojiIndexPath: IndexPath?
     private var selectedColorIndexPath: IndexPath?
-    
-    private let container: CoreDataContainer
+
+    private let viewModel: TrackerViewModel
     
     // MARK: - Initializes
-    init(trackerType: TrackerType, container: CoreDataContainer) {
-        self.trackerType = trackerType
-        self.container = container
+    init(viewModel: TrackerViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -77,30 +62,17 @@ final class TrackerDetailsViewController: UIViewController {
         
         navigationItem.hidesBackButton = true
         
-        let isHabit = trackerType == .habit
-        title = isHabit
-            ? NSLocalizedString(
-                "create_habit_title",
-                comment: "Title for create a new habit"
-            )
-            : NSLocalizedString(
-                "create_event_title",
-                comment: "Title for create a new irregular event"
-            )
+        title = viewModel.screenTitle
         
         saveButton.isEnabled = false
         setupUI()
-        scheduleView?.isHidden = trackerType != .habit
-        
-        if !isHabit {
-            scheduleView?.isHidden = true
-            separator.isHidden = true
-        }
+
+        scheduleView?.isHidden = !viewModel.isHabit
+        separator.isHidden = !viewModel.isHabit
         
         scheduleSettingsVC.delegate = self
-        let categoriesViewModel = CategoriesViewModel(
-            categoryStore: container.categoryStore
-        )
+
+        let categoriesViewModel = viewModel.makeCategoriesViewModel()
         let categoriesSettingsVC = CategoriesViewController(viewModel: categoriesViewModel)
         categoriesSettingsVC.delegate = self
         
@@ -130,6 +102,8 @@ final class TrackerDetailsViewController: UIViewController {
         saveButton.addTarget(self, action: #selector(saveButtonDidTap), for: .touchUpInside)
         
         titleTF.addTarget(self, action: #selector(titleDidChange(_:)), for: .editingChanged)
+        
+        bind()
     }
     
     // MARK: - Objc methods
@@ -138,46 +112,37 @@ final class TrackerDetailsViewController: UIViewController {
     }
     
     @objc private func saveButtonDidTap() {
-        let newTracker = Tracker(
-            id: UUID(),
-            name: trackerDraft.title,
-            color: trackerDraft.selectedColor ?? .colorselection1,
-            emoji: trackerDraft.selectedEmoji ?? "",
-            schedule: TrackerSchedule.daysOfWeek(trackerDraft.schedule),
-            type: trackerType)
-        
-        do {
-            try container.trackerStore.add(newTracker, to: trackerDraft.category)
-            
-            delegate?.trackersDidChanged()
-            dismiss(animated: true)
-        } catch {
-            print("[TrackerDetailsViewController] Save tracker error:", error)
-        }
+        viewModel.saveTracker()
+        delegate?.trackersDidChanged()
+        dismiss(animated: true)
     }
     
     @objc private func titleDidChange(_ textField: UITextField) {
-        trackerDraft.title = textField.text ?? ""
-        updateSaveButtonState()
+        viewModel.updateTitle(textField.text ?? "")
     }
 }
 
 // MARK: - Private methods
 private extension TrackerDetailsViewController {
-    private func updateSaveButtonState() {
-        let isValid: Bool = {
-            if trackerType == .habit {
-                return !trackerDraft.title.isEmpty &&
-                       !trackerDraft.category.isEmpty &&
-                       !trackerDraft.schedule.isEmpty
-            } else {
-                return !trackerDraft.title.isEmpty &&
-                       !trackerDraft.category.isEmpty
-            }
-        }()
-        
-        saveButton.isEnabled = isValid
-        saveButtonSetupColors()
+    func bind() {
+        viewModel.onSaveButtonStateChanged = { [weak self] isEnabled in
+            self?.saveButton.isEnabled = isEnabled
+            self?.saveButtonSetupColors()
+        }
+
+        viewModel.onCategoryChanged = { [weak self] category in
+            self?.categoryView?.setSubtitle(category)
+        }
+
+        viewModel.onScheduleChanged = { [weak self] text in
+            self?.scheduleView?.setSubtitle(text)
+            self?.scheduleView?.reloadInputViews()
+        }
+
+        viewModel.onTrackerSaved = { [weak self] in
+            self?.delegate?.trackersDidChanged()
+            self?.dismiss(animated: true)
+        }
     }
 }
 
@@ -462,7 +427,7 @@ extension TrackerDetailsViewController: UITextFieldDelegate {
         guard let text = textField.text, !text.isEmpty else {
             return false
         }
-        trackerDraft.title = text
+        viewModel.updateTitle(text)
         textField.resignFirstResponder()
         return true
     }
@@ -471,32 +436,15 @@ extension TrackerDetailsViewController: UITextFieldDelegate {
 // MARK: - ScheduleSettingsVCProtocol
 extension TrackerDetailsViewController: ScheduleSettingsVCProtocol {
     func scheduleDidSetup(for days: Set<Weekday>) {
-        trackerDraft.schedule = days
-        updateScheduleView()
-        updateSaveButtonState()
-    }
-    
-    private func updateScheduleView() {
-        let daysString = trackerDraft.schedule.count == Weekday.allCases.count
-        ? NSLocalizedString(
-            "days_string_text",
-            comment: "Text that shows when all days are selected in the schedule settings view"
-        )
-        : trackerDraft.schedule
-            .sorted(by: { $0.rawValue < $1.rawValue })
-            .map(\.shortTitle)
-            .joined(separator: ", ")
-        scheduleView?.setSubtitle(daysString)
-        scheduleView?.reloadInputViews()
+        viewModel.updateSchedule(days)
     }
 }
 
 // MARK: - CategoriesViewControllerProtocol
 extension TrackerDetailsViewController: CategoriesViewControllerProtocol {
     func categoryDidSelected(for category: String) {
-        trackerDraft.category = category
+        viewModel.updateCategory(category)
         updateCategoryView(with: category)
-        updateSaveButtonState()
         
         navigationController?.popViewController(animated: true)
     }
@@ -543,7 +491,8 @@ extension TrackerDetailsViewController: UICollectionViewDataSource {
             selectedEmojiIndexPath = indexPath
             collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
             
-            trackerDraft.selectedEmoji = Constants.emojis[indexPath.row]
+            let emoji = Constants.emojis[indexPath.row]
+            viewModel.updateEmoji(emoji)
         } else if collectionView == colorCollection {
             if let previous = selectedColorIndexPath {
                 collectionView.deselectItem(at: previous, animated: false)
@@ -552,7 +501,8 @@ extension TrackerDetailsViewController: UICollectionViewDataSource {
             selectedColorIndexPath = indexPath
             collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
             
-            trackerDraft.selectedColor = TrackerColor.allCases[indexPath.row]
+            let color = TrackerColor.allCases[indexPath.row]
+            viewModel.updateColor(color)
         }
     }
 }

@@ -9,11 +9,11 @@ import UIKit
 
 class MainTabBarController: UITabBarController {
     private let container: CoreDataContainer
-    private let viewModel: TrackerListUIModel
+    private let viewModel: TrackerListViewModel
     
     init(
         container: CoreDataContainer,
-        viewModel: TrackerListUIModel
+        viewModel: TrackerListViewModel
     ) {
         self.container = container
         self.viewModel = viewModel

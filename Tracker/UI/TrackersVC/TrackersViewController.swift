@@ -33,11 +33,11 @@ final class TrackersViewController: UIViewController {
     private var changedTrackerId: UUID?
     private var currentDate: Date = Date()
     private let container: CoreDataContainer
-    private let viewModel: TrackerListUIModel
+    private let viewModel: TrackerListViewModel
 
     init(
         container: CoreDataContainer,
-        viewModel: TrackerListUIModel
+        viewModel: TrackerListViewModel
     ) {
         self.container = container
         self.viewModel = viewModel
@@ -59,7 +59,6 @@ final class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad( )
         setupUI()
-        
         viewModel.onChange = { [weak self] in
             self?.updateUI()
         }
@@ -84,7 +83,6 @@ final class TrackersViewController: UIViewController {
 
     private func updateUI() {
         collectionView.reloadData()
-
         let isEmpty = viewModel.sections.isEmpty
         
         collectionView.isHidden = isEmpty
