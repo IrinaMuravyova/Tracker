@@ -77,7 +77,7 @@ final class TrackersCell: UICollectionViewCell {
         addButton.configuration = config
         
         emojiLabel.text = tracker.emoji
-        quantityLabel.text = "\(daysString(state.completedCount))"
+        quantityLabel.text = "\(String.localizedDaysString(for: state.completedCount))"
     }
 }
 

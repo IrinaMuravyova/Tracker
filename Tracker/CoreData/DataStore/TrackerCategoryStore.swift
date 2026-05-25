@@ -89,6 +89,26 @@ final class TrackerCategoryStore: NSObject {
         }
     }
     
+    func getCategory(for trackerID: UUID) -> TrackerCategoryCoreData? {
+        let trackerRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        trackerRequest.predicate = NSPredicate(format: "id == %@", trackerID as CVarArg)
+        trackerRequest.fetchLimit = 1
+        
+        do {
+            let trackers = try context.fetch(trackerRequest)
+            guard let tracker = trackers.first else { return nil }
+            return tracker.category
+        } catch {
+            print("[TrackerCategoryStore] Ошибка получения категории для трекера \(trackerID): \(error)")
+            return nil
+        }
+    }
+    
+    func getCategoryTitle(for trackerID: UUID) -> String {
+        guard let category = getCategory(for: trackerID) else { return "" }
+        return category.title ?? ""
+    }
+    
     // Helpers
     func categoryExists(with title: String) -> Bool {
         let request = TrackerCategoryCoreData.fetchRequest()

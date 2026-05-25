@@ -14,10 +14,17 @@ protocol TrackerViewModelProtocol: AnyObject {
     var onScheduleChanged: ((String) -> Void)? { get set }
     var onTrackerSaved: (() -> Void)? { get set }
 
-    // MARK: - Output
+    // MARK: - Output Properties
     var screenTitle: String { get }
     var isHabit: Bool { get }
+    var title: String { get set }
+    var category: String { get set }
+    var schedule: Set<Weekday> { get set }
+    var selectedEmoji: String? { get set }
+    var selectedColor: TrackerColor? { get set }
 
+    var scheduleText: String { get }
+    
     // MARK: - Input
     func updateTitle(_ text: String)
     func updateCategory(_ category: String)
@@ -28,6 +35,7 @@ protocol TrackerViewModelProtocol: AnyObject {
     // MARK: - Actions
     func saveTracker()
     func makeCategoriesViewModel() -> CategoriesViewModel
+    func validate()
 }
 
 class TrackerViewModel: TrackerViewModelProtocol {

@@ -11,7 +11,7 @@ import UIKit
 protocol SupplementaryCollectionDelegate: AnyObject {
     func getSelectedDate() -> Date
     func updateCell(with index: IndexPath)
-    func openEditTracker(_ viewModel: EditTrackerViewModel)
+    func openEditTracker(_ viewModel: EditTrackerViewModel, completedCount: Int)
 }
 
 // MARK: - SupplementaryCollection
@@ -195,10 +195,13 @@ extension SupplementaryCollection: UICollectionViewDelegate {
                 
                 guard let self else { return }
                 
+                
                 let viewModel = self.trackerListViewModel
                     .makeEditTrackerViewModel(tracker: tracker)
-                       
-                self.delegate?.openEditTracker(viewModel)
+                     
+                let completedCount = self.trackerListViewModel.state(for: tracker).completedCount
+                
+                self.delegate?.openEditTracker(viewModel, completedCount: completedCount)
             }
 
             let deleteAction = UIAction(

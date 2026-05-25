@@ -112,15 +112,17 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
         collectionView.reloadItems(at: [index])
     }
     
-    func openEditTracker(_ viewModel: EditTrackerViewModel) {
-        let editVC = EditTrackerViewController(viewModel: viewModel)
+    func openEditTracker(_ viewModel: EditTrackerViewModel, completedCount: Int) {
+        let editVC = EditTrackerViewController(viewModel: viewModel, completedCount: completedCount)
 
         viewModel.onTrackerSaved = { [weak self] in
             self?.trackerListViewModel.updateSections()
         }
+
+        let navController = UINavigationController(rootViewController: editVC)
+        navController.modalPresentationStyle = .pageSheet
         
-        editVC.modalPresentationStyle = .pageSheet
-        navigationController?.present(editVC, animated: true)
+        navigationController?.present(navController, animated: true)
     }
 }
 

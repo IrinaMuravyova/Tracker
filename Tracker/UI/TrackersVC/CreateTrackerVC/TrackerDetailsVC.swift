@@ -11,6 +11,10 @@ protocol TrackerDetailsViewControllerDelegate: AnyObject {
     func trackersDidChanged()
 }
 
+protocol TrackerDetailsLayoutDelegate: AnyObject {
+    func additionalViewsToInsert() -> [(view: UIView, spacing: CGFloat)]
+}
+
 class TrackerDetailsViewController: UIViewController {
     // MARK: - UI
     private let titleTF = UITextField()
@@ -40,14 +44,18 @@ class TrackerDetailsViewController: UIViewController {
     
     // MARK: - Private properties
     private let scheduleSettingsVC = ScheduleSettingsVC()
-    weak var delegate: TrackerDetailsViewControllerDelegate?
+    
     private var selectedEmojiIndexPath: IndexPath?
     private var selectedColorIndexPath: IndexPath?
-
-    private let viewModel: TrackerViewModel
     
+    private let viewModel: TrackerViewModelProtocol
+    
+    // MARK: - Delegates
+    weak var delegate: TrackerDetailsViewControllerDelegate?
+    weak var layoutDelegate: TrackerDetailsLayoutDelegate?
+
     // MARK: - Initializes
-    init(viewModel: TrackerViewModel) {
+    init(viewModel: TrackerViewModelProtocol) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -120,6 +128,42 @@ class TrackerDetailsViewController: UIViewController {
     @objc private func titleDidChange(_ textField: UITextField) {
         viewModel.updateTitle(textField.text ?? "")
     }
+    
+    func updateUIWithViewModel() {
+        titleTF.text = viewModel.title
+        
+        if !viewModel.category.isEmpty {
+            categoryView?.setSubtitle(viewModel.category)
+        }
+        
+        if viewModel.isHabit && !viewModel.schedule.isEmpty {
+            scheduleView?.setSubtitle(viewModel.scheduleText)
+        }
+        
+        if let emoji = viewModel.selectedEmoji,
+           let index = Constants.emojis.firstIndex(of: emoji) {
+            let indexPath = IndexPath(item: index, section: 0)
+            selectedEmojiIndexPath = indexPath
+            emojiCollection.selectItem(at: indexPath, animated: false, scrollPosition: [])
+            
+            if let cell = emojiCollection.cellForItem(at: indexPath) as? EmojisCollectionViewCell {
+                cell.isSelected = true
+            }
+        }
+        
+        if let color = viewModel.selectedColor,
+           let index = TrackerColor.allCases.firstIndex(of: color) {
+            let indexPath = IndexPath(item: index, section: 0)
+            selectedColorIndexPath = indexPath
+            colorCollection.selectItem(at: indexPath, animated: false, scrollPosition: [])
+            
+            if let cell = colorCollection.cellForItem(at: indexPath) as? ColorsCollectionViewCell {
+                cell.isSelected = true
+            }
+        }
+        
+        viewModel.validate()
+    }
 }
 
 // MARK: - Private methods
@@ -152,6 +196,7 @@ private extension TrackerDetailsViewController {
         view.backgroundColor = .white
         setupScrollView()
         setupTitleStack()
+        setupLayoutWithDelegate()
         setupDetailsView()
         setupButtons()
         setupCollections()
@@ -176,7 +221,6 @@ private extension TrackerDetailsViewController {
         
         titleStack = UIStackView(arrangedSubviews: [titleTF, titleFooter])
         titleStack.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(titleStack)
         
         titleStack.axis = .vertical
         titleStack.spacing = 8
@@ -324,11 +368,17 @@ private extension TrackerDetailsViewController {
         cancelButton.backgroundColor = .white
         
         saveButton.translatesAutoresizingMaskIntoConstraints = false
+        let saveButtonTitle = self is EditTrackerViewController
+        ? NSLocalizedString(
+            "edit_button_title",
+            comment: "Text of the save button in the edit tracker view controller"
+        )
+        : NSLocalizedString(
+            "savebutton_title",
+            comment: "Text of the save button in the tracker details view controller"
+        )
         saveButton.setTitle(
-            NSLocalizedString(
-                "savebutton_title",
-                comment: "Text of the save button in the tracker details view controller"
-            ),
+            saveButtonTitle,
             for: .normal)
         cancelButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         saveButton.setTitleColor(.white, for: .normal)
@@ -358,11 +408,6 @@ private extension TrackerDetailsViewController {
             
             // titleTextField
             titleTF.heightAnchor.constraint(equalToConstant: 75),
-            
-            // titleStack
-            titleStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            titleStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            titleStack.topAnchor.constraint(equalTo:  contentView.topAnchor, constant: 24),
             
             // separator
             separator.leadingAnchor.constraint(equalTo: detailsStackView.leadingAnchor, constant: 16),
@@ -403,6 +448,29 @@ private extension TrackerDetailsViewController {
             
             buttonStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             buttonStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20)
+        ])
+    }
+    
+    private func setupLayoutWithDelegate() {
+        var lastAnchor = contentView.topAnchor
+        var constant: CGFloat = 24
+        
+        layoutDelegate?.additionalViewsToInsert().forEach { item in
+            contentView.addSubview(item.view)
+            NSLayoutConstraint.activate([
+                item.view.topAnchor.constraint(equalTo: lastAnchor, constant: constant),
+                item.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+                item.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
+            ])
+            lastAnchor = item.view.bottomAnchor
+            constant = item.spacing
+        }
+        
+        contentView.addSubview(titleStack)
+            NSLayoutConstraint.activate([
+            titleStack.topAnchor.constraint(equalTo: lastAnchor, constant: constant),
+            titleStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            titleStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
         ])
     }
 }

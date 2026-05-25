@@ -85,3 +85,7 @@
 
 // MARK: - TrackersListViewModel
 "pinned" = "Закрепленные";
+
+// MARK: - EditTrackersViewController
+"edit_screen_title" = "Редактирование привычки";
+"edit_button_title" = "Сохранить";
