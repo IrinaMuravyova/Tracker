@@ -19,6 +19,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     
     // MARK: - Public properties
     var onChange: (() -> Void)?
+    var showAlert: ((String, String) -> Void)?
     
     // MARK: - Initializes
     init(
@@ -56,10 +57,18 @@ final class TrackerListViewModel: TrackerStoreDelegate {
         let tracker = sections[indexPath.section].trackers[indexPath.row]
 
         guard !isFutureDate(selectedDate) else {
-            //TODO: Добавить алерт
+            showAlert?(
+                NSLocalizedString(
+                    "alert_title",
+                    comment: "Title for alert when trying to select future date"),
+                NSLocalizedString(
+                    "alert_message_for_future_date",
+                    comment: "Message telling user that habit cannot be marked for future date"
+                )
+            )
             return
         }
-
+        
         let record = TrackerRecord(
             trackerId: tracker.id,
             date: selectedDate

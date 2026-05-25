@@ -60,8 +60,18 @@ final class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad( )
         setupUI()
+        
         trackerListViewModel.onChange = { [weak self] in
             self?.updateUI()
+        }
+        trackerListViewModel.showAlert = { [weak self] title, message in
+            guard let self = self else { return }
+            
+            AlertHelper.showAlertWith(
+                on: self,
+                title: title,
+                message: message
+            )
         }
         
         updateUI()
@@ -100,20 +110,6 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     
     func updateCell(with index: IndexPath) {
         collectionView.reloadItems(at: [index])
-    }
-    
-    func showNotAllowFutureDateAlert() {
-        AlertHelper.showAlertWith(
-            on: self,
-            title: NSLocalizedString(
-                "alert_title",
-                comment: "Title for alert"
-            ),
-            message: NSLocalizedString(
-                "alert_message_for_future_date",
-                comment: "Message about you can't mark a habit for a future date"
-            )
-        )
     }
     
     func openEditTracker(_ viewModel: EditTrackerViewModel) {

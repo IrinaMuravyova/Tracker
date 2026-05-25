@@ -11,7 +11,6 @@ import UIKit
 protocol SupplementaryCollectionDelegate: AnyObject {
     func getSelectedDate() -> Date
     func updateCell(with index: IndexPath)
-    func showNotAllowFutureDateAlert()
     func openEditTracker(_ viewModel: EditTrackerViewModel)
 }
 
