@@ -14,7 +14,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     private let container: CoreDataContainer
     
     private(set) var sections: [TrackerSectionModel] = []
-    
+    private var allTrackersWithCategories: [(tracker: Tracker, category: String)] = []
     private var selectedDate: Date = Date()
     
     // MARK: - Public properties
@@ -38,11 +38,12 @@ final class TrackerListViewModel: TrackerStoreDelegate {
             print(error)
         }
         
-        reload()
+        loadTrackersWithCategories()
     }
     
     // MARK: - Public methods
     func trackerStoreDidChangeContent() {
+        loadTrackersWithCategories()
         reload()
     }
     
@@ -54,7 +55,10 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     func toggleTracker(at indexPath: IndexPath) {
         let tracker = sections[indexPath.section].trackers[indexPath.row]
 
-        guard !isFutureDate(selectedDate) else { return }
+        guard !isFutureDate(selectedDate) else {
+            //TODO: Добавить алерт
+            return
+        }
 
         let record = TrackerRecord(
             trackerId: tracker.id,
@@ -120,86 +124,98 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     }
     
     // MARK: - Private methods
-    private func reload() {
-        var sections: [TrackerSectionModel] = []
-
-        let calendar = Calendar.current
-
-        let weekdayNumber = calendar.component(.weekday, from: selectedDate)
-
-        guard let currentWeekday = Weekday(calendarWeekday: weekdayNumber) else {
-            sections = []
-            onChange?()
-            return
-        }
-        
-        let records = recordStore.records()
-
-        for sectionIndex in 0..<trackerStore.numberOfSections {
-
-            var items: [Tracker] = []
-
-            let rows = trackerStore.numberOfRowsInSection(sectionIndex)
-
-            for row in 0..<rows {
-                let indexPath = IndexPath(row: row, section: sectionIndex)
-
-                let tracker = trackerStore.object(at: indexPath)
-
-                // MARK: - Filter by selected date
-                switch tracker.type {
-
-                case .habit:
-                    let shouldShow: Bool
-
-                    switch tracker.schedule {
-                    case .daysOfWeek(let days):
-                        shouldShow = days.contains(currentWeekday)
-                    }
-
-                    guard shouldShow else { continue }
-
-                case .irregular:
-                    let trackerRecords = records.filter {
-                        $0.trackerId == tracker.id
-                    }
-
-                    if trackerRecords.isEmpty {
-                        break
-                    }
-                    
-                    let hasRecord = trackerRecords.contains {
-                        return Calendar.current.isDate($0.date, inSameDayAs: selectedDate)
-                    }
-
-                    guard hasRecord else { continue }
-                }
-
-                items.append(tracker)
-            }
-
-            guard !items.isEmpty else { continue }
-            
-            let title = trackerStore.titleForSection(sectionIndex)
-
-            sections.append(
-                TrackerSectionModel(
-                    title: title,
-                    trackers: items
-                )
-            )
-        }
-
-        self.sections = sections
-
-        onChange?()
-    }
-    
     private func isFutureDate(_ date: Date) -> Bool {
         let calendar = Calendar.current
 
         return calendar.startOfDay(for: date)
         > calendar.startOfDay(for: Date())
+    }
+    
+    private func loadTrackersWithCategories() {
+        var trackersWithCategories: [(tracker: Tracker, category: String)] = []
+        
+        for section in 0..<trackerStore.numberOfSections {
+            let categoryTitle = trackerStore.titleForSection(section)
+            
+            for row in 0..<trackerStore.numberOfRowsInSection(section) {
+                let indexPath = IndexPath(row: row, section: section)
+                let tracker = trackerStore.object(at: indexPath)
+                trackersWithCategories.append((tracker: tracker, category: categoryTitle))
+            }
+        }
+        
+        allTrackersWithCategories = trackersWithCategories
+        reload()
+    }
+    
+    private func reload() {
+        let filteredTrackers = filterTrackersByDate(allTrackersWithCategories)
+        let newSections = buildSections(from: filteredTrackers)
+        sections = newSections
+        onChange?()
+    }
+    
+    private func filterTrackersByDate(_ trackersWithCategories: [(tracker: Tracker, category: String)]) -> [(tracker: Tracker, category: String)] {
+        let calendar = Calendar.current
+        let weekdayNumber = calendar.component(.weekday, from: selectedDate)
+        
+        guard let currentWeekday = Weekday(calendarWeekday: weekdayNumber) else {
+            return []
+        }
+        
+        let records = recordStore.records()
+        
+        return trackersWithCategories.filter { item in
+            let tracker = item.tracker
+            
+            switch tracker.type {
+            case .habit:
+                switch tracker.schedule {
+                case .daysOfWeek(let days):
+                    return days.contains(currentWeekday)
+                }
+                
+            case .irregular:
+                let trackerRecords = records.filter { $0.trackerId == tracker.id }
+                
+                guard !trackerRecords.isEmpty else { return false }
+                
+                return trackerRecords.contains { record in
+                    Calendar.current.isDate(record.date, inSameDayAs: selectedDate)
+                }
+            }
+        }
+    }
+    
+    private func buildSections(from trackersWithCategories: [(tracker: Tracker, category: String)]) -> [TrackerSectionModel] {
+        var sections: [TrackerSectionModel] = []
+        
+        let pinnedTrackers = trackersWithCategories.filter { $0.tracker.isPinned }.map { $0.tracker }
+        let regularTrackersWithCategories = trackersWithCategories.filter { !$0.tracker.isPinned }
+        
+        if !pinnedTrackers.isEmpty {
+            sections.append(TrackerSectionModel(
+                title: NSLocalizedString(
+                    "pinned",
+                    comment: "Title for group of pinned trackers"
+                ),
+                trackers: pinnedTrackers
+            ))
+        }
+        
+        let groupedByCategory = Dictionary(grouping: regularTrackersWithCategories) { $0.category }
+        
+        let sortedCategories = groupedByCategory.sorted { $0.key < $1.key }
+        
+        for (categoryTitle, items) in sortedCategories {
+            let trackers = items.map { $0.tracker }
+            sections.append(TrackerSectionModel(
+                title: categoryTitle,
+                trackers: trackers
+            ))
+        }
+        
+        return sections
     }
 }
 

@@ -82,3 +82,6 @@
 "unpin" = "Открепить";
 "edit" = "Редактировать";
 "delete" = "Удалить";
+
+// MARK: - TrackersListViewModel
+"pinned" = "Закрепленные";

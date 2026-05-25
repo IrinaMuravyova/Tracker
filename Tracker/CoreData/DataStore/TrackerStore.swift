@@ -50,7 +50,7 @@ final class TrackerStore: NSObject {
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
-            sectionNameKeyPath: "sectionName",
+            sectionNameKeyPath: "category.title",
             cacheName: nil)
          
         return fetchedResultsController
@@ -101,12 +101,6 @@ extension TrackerStore {
         try context.save()
     }
 
-    func fetchAllTrackers() throws -> [TrackerCoreData] {
-        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        let results = try context.fetch(request)
-        return results
-    }
-    
     func togglePinned(for id: UUID) throws {
         let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "id == %@", id as CVarArg)

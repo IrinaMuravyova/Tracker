@@ -82,3 +82,6 @@
 "unpin" = "Unpin";
 "edit" = "Edit";
 "delete" = "Delete";
+
+// MARK: - TrackersListViewModel
+"pinned" = "Pinned";
