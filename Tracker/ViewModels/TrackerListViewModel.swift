@@ -13,7 +13,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     private var recordStore: TrackerRecordStoreProtocol
     private let container: CoreDataContainer
     
-    private(set) var sections: [TrackerSectionUIModel] = []
+    private(set) var sections: [TrackerSectionModel] = []
     
     private var selectedDate: Date = Date()
     
@@ -88,9 +88,40 @@ final class TrackerListViewModel: TrackerStoreDelegate {
         }
     }
     
+    func makeEditTrackerViewModel(tracker: Tracker) -> EditTrackerViewModel {
+        EditTrackerViewModel(tracker: tracker, container: container)
+    }
+    
+    func state(for tracker: Tracker) -> TrackerCellState {
+        let records = recordStore.records()
+
+        var completedCount = 0
+        var isDoneToday = false
+
+        for record in records {
+            guard record.trackerId == tracker.id else { continue }
+
+            completedCount += 1
+
+            if !isDoneToday,
+               Calendar.current.isDate(record.date, inSameDayAs: Date()) {
+                isDoneToday = true
+            }
+        }
+
+        return TrackerCellState(
+            completedCount: completedCount,
+            isDoneToday: isDoneToday
+        )
+    }
+    
+    func updateSections() {
+        reload()
+    }
+    
     // MARK: - Private methods
     private func reload() {
-        var sections: [TrackerSectionUIModel] = []
+        var sections: [TrackerSectionModel] = []
 
         let calendar = Calendar.current
 
@@ -106,7 +137,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
 
         for sectionIndex in 0..<trackerStore.numberOfSections {
 
-            var items: [TrackerUIModel] = []
+            var items: [Tracker] = []
 
             let rows = trackerStore.numberOfRowsInSection(sectionIndex)
 
@@ -144,7 +175,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
                     guard hasRecord else { continue }
                 }
 
-                items.append(makeVM(tracker, records: records))
+                items.append(tracker)
             }
 
             guard !items.isEmpty else { continue }
@@ -152,7 +183,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
             let title = trackerStore.titleForSection(sectionIndex)
 
             sections.append(
-                TrackerSectionUIModel(
+                TrackerSectionModel(
                     title: title,
                     trackers: items
                 )
@@ -164,28 +195,6 @@ final class TrackerListViewModel: TrackerStoreDelegate {
         onChange?()
     }
     
-    private func makeVM(_ tracker: Tracker,
-                        records: [TrackerRecord]) -> TrackerUIModel {
-        
-        let trackerRecords = records.filter {
-            $0.trackerId == tracker.id
-        }
-        
-        let isDoneToday = trackerRecords.contains {
-            return Calendar.current.isDate($0.date, inSameDayAs: selectedDate)
-        }
-
-        return TrackerUIModel(
-            id: tracker.id,
-            name: tracker.name,
-            emoji: tracker.emoji,
-            color: tracker.color,
-            completedCount: trackerRecords.count,
-            isDoneToday: isDoneToday,
-            isPinned: tracker.isPinned
-        )
-    }
-
     private func isFutureDate(_ date: Date) -> Bool {
         let calendar = Calendar.current
 

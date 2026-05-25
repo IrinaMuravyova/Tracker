@@ -12,6 +12,7 @@ protocol SupplementaryCollectionDelegate: AnyObject {
     func getSelectedDate() -> Date
     func updateCell(with index: IndexPath)
     func showNotAllowFutureDateAlert()
+    func openEditTracker(_ viewModel: EditTrackerViewModel)
 }
 
 // MARK: - SupplementaryCollection
@@ -22,7 +23,7 @@ final class SupplementaryCollection: NSObject {
     // MARK: - Private properties
     private let params: GeometricParams
     private let container: CoreDataContainer
-    private let viewModel: TrackerListViewModel
+    private let trackerListViewModel: TrackerListViewModel
     private var contextMenuIndexPath: IndexPath?
     
     // MARK: - Public properties
@@ -33,7 +34,7 @@ final class SupplementaryCollection: NSObject {
     init(using params: GeometricParams, container: CoreDataContainer, viewModel: TrackerListViewModel) {
         self.params = params
         self.container = container
-        self.viewModel = viewModel
+        self.trackerListViewModel = viewModel
     }
     
     // MARK: - Public methods
@@ -48,20 +49,21 @@ final class SupplementaryCollection: NSObject {
 // MARK: - UICollectionViewDataSource
 extension SupplementaryCollection: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        viewModel.sections.count
+        trackerListViewModel.sections.count
     }
     
     func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        viewModel.sections[section].trackers.count
+        trackerListViewModel.sections[section].trackers.count
     }
     
     func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
+        
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: SupplementaryCollection.trackerCellIdentifier,
             for: indexPath
@@ -70,14 +72,17 @@ extension SupplementaryCollection: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
 
-        let vm = viewModel.sections[indexPath.section].trackers[indexPath.row]
+        let tracker = trackerListViewModel
+            .sections[indexPath.section]
+            .trackers[indexPath.row]
+
+        let state = trackerListViewModel.state(for: tracker)
 
         cell.delegate = self
-        
+
         cell.configureCell(
-            with: vm,
-            completedCount: vm.completedCount,
-            isDone: vm.isDoneToday
+            with: tracker,
+            state: state
         )
 
         return cell
@@ -99,7 +104,7 @@ extension SupplementaryCollection: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
 
-        let title = viewModel.sections[indexPath.section].title
+        let title = trackerListViewModel.sections[indexPath.section].title
         header.configure(title: title)
 
         return header
@@ -147,7 +152,7 @@ extension SupplementaryCollection: TrackersCellDelegate {
         guard let indexPath = collectionView?.indexPath(for: cell)
         else { return }
 
-        viewModel.toggleTracker(at: indexPath)
+        trackerListViewModel.toggleTracker(at: indexPath)
     }
 }
 
@@ -159,7 +164,7 @@ extension SupplementaryCollection: UICollectionViewDelegate {
     ) -> UIContextMenuConfiguration? {
         contextMenuIndexPath = indexPath
         
-        let tracker = viewModel.sections[indexPath.section].trackers[indexPath.row]
+        let tracker = trackerListViewModel.sections[indexPath.section].trackers[indexPath.row]
 
         let pinTitle = tracker.isPinned
         ? NSLocalizedString(
@@ -179,7 +184,7 @@ extension SupplementaryCollection: UICollectionViewDelegate {
             let pinAction = UIAction(
                 title: pinTitle
             ) { _ in
-                self.viewModel.togglePinned(at: tracker.id)
+                self.trackerListViewModel.togglePinned(at: tracker.id)
             }
 
             let editAction = UIAction(
@@ -187,8 +192,14 @@ extension SupplementaryCollection: UICollectionViewDelegate {
                     "edit",
                     comment: "Title for edit action"
                 )
-            ) { _ in
-                // TODO: edit tracker
+            ) { [weak self] _ in
+                
+                guard let self else { return }
+                
+                let viewModel = self.trackerListViewModel
+                    .makeEditTrackerViewModel(tracker: tracker)
+                       
+                self.delegate?.openEditTracker(viewModel)
             }
 
             let deleteAction = UIAction(

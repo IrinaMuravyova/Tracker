@@ -98,7 +98,7 @@ class TrackerViewModel: TrackerViewModelProtocol {
         selectedColor = color
         validate()
     }
-
+    
     // MARK: - Actions
     func saveTracker() {
         fatalError("Override in subclass")

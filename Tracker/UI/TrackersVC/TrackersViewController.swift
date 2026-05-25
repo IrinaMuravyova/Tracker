@@ -33,14 +33,15 @@ final class TrackersViewController: UIViewController {
     private var changedTrackerId: UUID?
     private var currentDate: Date = Date()
     private let container: CoreDataContainer
-    private let viewModel: TrackerListViewModel
+    private let trackerListViewModel: TrackerListViewModel
 
+    // MARK: - Init
     init(
         container: CoreDataContainer,
         viewModel: TrackerListViewModel
     ) {
         self.container = container
-        self.viewModel = viewModel
+        self.trackerListViewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -59,7 +60,7 @@ final class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad( )
         setupUI()
-        viewModel.onChange = { [weak self] in
+        trackerListViewModel.onChange = { [weak self] in
             self?.updateUI()
         }
         
@@ -69,7 +70,7 @@ final class TrackersViewController: UIViewController {
     // MARK: - Objc methods
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         currentDate = sender.date
-        viewModel.setDate(sender.date)
+        trackerListViewModel.setDate(sender.date)
     }
     
     @objc private func addTrackerButtonTapped() {
@@ -83,7 +84,7 @@ final class TrackersViewController: UIViewController {
 
     private func updateUI() {
         collectionView.reloadData()
-        let isEmpty = viewModel.sections.isEmpty
+        let isEmpty = trackerListViewModel.sections.isEmpty
         
         collectionView.isHidden = isEmpty
         emptyStageView.isHidden = !isEmpty
@@ -113,6 +114,17 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
                 comment: "Message about you can't mark a habit for a future date"
             )
         )
+    }
+    
+    func openEditTracker(_ viewModel: EditTrackerViewModel) {
+        let editVC = EditTrackerViewController(viewModel: viewModel)
+
+        viewModel.onTrackerSaved = { [weak self] in
+            self?.trackerListViewModel.updateSections()
+        }
+        
+        editVC.modalPresentationStyle = .pageSheet
+        navigationController?.present(editVC, animated: true)
     }
 }
 
@@ -224,7 +236,7 @@ private extension TrackersViewController {
         helper = SupplementaryCollection(
             using: params,
             container: container,
-            viewModel: viewModel
+            viewModel: trackerListViewModel
         )
         helper?.delegate = self
         helper?.collectionView = collectionView

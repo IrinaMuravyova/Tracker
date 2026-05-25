@@ -32,6 +32,9 @@ final class TrackersCell: UICollectionViewCell {
     private var currentTrackerId: UUID?
     private var trackerIsDone: Bool = false
     
+    // MARK: - Bindings
+    var onAddTap: ((UUID, Bool) -> Void)?
+    
     // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -52,9 +55,8 @@ final class TrackersCell: UICollectionViewCell {
     
     // MARK: - Public functions
     func configureCell(
-        with tracker: TrackerUIModel,
-        completedCount: Int,
-        isDone: Bool
+        with tracker: Tracker,
+        state: TrackerCellState
     ) {
         pinImageView.isHidden = !tracker.isPinned
         
@@ -65,16 +67,17 @@ final class TrackersCell: UICollectionViewCell {
         
         titleLabel.text = tracker.name
         
-        let image = isDone
-        ? UIImage(resource: .done).withRenderingMode(.alwaysTemplate)
-        : UIImage(resource: .plus).withRenderingMode(.alwaysTemplate)
+        let image = state.isDoneToday
+            ? UIImage(resource: .done).withRenderingMode(.alwaysTemplate)
+            : UIImage(resource: .plus).withRenderingMode(.alwaysTemplate)
         addButton.setImage(image, for: .normal)
+        
         guard var config = addButton.configuration else { return }
         config.baseForegroundColor = color
         addButton.configuration = config
         
         emojiLabel.text = tracker.emoji
-        quantityLabel.text = "\(daysString(completedCount))"
+        quantityLabel.text = "\(daysString(state.completedCount))"
     }
 }
 

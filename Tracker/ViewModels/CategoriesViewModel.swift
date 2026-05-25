@@ -45,7 +45,7 @@ final class CategoriesViewModel {
 }
 
 // MARK: - Public functions
-extension CategoriesViewModel {git
+extension CategoriesViewModel {
     func selectCategory(at index: Int) {
         guard index < categories.count,
               let category = categories[index].title
