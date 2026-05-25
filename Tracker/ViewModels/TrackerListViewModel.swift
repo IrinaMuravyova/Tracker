@@ -137,6 +137,17 @@ final class TrackerListViewModel: TrackerStoreDelegate {
         reload()
     }
     
+    func requestDeleteTracker(at indexPath: IndexPath) {
+        let tracker = sections[indexPath.section].trackers[indexPath.row]
+        
+        do {
+            try self.container.trackerStore.delete(by: tracker.id)
+            self.onChange?()
+        } catch {
+            assertionFailure("[TrackerListViewModel] Error message when delete fails")
+        }
+    }
+    
     // MARK: - Private methods
     private func isFutureDate(_ date: Date) -> Bool {
         let calendar = Calendar.current

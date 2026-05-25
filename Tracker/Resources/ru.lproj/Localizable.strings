@@ -19,6 +19,8 @@
 "alert_okbutton_title" = "OK";
 "alert_title" = "Упс.. Что-то пошло не так";
 "alert_message_for_future_date" = "Нельзя отметить привычку для будущей даты";
+"delete_tracker_alert_title" = "Уверены что хотите удалить трекер?";
+"cancel" = "Отменить";
 
 // MARK: - Models
 "weekday_monday" = "Понедельник";

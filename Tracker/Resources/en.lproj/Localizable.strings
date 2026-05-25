@@ -19,6 +19,8 @@
 "alert_okbutton_title" = "OK";
 "alert_title" = "Oops... Something went wrong";
 "alert_message_for_future_date" = "You can't mark a habit for a future date";
+"delete_tracker_alert_title" = "Are you sure?";
+"cancel" = "Cancel";
 
 // MARK: - Models
 "weekday_monday" = "Monday";

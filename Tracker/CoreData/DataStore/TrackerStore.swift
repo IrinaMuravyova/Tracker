@@ -147,6 +147,18 @@ extension TrackerStore {
 
         try context.save()
     }
+    
+    func delete(by id: UUID) throws {
+        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        
+        guard let tracker = try context.fetch(request).first else {
+            throw TrackerStoreError.trackerNotFound
+        }
+        
+        context.delete(tracker)
+        try context.save()
+    }
 }
 
 extension TrackerStore: TrackerStoreProtocol {

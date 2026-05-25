@@ -12,6 +12,7 @@ protocol SupplementaryCollectionDelegate: AnyObject {
     func getSelectedDate() -> Date
     func updateCell(with index: IndexPath)
     func openEditTracker(_ viewModel: EditTrackerViewModel, completedCount: Int)
+    func presentDeleteTrackerAlert(for indexPath: IndexPath)
 }
 
 // MARK: - SupplementaryCollection
@@ -210,8 +211,9 @@ extension SupplementaryCollection: UICollectionViewDelegate {
                     comment: "Title for delete action"
                 ),
                 attributes: .destructive
-            ) { _ in
-                // TODO: delete tracker
+            ) { [weak self] _ in
+                
+                self?.delegate?.presentDeleteTrackerAlert(for: indexPath)
             }
 
             return UIMenu(
@@ -225,6 +227,7 @@ extension SupplementaryCollection: UICollectionViewDelegate {
         }
     }
 }
+
 
 // MARK: - Context Menu Preview
 extension SupplementaryCollection {

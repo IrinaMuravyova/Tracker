@@ -58,7 +58,7 @@ final class TrackersViewController: UIViewController {
     
     // MARK: - Life cycle methods
     override func viewDidLoad() {
-        super.viewDidLoad( )
+        super.viewDidLoad()
         setupUI()
         
         trackerListViewModel.onChange = { [weak self] in
@@ -92,6 +92,7 @@ final class TrackersViewController: UIViewController {
         self.present(createTrackerNavVC, animated: true)
     }
 
+    // MARK: - Private methods
     private func updateUI() {
         collectionView.reloadData()
         let isEmpty = trackerListViewModel.sections.isEmpty
@@ -123,6 +124,40 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
         navController.modalPresentationStyle = .pageSheet
         
         navigationController?.present(navController, animated: true)
+    }
+    
+    func presentDeleteTrackerAlert(for indexPath: IndexPath) {
+        let alert = UIAlertController(
+            title: NSLocalizedString(
+                "delete_tracker_alert_title",
+                comment: "Delete tracker confirmation title"
+            ),
+            message: nil,
+            preferredStyle: .actionSheet
+        )
+ 
+        let delete = UIAlertAction(
+            title: NSLocalizedString(
+                "delete",
+                comment: "Delete action"
+            ),
+            style: .destructive
+        ) { [weak self] _ in
+            self?.trackerListViewModel.requestDeleteTracker(at: indexPath)
+        }
+        
+        let cancel = UIAlertAction(
+            title: NSLocalizedString(
+                "cancel",
+                comment: "Cancel action"
+            ),
+            style: .cancel
+        )
+        
+        alert.addAction(delete)
+        alert.addAction(cancel)
+    
+        present(alert, animated: true)
     }
 }
 
