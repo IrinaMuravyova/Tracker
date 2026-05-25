@@ -14,10 +14,7 @@ final class CreateCategoryViewController: UIViewController {
     
     // MARK: - Private properties
     private let viewModel: CreateCategoryViewModel
-    
-    // MARK: - Public properties
-    var onCategoryCreated: (() -> Void)?
-    
+       
     // MARK: - Initializes
     init(viewModel: CreateCategoryViewModel) {
         self.viewModel = viewModel
@@ -53,7 +50,6 @@ private extension CreateCategoryViewController {
         }
 
         viewModel.categoryDidCreate = { [weak self] in
-            self?.onCategoryCreated?()
             self?.navigationController?.popViewController(animated: true)
         }
 

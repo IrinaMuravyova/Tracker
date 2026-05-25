@@ -41,7 +41,6 @@ final class CategoriesViewController: UIViewController {
         
         setupUI()
         bindViewModel()
-        viewModel.fetchCategories()
     }
     
     // MARK: - Objc methods
@@ -49,11 +48,7 @@ final class CategoriesViewController: UIViewController {
         let createCategoryVC = CreateCategoryViewController(
             viewModel: viewModel.makeCreateCategoryViewModel()
         )
-
-        createCategoryVC.onCategoryCreated = { [weak self] in
-            self?.viewModel.fetchCategories()
-        }
-
+        
         navigationController?.pushViewController(createCategoryVC, animated: true)
     }
 }
@@ -202,8 +197,14 @@ extension CategoriesViewController: UITableViewDataSource, UITableViewDelegate {
         }
   
         let category = viewModel.category(at: indexPath.row)
-        cell.configure(with: category)
         
+        if let title = category.title {
+            cell.configure(with: title)
+        } else {
+            print("[CategoriesVC] category.title is nil")
+            cell.configure(with: "")
+        }
+    
         let isFirst = indexPath.row == 0
         let isLast = indexPath.row == viewModel.numberOfCategories - 1
         cell.configureAppearance(isFirst: isFirst, isLast: isLast)

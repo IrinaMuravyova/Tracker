@@ -16,8 +16,11 @@ final class CategoriesViewModel {
     private let categoryStore: TrackerCategoryStore
 
     // MARK: - Public properties
-    private(set) var categories: [TrackerCategory] = []
     private(set) var selectedCategory: String?
+    
+    var categories: [TrackerCategoryCoreData] {
+        categoryStore.categories
+    }
     
     var isEmpty: Bool {
         categories.isEmpty
@@ -30,23 +33,29 @@ final class CategoriesViewModel {
     // MARK: - Initializes
     init(categoryStore: TrackerCategoryStore) {
         self.categoryStore = categoryStore
+        bind()
+    }
+    
+    // MARK: - Private methods
+    private func bind() {
+        categoryStore.onChange = { [weak self] in
+            self?.categoriesDidChange?()
+        }
     }
 }
 
 // MARK: - Public functions
-extension CategoriesViewModel {
-    func fetchCategories() {
-        categories = categoryStore.fetchCategories()
-        categoriesDidChange?()
-    }
-    
+extension CategoriesViewModel {git
     func selectCategory(at index: Int) {
-        let category = categories[index].title
+        guard index < categories.count,
+              let category = categories[index].title
+        else { return }
+        
         selectedCategory = category
         selectedCategoryDidChange?(category)
     }
     
-    func category(at index: Int) -> TrackerCategory {
+    func category(at index: Int) -> TrackerCategoryCoreData {
         categories[index]
     }
     

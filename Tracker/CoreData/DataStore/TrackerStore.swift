@@ -119,6 +119,40 @@ extension TrackerStore {
         
         try context.save()
     }
+    
+    func updateTracker(
+        id: UUID,
+        title: String,
+        category: String,
+        schedule: Set<Weekday>,
+        emoji: String,
+        color: TrackerColor
+    ) throws {
+
+        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+
+        guard let tracker = try context.fetch(request).first else {
+            throw TrackerStoreError.trackerNotFound
+        }
+
+        let categoryStore = TrackerCategoryStore(context: context)
+        let categoryCoreData = categoryStore.fetchCategory(by: category)
+
+        guard let categoryCoreData else {
+            throw TrackerStoreError.categoryNotFound
+        }
+
+        tracker.name = title
+        tracker.category = categoryCoreData
+        tracker.emoji = emoji
+        tracker.color = color.rawValue
+
+        let updatedSchedule = TrackerSchedule.daysOfWeek(schedule)
+        tracker.schedule = try? JSONEncoder().encode(updatedSchedule)
+
+        try context.save()
+    }
 }
 
 extension TrackerStore: TrackerStoreProtocol {

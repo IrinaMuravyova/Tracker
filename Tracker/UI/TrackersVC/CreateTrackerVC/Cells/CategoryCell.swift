@@ -69,9 +69,9 @@ class CategoryCell: UITableViewCell {
         selectionImageView.image = UIImage(systemName: "checkmark")
     }
     
-    func configure(with category: TrackerCategory) {
+    func configure(with title: String) {
         configureDefault()
-        categoryTextField.text = category.title
+        categoryTextField.text = title
         
         categoryTextField.isEnabled = false
         selectionImageView.isHidden = false
