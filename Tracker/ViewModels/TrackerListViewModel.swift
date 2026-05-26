@@ -22,6 +22,8 @@ final class TrackerListViewModel: TrackerStoreDelegate {
             filterSettingsService.saveFilter(currentFilter)
         }
     }
+    private(set) var searchText: String = ""
+    private(set) var isSearchActive: Bool = false
     
     // MARK: - Public properties
     var onChange: (() -> Void)?
@@ -61,6 +63,12 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     
     func setDate(_ date: Date) {
         selectedDate = date
+        reload()
+    }
+    
+    func updateSearchText(_ text: String) {
+        searchText = text
+        isSearchActive = !text.isEmpty
         reload()
     }
     
@@ -203,7 +211,8 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     }
     
     private func reload() {
-        let filteredTrackers = filterTrackersByDate(allTrackersWithCategories)
+        var filteredTrackers = filterTrackersByDate(allTrackersWithCategories)
+        filteredTrackers = applySearchFilter(to: filteredTrackers)
         let filteredByOption = applyCurrentFilter(to: filteredTrackers)
         let newSections = buildSections(from: filteredByOption)
         sections = newSections
@@ -239,6 +248,16 @@ final class TrackerListViewModel: TrackerStoreDelegate {
                     Calendar.current.isDate(record.date, inSameDayAs: selectedDate)
                 }
             }
+        }
+    }
+    
+    private func applySearchFilter(to trackersWithCategories: [(tracker: Tracker, category: String)]) -> [(tracker: Tracker, category: String)] {
+        guard !searchText.isEmpty else {
+            return trackersWithCategories
+        }
+        
+        return trackersWithCategories.filter { item in
+            item.tracker.name.lowercased().contains(searchText.lowercased())
         }
     }
     

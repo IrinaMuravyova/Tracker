@@ -20,13 +20,24 @@ final class TrackersViewController: UIViewController {
         return formatter
     }()
     
+    private lazy var searchController: UISearchController = {
+        let searchController = UISearchController(searchResultsController: nil)
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchBar.placeholder = NSLocalizedString(
+            "search",
+            comment: "Text for search bar placeholder"
+        )
+        searchController.searchBar.delegate = self
+        searchController.searchResultsUpdater = self
+        return searchController
+    }()
+    
     private let datePicker = UIDatePicker()
     private let titleLabel = UILabel()
+    private let searchContainerView = UIView()
     private let emptyStageView = UIView()
     private let emptySearchResultView = UIView()
-    private let searchBar = UIView()
-    private let searchIconIV = UIImageView()
-    private let textFieldInsideSearchBar = UITextField()
     private var addTrackerButtonItem = UIBarButtonItem()
     private let filterButton = UIButton()
     
@@ -114,18 +125,27 @@ final class TrackersViewController: UIViewController {
         let hasTrackersOnDate = trackerListViewModel.hasTrackersOnSelectedDate()
         let filterResultsEmpty = trackerListViewModel.sections.isEmpty
         let currentFilter = trackerListViewModel.getCurrentFilter()
+        let isSearchActive = trackerListViewModel.isSearchActive
 
-        if !hasTrackersOnDate {
+        if isSearchActive && filterResultsEmpty {
+            collectionView.isHidden = true
+            emptyStageView.isHidden = true
+            emptySearchResultView.isHidden = false
+            filterButton.isHidden = true
+        }
+        else if !hasTrackersOnDate {
             collectionView.isHidden = true
             emptyStageView.isHidden = false
             emptySearchResultView.isHidden = true
             filterButton.isHidden = true
-        } else if filterResultsEmpty && currentFilter != .allTrackers {
+        }
+        else if filterResultsEmpty && currentFilter != .allTrackers && !isSearchActive {
             collectionView.isHidden = true
             emptyStageView.isHidden = true
             emptySearchResultView.isHidden = false
             filterButton.isHidden = false
-        } else {
+        }
+        else {
             collectionView.isHidden = false
             emptyStageView.isHidden = true
             emptySearchResultView.isHidden = true
@@ -147,6 +167,32 @@ final class TrackersViewController: UIViewController {
         currentDate = date
 
         trackerListViewModel.setDate(date)
+    }
+    
+    private func clearSearchIfNeeded() {
+        if let searchText = searchController.searchBar.text, !searchText.isEmpty {
+            searchController.searchBar.text = ""
+            trackerListViewModel.updateSearchText("")
+        }
+    }
+}
+
+// MARK: - UISearchResultsUpdating
+extension TrackersViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchText = searchController.searchBar.text ?? ""
+        trackerListViewModel.updateSearchText(searchText)
+    }
+}
+
+// MARK: - UISearchBarDelegate
+extension TrackersViewController: UISearchBarDelegate {
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        trackerListViewModel.updateSearchText("")
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
     }
 }
 
@@ -221,7 +267,7 @@ private extension TrackersViewController {
         view.backgroundColor = .white
         setupNavBar()
         setupTitle()
-        setupSearchBar()
+        setupSearchController()
         setupCollectionView()
         setupFilterButton()
         setupEmptyStageView()
@@ -230,7 +276,10 @@ private extension TrackersViewController {
     }
     
     func setupNavBar() {
+        navigationItem.title = ""
         navigationController?.navigationBar.backgroundColor = .white
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.largeTitleDisplayMode = .never
         setupNavButton()
     }
     
@@ -247,35 +296,33 @@ private extension TrackersViewController {
         )
         titleLabel.font = UIFont.systemFont(ofSize: 34, weight: .bold)
         titleLabel.numberOfLines = 0
+
         view.addSubview(titleLabel)
     }
     
-    func setupSearchBar() {
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(searchBar)
-        
-        searchBar.backgroundColor = .innerFields
-        searchBar.layer.cornerRadius = 10
-        
-        searchIconIV.frame.size = CGSize(width: 30, height: 30)
-        searchIconIV.contentMode = .scaleAspectFit
-        searchIconIV.image = UIImage(systemName: "magnifyingglass")
-        searchIconIV.tintColor = .gray
-        searchIconIV.image = searchIconIV.image?.withRenderingMode(.alwaysTemplate)
-        searchIconIV.translatesAutoresizingMaskIntoConstraints = false
-        searchBar.addSubview(searchIconIV)
-        
-        textFieldInsideSearchBar.textColor = .gray
-        textFieldInsideSearchBar.font = .systemFont(ofSize: 17, weight: .regular)
-        textFieldInsideSearchBar.attributedPlaceholder = NSAttributedString(
-            string: NSLocalizedString(
-                "search",
-                comment: "Text for search bar placeholder"
-            ),
-            attributes: [.foregroundColor: UIColor.gray]
+    func setupSearchController() {
+        searchController.searchBar.placeholder = NSLocalizedString(
+            "search",
+            comment: "Text for search bar placeholder"
         )
-        textFieldInsideSearchBar.translatesAutoresizingMaskIntoConstraints = false
-        searchBar.addSubview(textFieldInsideSearchBar)
+        
+        searchController.searchBar.backgroundImage = UIImage()
+        
+        searchController.searchBar.delegate = self
+        searchController.searchResultsUpdater = self
+        
+        searchController.searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchContainerView.addSubview(searchController.searchBar)
+        
+        searchContainerView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(searchContainerView)
+        
+        NSLayoutConstraint.activate([
+            searchController.searchBar.topAnchor.constraint(equalTo: searchContainerView.topAnchor),
+            searchController.searchBar.bottomAnchor.constraint(equalTo: searchContainerView.bottomAnchor),
+            searchController.searchBar.leadingAnchor.constraint(equalTo: searchContainerView.leadingAnchor),
+            searchController.searchBar.trailingAnchor.constraint(equalTo: searchContainerView.trailingAnchor),
+        ])
     }
     
     func setupDatePicker() {
@@ -352,34 +399,23 @@ private extension TrackersViewController {
     
     func setupConstraints() {
         NSLayoutConstraint.activate([
-            searchBar.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 7),
-            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            searchBar.heightAnchor.constraint(equalToConstant: 40),
-            
-            searchIconIV.leadingAnchor.constraint(equalTo: searchBar.leadingAnchor, constant: 8),
-            searchIconIV.centerYAnchor.constraint(equalTo: searchBar.centerYAnchor),
-            searchIconIV.heightAnchor.constraint(equalTo: searchBar.heightAnchor, multiplier: 0.6),
-            searchIconIV.widthAnchor.constraint(equalTo: searchIconIV.heightAnchor),
-            
-            textFieldInsideSearchBar.leadingAnchor.constraint(equalTo: searchIconIV.trailingAnchor, constant: 6),
-            textFieldInsideSearchBar.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor, constant: -7),
-            textFieldInsideSearchBar.topAnchor.constraint(equalTo: searchBar.topAnchor, constant: 7),
-            textFieldInsideSearchBar.bottomAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: -7),
-            
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
             titleLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
             titleLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -105),
+        
+            searchContainerView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 0),
+            searchContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            searchContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            collectionView.topAnchor.constraint(equalTo: searchContainerView.bottomAnchor, constant: 24),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
             filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             filterButton.heightAnchor.constraint(equalToConstant: 50),
             filterButton.widthAnchor.constraint(equalToConstant: 114),
-            
-            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 24),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
     }
     
@@ -442,7 +478,7 @@ private extension TrackersViewController {
         
         NSLayoutConstraint.activate([
             emptySearchImage.centerXAnchor.constraint(equalTo: emptySearchResultView.centerXAnchor),
-            emptySearchImage.centerYAnchor.constraint(equalTo: emptySearchResultView.centerYAnchor, constant: -50),
+            emptySearchImage.centerYAnchor.constraint(equalTo: emptySearchResultView.centerYAnchor),
             emptySearchImage.widthAnchor.constraint(equalToConstant: 80),
             emptySearchImage.heightAnchor.constraint(equalToConstant: 80),
             
@@ -452,11 +488,7 @@ private extension TrackersViewController {
             emptySearchLabel.trailingAnchor.constraint(lessThanOrEqualTo: emptySearchResultView.trailingAnchor, constant: -16),
             
             emptySearchResultView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            emptySearchResultView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            emptySearchResultView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            emptySearchResultView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            emptySearchResultView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 24),
-            emptySearchResultView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            emptySearchResultView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
 }
