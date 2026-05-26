@@ -117,6 +117,7 @@ class TrackerViewModel: TrackerViewModelProtocol {
     }
 }
 
+// MARK: - for edit tracker
 extension TrackerViewModel {
 
     var scheduleText: String {

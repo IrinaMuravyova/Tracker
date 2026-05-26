@@ -46,7 +46,18 @@ class MainTabBarController: UITabBarController {
             "statisticvc_title",
             comment: "Text displayed title for statistics view controller"
         )
-        let statisticsVC = StatisticsViewController()
+        
+        let service = StatisticsService(
+            recordStore: container.recordStore,
+            trackerStore: container.trackerStore
+        )
+        let viewModel = StatisticsViewModel(statisticsService: service, recordStore: container.recordStore)
+        
+        let statisticsVC = StatisticsViewController(
+            viewModel: viewModel,
+            container: container
+        )
+        
         statisticsVC.tabBarItem = UITabBarItem(
             title: statisticsTitle,
             image: UIImage(systemName: "hare.fill")?.withRenderingMode(.alwaysOriginal),

@@ -98,3 +98,13 @@
 "todayTrackers" = "Трекеры на сегодня";
 "completedTrackers" = "Завершённые";
 "notCompletedTrackers" = "Не завершённые";
+
+// MARK: - StatisticsViewController
+"statistics_title" = "Статистика";
+"stat_empty_message" = "Анализировать пока нечего";
+
+// MARK: - StatisticsViewModel
+"bestPeriod" = "Лучший период";
+"idealDays" = "Идеальные дни";
+"completed" = "Трекеров завершено";
+"average" = "Среднее значение";

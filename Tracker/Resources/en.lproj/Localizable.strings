@@ -99,3 +99,13 @@
 "completedTrackers" = "Completed";
 "notCompletedTrackers" = "Not Completed";
 "close" = "Close";
+
+// MARK: - StatisticsViewController
+"statistics_title" = "Statistics";
+"stat_empty_message" = "No data for statistics";
+
+// MARK: - StatisticsViewModel
+"bestPeriod" = "The best period";
+"idealDays" = "Ideal Days count";
+"completed" = "Completed trackers";
+"average" = "Average";
