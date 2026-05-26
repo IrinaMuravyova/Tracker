@@ -106,6 +106,6 @@
 
 // MARK: - StatisticsViewModel
 "bestPeriod" = "The best period";
-"idealDays" = "Ideal Days count";
+"idealDays" = "Count of deal days";
 "completed" = "Completed trackers";
 "average" = "Average";
