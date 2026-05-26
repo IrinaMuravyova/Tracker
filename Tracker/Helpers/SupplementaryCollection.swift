@@ -76,7 +76,7 @@ extension SupplementaryCollection: UICollectionViewDataSource {
             .sections[indexPath.section]
             .trackers[indexPath.row]
 
-        let state = trackerListViewModel.state(for: tracker)
+        let state = trackerListViewModel.state(for: tracker, on: trackerListViewModel.selectedDate)
 
         cell.delegate = self
 
@@ -200,7 +200,7 @@ extension SupplementaryCollection: UICollectionViewDelegate {
                 let viewModel = self.trackerListViewModel
                     .makeEditTrackerViewModel(tracker: tracker)
                      
-                let completedCount = self.trackerListViewModel.state(for: tracker).completedCount
+                let completedCount = self.trackerListViewModel.state(for: tracker, on: trackerListViewModel.selectedDate).completedCount
                 
                 self.delegate?.openEditTracker(viewModel, completedCount: completedCount)
             }

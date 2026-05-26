@@ -74,6 +74,7 @@
 "search" = "Search";
 "filters" = "Filters";
 "empty_stage_label_text" = "What shall we track?";
+"empty_search_result_text" = "Nothing found";
 
 // MARK: - Errors
 "error_message_empty_category" = "Enter category name";
@@ -91,3 +92,10 @@
 // MARK: - EditTrackersViewController
 "edit_screen_title" = "Редактирование привычки";
 "edit_button_title" = "Save";
+
+// MARK: - FilerViewController
+"allTrackers" = "All Trackers";
+"todayTrackers" = "Trackers for Today";
+"completedTrackers" = "Completed";
+"notCompletedTrackers" = "Not Completed";
+"close" = "Close";

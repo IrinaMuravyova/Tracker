@@ -12,14 +12,22 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     private var trackerStore: TrackerStoreProtocol
     private var recordStore: TrackerRecordStoreProtocol
     private let container: CoreDataContainer
+    private let filterSettingsService = FilterSettingsService()
     
     private(set) var sections: [TrackerSectionModel] = []
     private var allTrackersWithCategories: [(tracker: Tracker, category: String)] = []
-    private var selectedDate: Date = Date()
+    private(set) var selectedDate: Date = Date()
+    private(set) var currentFilter: FilterOption {
+        didSet {
+            filterSettingsService.saveFilter(currentFilter)
+        }
+    }
     
     // MARK: - Public properties
     var onChange: (() -> Void)?
     var showAlert: ((String, String) -> Void)?
+    var onFilterChanged: ((FilterOption) -> Void)?
+    var onDateChangeRequested: ((Date) -> Void)?
     
     // MARK: - Initializes
     init(
@@ -28,6 +36,9 @@ final class TrackerListViewModel: TrackerStoreDelegate {
         self.container = container
         self.trackerStore = container.trackerStore
         self.recordStore = container.recordStore
+        
+        let savedFilter = filterSettingsService.loadFilter()
+        self.currentFilter = savedFilter
         
         self.trackerStore.delegate = self
         self.recordStore.delegate = self
@@ -110,7 +121,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
             container: container)
     }
     
-    func state(for tracker: Tracker) -> TrackerCellState {
+    func state(for tracker: Tracker, on date: Date) -> TrackerCellState {
         let records = recordStore.records()
 
         var completedCount = 0
@@ -122,7 +133,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
             completedCount += 1
 
             if !isDoneToday,
-               Calendar.current.isDate(record.date, inSameDayAs: Date()) {
+               Calendar.current.isDate(record.date, inSameDayAs: date) {
                 isDoneToday = true
             }
         }
@@ -146,6 +157,24 @@ final class TrackerListViewModel: TrackerStoreDelegate {
         } catch {
             assertionFailure("[TrackerListViewModel] Error message when delete fails")
         }
+    }
+    
+    func setFilter(_ filter: FilterOption) {
+        currentFilter = filter
+        
+        if filter == .todayTrackers {
+            let today = Date()
+            selectedDate = today
+            onDateChangeRequested?(today)
+        }
+        
+        reload()
+        onFilterChanged?(filter)
+    }
+    
+    func hasTrackersOnSelectedDate() -> Bool {
+        let filteredByDate = filterTrackersByDate(allTrackersWithCategories)
+        return !filteredByDate.isEmpty
     }
     
     // MARK: - Private methods
@@ -175,7 +204,8 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     
     private func reload() {
         let filteredTrackers = filterTrackersByDate(allTrackersWithCategories)
-        let newSections = buildSections(from: filteredTrackers)
+        let filteredByOption = applyCurrentFilter(to: filteredTrackers)
+        let newSections = buildSections(from: filteredByOption)
         sections = newSections
         onChange?()
     }
@@ -241,6 +271,40 @@ final class TrackerListViewModel: TrackerStoreDelegate {
         }
         
         return sections
+    }
+    
+    private func applyCurrentFilter(to trackersWithCategories: [(tracker: Tracker, category: String)]) -> [(tracker: Tracker, category: String)] {
+        switch currentFilter {
+        case .allTrackers:
+            return trackersWithCategories
+            
+        case .todayTrackers:
+            return trackersWithCategories
+            
+        case .completedTrackers:
+            let records = recordStore.records()
+            let completedTrackerIds = records
+                .filter { Calendar.current.isDate($0.date, inSameDayAs: selectedDate) }
+                .map { $0.trackerId }
+            
+            return trackersWithCategories.filter { item in
+                completedTrackerIds.contains(item.tracker.id)
+            }
+            
+        case .notCompletedTrackers:
+            let records = recordStore.records()
+            let completedTrackerIds = records
+                .filter { Calendar.current.isDate($0.date, inSameDayAs: selectedDate) }
+                .map { $0.trackerId }
+            
+            return trackersWithCategories.filter { item in
+                !completedTrackerIds.contains(item.tracker.id)
+            }
+        }
+    }
+    
+    func getCurrentFilter() -> FilterOption {
+        return currentFilter
     }
 }
 
