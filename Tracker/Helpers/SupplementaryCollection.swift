@@ -25,6 +25,7 @@ final class SupplementaryCollection: NSObject {
     private let container: CoreDataContainer
     private let trackerListViewModel: TrackerListViewModel
     private var contextMenuIndexPath: IndexPath?
+    private let analyticsService = AnalyticsService.shared
     
     // MARK: - Public properties
     weak var delegate: SupplementaryCollectionDelegate?
@@ -149,6 +150,8 @@ extension SupplementaryCollection: UICollectionViewDelegateFlowLayout {
 extension SupplementaryCollection: TrackersCellDelegate {
 
     func didTapAddButton(in cell: TrackersCell) {
+        analyticsService.sendEvent(event: "click", screen: "Main", item: "track")
+        
         guard let indexPath = collectionView?.indexPath(for: cell)
         else { return }
 
@@ -193,9 +196,9 @@ extension SupplementaryCollection: UICollectionViewDelegate {
                     comment: "Title for edit action"
                 )
             ) { [weak self] _ in
+                self?.analyticsService.sendEvent(event: "click", screen: "Main", item: "edit")
                 
                 guard let self else { return }
-                
                 
                 let viewModel = self.trackerListViewModel
                     .makeEditTrackerViewModel(tracker: tracker)

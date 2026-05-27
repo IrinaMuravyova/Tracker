@@ -46,6 +46,7 @@ final class TrackersViewController: UIViewController {
     private var currentDate: Date = Date()
     private let container: CoreDataContainer
     private let trackerListViewModel: TrackerListViewModel
+    private let analyticsService = AnalyticsService.shared
 
     // MARK: - Init
     init(
@@ -99,6 +100,8 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc private func addTrackerButtonTapped() {
+        analyticsService.sendEvent(event: "click", screen: "Main", item: "add_track")
+        
         guard navigationController?.visibleViewController == self else { return }
         
         let trackerTypeVC = TrackerTypeSelectionViewController(container: container)
@@ -108,6 +111,8 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc private func filterButtonTapped() {
+        analyticsService.sendEvent(event: "click", screen: "Main", item: "filter")
+        
         let currentFilter = trackerListViewModel.getCurrentFilter()
         let filtersVC = FiltersViewController(selectedFilter: currentFilter)
         filtersVC.delegate = self
@@ -236,6 +241,8 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
             ),
             style: .destructive
         ) { [weak self] _ in
+            self?.analyticsService.sendEvent(event: "click", screen: "Main", item: "delete")
+            
             self?.trackerListViewModel.requestDeleteTracker(at: indexPath)
         }
         
@@ -251,6 +258,16 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
         alert.addAction(cancel)
     
         present(alert, animated: true)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        analyticsService.sendEvent(event: "open", screen: "Main", item: nil)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        analyticsService.sendEvent(event: "close", screen: "Main", item: nil)
     }
 }
 
