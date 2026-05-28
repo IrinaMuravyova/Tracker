@@ -81,7 +81,7 @@ extension TrackerStore {
         }
                 
         let categoryStore = TrackerCategoryStore(context: context)
-        let categoryCoreData = categoryStore.fetchCategory(by: category)
+        let categoryCoreData = try categoryStore.fetchCategory(by: category)
         
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.id = UUID()
@@ -131,7 +131,7 @@ extension TrackerStore {
         }
 
         let categoryStore = TrackerCategoryStore(context: context)
-        let categoryCoreData = categoryStore.fetchCategory(by: category)
+        let categoryCoreData = try categoryStore.fetchCategory(by: category)
 
         guard let categoryCoreData else {
             throw TrackerStoreError.categoryNotFound

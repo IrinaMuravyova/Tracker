@@ -34,7 +34,7 @@ protocol TrackerViewModelProtocol: AnyObject {
 
     // MARK: - Actions
     func saveTracker()
-    func makeCategoriesViewModel() -> CategoriesViewModel
+    func makeCategoriesViewModel(mode: CategoriesViewMode) -> CategoriesViewModel
     func validate()
 }
 
@@ -85,7 +85,6 @@ class TrackerViewModel: TrackerViewModelProtocol {
         self.category = category
 
         onCategoryChanged?(category)
-
         validate()
     }
 
@@ -93,7 +92,6 @@ class TrackerViewModel: TrackerViewModelProtocol {
         schedule = days
 
         onScheduleChanged?(scheduleText)
-
         validate()
     }
 
@@ -112,8 +110,8 @@ class TrackerViewModel: TrackerViewModelProtocol {
         fatalError("Override in subclass")
     }
 
-    func makeCategoriesViewModel() -> CategoriesViewModel {
-        CategoriesViewModel(categoryStore: container.categoryStore)
+    func makeCategoriesViewModel(mode: CategoriesViewMode) -> CategoriesViewModel {
+        CategoriesViewModel(categoryStore: container.categoryStore, mode: mode)
     }
 }
 

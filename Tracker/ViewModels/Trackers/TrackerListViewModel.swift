@@ -122,7 +122,6 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     
     func makeEditTrackerViewModel(tracker: Tracker) -> EditTrackerViewModel {
         let categoryTitle = container.categoryStore.getCategoryTitle(for: tracker.id)
-        
         return EditTrackerViewModel(
             tracker: tracker,
             categoryTitle: categoryTitle,

@@ -21,6 +21,9 @@
 "alert_message_for_future_date" = "Нельзя отметить привычку для будущей даты";
 "delete_tracker_alert_title" = "Уверены что хотите удалить трекер?";
 "cancel" = "Отменить";
+"alert_message_for_delete_category" = "Эта категория точно не нужна?";
+"category_delete_not_empty" = "Нельзя удалить категорию, в которой есть трекеры. Сначала удалите все трекеры из этой категории.";
+"category_delete_failed" = "Не удалось удалить категорию.";
 
 // MARK: - Models
 "weekday_monday" = "Понедельник";
@@ -49,6 +52,7 @@
 // MARK: - CreateCategoryViewController
 "createcategory_navigationbar_title" = "Новая категория";
 "createcategory_savebutton_title" = "Готово";
+"editcategory_navigationbar_title" = "Редактирование категории";
 
 // MARK: - ScheduleSettingsVC
 "schedule_savebutton_title" = "Готово";
@@ -79,6 +83,7 @@
 // MARK: - Errors
 "error_message_empty_category" = "Введите название категории";
 "error_message_category_exist" = "Такая категория уже существует";
+"error_message_category_update_failed" = "Не получилось обновить категорию";
 
 // MARK: - SupplementaryCollection
 "pin" = "Закрепить";

@@ -14,7 +14,7 @@ final class CreateCategoryViewController: UIViewController {
     
     // MARK: - Private properties
     private let viewModel: CreateCategoryViewModel
-       
+    
     // MARK: - Initializes
     init(viewModel: CreateCategoryViewModel) {
         self.viewModel = viewModel
@@ -32,11 +32,12 @@ final class CreateCategoryViewController: UIViewController {
         
         setupUI()
         bindViewModel()
+        viewModel.setupForMode()
     }
     
     // MARK: - Objective functions
     @objc private func saveButtonDidTap() {
-        viewModel.createCategory()
+        viewModel.saveCategory()
     }
 }
 
@@ -48,14 +49,14 @@ private extension CreateCategoryViewController {
             self?.saveButton.backgroundColor =
             isEnabled ? .black : .grayButton
         }
-
-        viewModel.categoryDidCreate = { [weak self] in
+        
+        viewModel.categoryDidSave = { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }
-
+        
         viewModel.showError = { [weak self] message in
             guard let self else { return }
-
+            
             AlertHelper.showAlertWith(
                 on: self,
                 title: NSLocalizedString(
@@ -65,8 +66,12 @@ private extension CreateCategoryViewController {
                 message: message
             )
         }
+        
+        viewModel.updateNavigationTitle = { [weak self] title in
+            self?.title = title
+        }
     }
-
+    
     func setupUI() {
         setupView()
         setupNavigationBar()
@@ -148,11 +153,17 @@ extension CreateCategoryViewController: UITableViewDataSource, UITableViewDelega
             fatalError("[CreateCategoryViewController] WeekCell has not been implemented")
             return UITableViewCell()
         }
-    
+        
         cell.delegate = self
-        cell.configureDefault()
+        
+        if viewModel.categoryTitle.isEmpty {
+            cell.configureDefault()
+        } else {
+            cell.configureEditable(with: viewModel.categoryTitle)
+        }
+        
         cell.configureAppearance(isFirst: true, isLast: true)
-
+        
         return cell
     }
     

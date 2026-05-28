@@ -21,6 +21,8 @@ final class CategoriesViewController: UIViewController {
     
     // MARK: - Private properties
     private let viewModel: CategoriesViewModel
+    private var contextMenuIndexPath: IndexPath?
+
     
     // MARK: - Public Properties
     weak var delegate: CategoriesViewControllerProtocol?
@@ -41,6 +43,8 @@ final class CategoriesViewController: UIViewController {
         
         setupUI()
         bindViewModel()
+        
+        updateSelectedCategory()
     }
     
     // MARK: - Objc methods
@@ -51,16 +55,14 @@ final class CategoriesViewController: UIViewController {
         
         navigationController?.pushViewController(createCategoryVC, animated: true)
     }
-}
-
-// MARK: - UI setting methods
-private extension CategoriesViewController {
-    func bindViewModel() {
+    
+    private func bindViewModel() {
         viewModel.categoriesDidChange = { [weak self] in
             guard let self else { return }
         
             self.updateUI()
             self.tableView.reloadData()
+            self.updateSelectedCategory()
         }
 
         viewModel.selectedCategoryDidChange = { [weak self] category in
@@ -69,6 +71,30 @@ private extension CategoriesViewController {
         }
     }
     
+    // MARK: - Public methods
+    func updateSelectedCategory() {
+        guard let selectedCategory = viewModel.selectedCategory else { return }
+
+        guard let row = (0..<viewModel.numberOfCategories)
+            .first(where: {
+                viewModel.category(at: $0).title == selectedCategory
+            })
+        else {
+            return
+        }
+
+        let indexPath = IndexPath(row: row, section: 0)
+
+        tableView.selectRow(
+            at: indexPath,
+            animated: false,
+            scrollPosition: .none
+        )
+    }
+}
+
+// MARK: - UI setting methods
+private extension CategoriesViewController {
     func updateUI() {
         emptyStageView.isHidden = !viewModel.isEmpty
         tableView.isHidden = viewModel.isEmpty
@@ -208,7 +234,13 @@ extension CategoriesViewController: UITableViewDataSource, UITableViewDelegate {
         let isFirst = indexPath.row == 0
         let isLast = indexPath.row == viewModel.numberOfCategories - 1
         cell.configureAppearance(isFirst: isFirst, isLast: isLast)
-
+        
+        let isSelected = category.title == viewModel.selectedCategory
+        if isSelected {
+            tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+            cell.setSelected(true, animated: false)
+        }
+        
         return cell
     }
     
@@ -218,5 +250,83 @@ extension CategoriesViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         75
+    }
+}
+
+// MARK: - Context Menu Actions
+extension CategoriesViewController {
+    private func showDeleteConfirmation(for indexPath: IndexPath) {
+        let alertController = UIAlertController(
+            title: NSLocalizedString(
+                "alert_message_for_delete_category", comment: ""
+            ),
+            message: "",
+            preferredStyle: .actionSheet
+        )
+        
+        let deleteAction = UIAlertAction(
+            title: NSLocalizedString(
+                "delete", comment: ""
+            ),
+            style: .destructive
+        ) { [weak self] _ in
+            self?.viewModel.deleteCategory(at: indexPath.row)
+        }
+        
+        let cancelAction = UIAlertAction(
+            title: NSLocalizedString(
+                "cancel", comment: ""
+            ),
+            style: .cancel
+        )
+        
+        alertController.addAction(deleteAction)
+        alertController.addAction(cancelAction)
+        
+        present(alertController, animated: true)
+    }
+}
+
+// MARK: - Context Menu Configuration
+extension CategoriesViewController {
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        
+        contextMenuIndexPath = indexPath
+        
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: nil
+        ) { [weak self] _ in
+            guard let self = self else { return UIMenu(title: "") }
+        
+            let editAction = UIAction(
+                title: NSLocalizedString(
+                    "edit",
+                    comment: "Title for edit action"
+                )
+            ) { [weak self] _ in
+                guard let self else { return }
+                let editViewModel = self.viewModel.makeEditCategoryViewModel(at: indexPath.row)
+                
+                guard let editViewModel else { return }
+                let editCategoryVC = CreateCategoryViewController(viewModel: editViewModel)
+                navigationController?.pushViewController(editCategoryVC, animated: true)
+            }
+            
+            let deleteAction = UIAction(
+                title: NSLocalizedString(
+                    "delete",
+                    comment: "Title for delete action"
+                ),
+                attributes: .destructive
+            ) { [weak self] _ in
+                self?.showDeleteConfirmation(for: indexPath)
+            }
+            
+            return UIMenu(
+                title:"",
+                children: [editAction, deleteAction]
+            )
+        }
     }
 }

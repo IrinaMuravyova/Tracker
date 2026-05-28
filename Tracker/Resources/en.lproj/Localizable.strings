@@ -21,6 +21,9 @@
 "alert_message_for_future_date" = "You can't mark a habit for a future date";
 "delete_tracker_alert_title" = "Are you sure?";
 "cancel" = "Cancel";
+"alert_message_for_delete_category" = "Is this category definitely not needed?";
+"category_delete_not_empty" = "Cannot delete a category that contains trackers. Delete all trackers in this category first.";
+"category_delete_failed" = "Failed to delete category";
 
 // MARK: - Models
 "weekday_monday" = "Monday";
@@ -49,6 +52,7 @@
 // MARK: - CreateCategoryViewController
 "createcategory_navigationbar_title" = "New Category";
 "createcategory_savebutton_title" = "Done";
+"editcategory_navigationbar_title" = "Category editing";
 
 // MARK: - ScheduleSettingsVC
 "schedule_savebutton_title" = "Done";
@@ -79,6 +83,7 @@
 // MARK: - Errors
 "error_message_empty_category" = "Enter category name";
 "error_message_category_exist" = "This category already exists";
+"error_message_category_update_failed" = "Error during update category";
 
 // MARK: - SupplementaryCollection
 "pin" = "Pin";

@@ -44,12 +44,9 @@ class CategoryCell: UITableViewCell {
             selectionImageView.isHidden = true
             return
         }
-        
-        if selected {
-            selectionImageView.image = UIImage(systemName: "checkmark")
-        } else {
-            selectionImageView.image = UIImage()
-        }
+
+        selectionImageView.image = selected ? UIImage(systemName: "checkmark") : UIImage()
+        selectionImageView.isHidden = !selected
     }
     
     // MARK: - Objective-C methods
@@ -75,6 +72,15 @@ class CategoryCell: UITableViewCell {
         
         categoryTextField.isEnabled = false
         selectionImageView.isHidden = false
+    }
+    
+    func configureEditable(with title: String) {
+        configureDefault()
+
+        categoryTextField.text = title
+        categoryTextField.isEnabled = true
+
+        selectionImageView.isHidden = true
     }
     
     func getCategoryTitle() -> String {

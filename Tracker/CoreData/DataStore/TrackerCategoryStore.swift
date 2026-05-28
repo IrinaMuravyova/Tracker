@@ -71,12 +71,20 @@ final class TrackerCategoryStore: NSObject {
         }
     }
     
-    func deleteCategory(_ category: NSManagedObject) throws {
+    func deleteCategory(_ category: TrackerCategoryCoreData) throws {
+        if let trackers = category.tracker, trackers.count > 0 {
+            throw NSError(
+                domain: "TrackerCategoryStore",
+                code: 400,
+                userInfo: [NSLocalizedDescriptionKey: "Cannot delete category that contains trackers"]
+            )
+        }
+        
         context.delete(category)
         try context.save()
     }
     
-    func fetchCategory(by title: String) -> TrackerCategoryCoreData? {
+    func fetchCategory(by title: String) throws -> TrackerCategoryCoreData? {
         let request = TrackerCategoryCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "title == %@", title)
         request.fetchLimit = 1
@@ -84,12 +92,15 @@ final class TrackerCategoryStore: NSObject {
         do {
             return try context.fetch(request).first
         } catch {
-            print("[TrackerCategoryStore] fetchCategory(by:) failed with error: \(error)")
-            return nil
+            throw NSError(
+                domain: "TrackerCategoryStore",
+                code: 404,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to fetch category by title: \(title)"]
+            )
         }
     }
     
-    func getCategory(for trackerID: UUID) -> TrackerCategoryCoreData? {
+    func getCategory(for trackerID: UUID) throws -> TrackerCategoryCoreData? {
         let trackerRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         trackerRequest.predicate = NSPredicate(format: "id == %@", trackerID as CVarArg)
         trackerRequest.fetchLimit = 1
@@ -97,19 +108,59 @@ final class TrackerCategoryStore: NSObject {
         do {
             let trackers = try context.fetch(trackerRequest)
             guard let tracker = trackers.first else { return nil }
+
             return tracker.category
         } catch {
-            print("[TrackerCategoryStore] Ошибка получения категории для трекера \(trackerID): \(error)")
-            return nil
+            throw NSError(
+                domain: "TrackerCategoryStore",
+                code: 404,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to get category for tracker with id: \(trackerID)"]
+            )
         }
     }
     
     func getCategoryTitle(for trackerID: UUID) -> String {
-        guard let category = getCategory(for: trackerID) else { return "" }
-        return category.title ?? ""
+        do {
+            guard let category = try getCategory(for: trackerID) else { return "" }
+            return category.title ?? ""
+        } catch {
+            print("[TrackerCategoryStore] Error getting category title for tracker \(trackerID): \(error.localizedDescription)")
+            return ""
+        }
     }
     
-    // Helpers
+    func getCategory(by title: String) throws -> TrackerCategoryCoreData? {
+        let request: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "title == %@", title)
+        request.fetchLimit = 1
+        
+        do {
+            let categories = try context.fetch(request)
+            return categories.first
+        } catch {
+            throw NSError(
+                domain: "TrackerCategoryStore",
+                code: 409,
+                userInfo: [NSLocalizedDescriptionKey: "Category with this name already exists"]
+            )
+        }
+    }
+    
+    func updateCategory(_ category: TrackerCategoryCoreData, newTitle: String) throws {
+        let categoryExists = categoryExists(with: newTitle)
+        
+        if categoryExists {
+            throw NSError(
+                domain: "TrackerCategoryStore",
+                code: 409,
+                userInfo: [NSLocalizedDescriptionKey: "Category with this name already exists"]
+            )
+        }
+        
+        category.title = newTitle
+        try context.save()
+    }
+    
     func categoryExists(with title: String) -> Bool {
         let request = TrackerCategoryCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "title == %@", title)

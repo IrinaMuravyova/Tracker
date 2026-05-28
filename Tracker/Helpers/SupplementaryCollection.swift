@@ -202,7 +202,7 @@ extension SupplementaryCollection: UICollectionViewDelegate {
                 
                 let viewModel = self.trackerListViewModel
                     .makeEditTrackerViewModel(tracker: tracker)
-                     
+                
                 let completedCount = self.trackerListViewModel.state(for: tracker, on: trackerListViewModel.selectedDate).completedCount
                 
                 self.delegate?.openEditTracker(viewModel, completedCount: completedCount)

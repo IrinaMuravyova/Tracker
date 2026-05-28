@@ -80,15 +80,18 @@ class TrackerDetailsViewController: UIViewController {
         
         scheduleSettingsVC.delegate = self
 
-        let categoriesViewModel = viewModel.makeCategoriesViewModel()
-        let categoriesSettingsVC = CategoriesViewController(viewModel: categoriesViewModel)
-        categoriesSettingsVC.delegate = self
+        let categoriesMode: CategoriesViewMode = self is EditTrackerViewController ? .editing : .selection
+        let categoriesViewModel = viewModel.makeCategoriesViewModel(mode: categoriesMode)
+        let categoriesVC = CategoriesViewController(viewModel: categoriesViewModel)
+
+        
+        categoriesVC.delegate = self
         
         categoryView?.onTap = { [weak self] in
             guard let self else { return }
             
-            categoriesSettingsVC.title = self.categoryView?.getTitle()
-            self.navigationController?.pushViewController(categoriesSettingsVC, animated: true)
+            categoriesVC.title = self.categoryView?.getTitle()
+            self.navigationController?.pushViewController(categoriesVC, animated: true)
         }
         
         scheduleView?.onTap = { [weak self] in
@@ -392,34 +395,27 @@ private extension TrackerDetailsViewController {
     
     func setupConstraints() {
         NSLayoutConstraint.activate([
-            // scrollView
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: buttonStackView.topAnchor, constant: -16),
 
-            // contentView
             contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
-
             contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
             
-            // titleTextField
             titleTF.heightAnchor.constraint(equalToConstant: 75),
             
-            // separator
             separator.leadingAnchor.constraint(equalTo: detailsStackView.leadingAnchor, constant: 16),
             separator.trailingAnchor.constraint(equalTo: detailsStackView.trailingAnchor, constant: -16),
             separator.heightAnchor.constraint(equalToConstant: 1),
             
-            // detailsStackView
             detailsStackView.topAnchor.constraint(equalTo: titleStack.bottomAnchor, constant: 24),
             detailsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             detailsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            // emojiCollectionView
             emojiLabel.topAnchor.constraint(equalTo: detailsStackView.bottomAnchor, constant: 32),
             emojiLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
             emojiLabel.heightAnchor.constraint(equalToConstant: 18),
@@ -429,7 +425,6 @@ private extension TrackerDetailsViewController {
             emojiCollection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             emojiCollection.heightAnchor.constraint(equalToConstant: 204),
             
-
             colorLabel.topAnchor.constraint(equalTo: emojiCollection.bottomAnchor, constant: 16),
             colorLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
             colorLabel.heightAnchor.constraint(equalToConstant: 18),
@@ -440,7 +435,6 @@ private extension TrackerDetailsViewController {
             colorCollection.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
             colorCollection.heightAnchor.constraint(equalToConstant: 204),
             
-            // buttons
             cancelButton.heightAnchor.constraint(equalToConstant: 60),
             cancelButton.widthAnchor.constraint(equalToConstant: 161),
             saveButton.heightAnchor.constraint(equalToConstant: 60),

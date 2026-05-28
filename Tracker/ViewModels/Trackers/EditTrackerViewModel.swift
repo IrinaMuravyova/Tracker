@@ -49,4 +49,10 @@ final class EditTrackerViewModel: TrackerViewModel {
             print(error)
         }
     }
+    
+    override func makeCategoriesViewModel(mode: CategoriesViewMode) -> CategoriesViewModel {
+        let vm = CategoriesViewModel(categoryStore: container.categoryStore)
+        vm.setSelectedCategory(category)
+        return vm
+    }
 }
