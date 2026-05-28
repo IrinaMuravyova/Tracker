@@ -11,7 +11,7 @@ import SnapshotTesting
 
 final class TrackersViewControllerTests: XCTestCase {
 
-    func testTrackersViewController() {
+    func testTrackersViewControllerLight() {
         let container = CoreDataContainer()
 
         let viewModel = TrackerListViewModel(
@@ -30,12 +30,41 @@ final class TrackersViewControllerTests: XCTestCase {
 
         assertSnapshots(
             of: navigationController,
-            as: [.image]
+            as: [.image(traits: .init(userInterfaceStyle: .light))]
         )
 //        withSnapshotTesting(record: .all) {
 //            assertSnapshots(
 //                of: navigationController,
-//                as: [.image]
+//                as: [.image(traits: .init(userInterfaceStyle: .light))]
+//            )
+//        }
+    }
+    
+    func testTrackersViewControllerDark() {
+        let container = CoreDataContainer()
+
+        let viewModel = TrackerListViewModel(
+            container: container
+        )
+
+        let vc = TrackersViewController(
+            container: container,
+            viewModel: viewModel
+        )
+
+        let navigationController = UINavigationController(
+            rootViewController: vc
+        )
+
+
+        assertSnapshots(
+            of: navigationController,
+            as: [.image(traits: .init(userInterfaceStyle: .dark))]
+        )
+//        withSnapshotTesting(record: .all) {
+//            assertSnapshots(
+//                of: navigationController,
+//                as: [.image(traits: .init(userInterfaceStyle: .dark))]
 //            )
 //        }
     }
