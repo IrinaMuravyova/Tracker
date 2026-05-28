@@ -17,6 +17,7 @@ final class TrackersCell: UICollectionViewCell {
     
     // MARK: - UI
     private(set) lazy var habitView = UIView()
+    private let backgroundCircleView = UIView()
     private let emojiLabel = UILabel()
     private let titleLabel = UILabel()
     
@@ -96,6 +97,7 @@ private extension TrackersCell {
         
         habitView.layer.cornerRadius = 16
         
+        setupBackgroundCircle()
         setupEmoji()
         setupLabel()
     }
@@ -113,18 +115,35 @@ private extension TrackersCell {
         setupQuantityViewConstraints()
     }
     
+    func setupBackgroundCircle() {
+        backgroundCircleView.translatesAutoresizingMaskIntoConstraints = false
+
+        backgroundCircleView.backgroundColor = UIColor.white.withAlphaComponent(0.3)
+        backgroundCircleView.layer.cornerRadius = CGFloat(emojiSize / 2)
+        backgroundCircleView.clipsToBounds = true
+
+        contentView.addSubview(backgroundCircleView)
+    }
+    
     func setupEmoji() {
-        emojiLabel.frame.size = CGSize(width: emojiSize, height: emojiSize)
         emojiLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        emojiLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        emojiLabel.textAlignment = .center
+        emojiLabel.adjustsFontSizeToFitWidth = true
+        emojiLabel.minimumScaleFactor = 0.5
+        
         habitView.addSubview(emojiLabel)
     }
     
     func setupLabel() {
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
         titleLabel.text = "Sample a very long maybe too long habit title"
         titleLabel.font = .systemFont(ofSize: 12, weight: .medium)
         titleLabel.textColor = .white
         titleLabel.numberOfLines = 0
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
         habitView.addSubview(titleLabel)
     }
     
@@ -148,10 +167,13 @@ private extension TrackersCell {
             pinImageView.widthAnchor.constraint(equalToConstant: CGFloat(pinSize)),
             pinImageView.heightAnchor.constraint(equalToConstant: CGFloat(pinSize)),
             
-            emojiLabel.topAnchor.constraint(equalTo: habitView.topAnchor, constant: 12),
-            emojiLabel.leadingAnchor.constraint(equalTo: habitView.leadingAnchor, constant: 12),
-            emojiLabel.widthAnchor.constraint(equalToConstant: CGFloat(emojiSize)),
-            emojiLabel.heightAnchor.constraint(equalToConstant: CGFloat(emojiSize)),
+            backgroundCircleView.topAnchor.constraint(equalTo: habitView.topAnchor, constant: 12),
+            backgroundCircleView.leadingAnchor.constraint(equalTo: habitView.leadingAnchor, constant: 12),
+            backgroundCircleView.widthAnchor.constraint(equalToConstant: CGFloat(emojiSize)),
+            backgroundCircleView.heightAnchor.constraint(equalToConstant: CGFloat(emojiSize)),
+            
+            emojiLabel.centerXAnchor.constraint(equalTo: backgroundCircleView.centerXAnchor),
+            emojiLabel.centerYAnchor.constraint(equalTo: backgroundCircleView.centerYAnchor),
             
             titleLabel.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 8),
             titleLabel.leadingAnchor.constraint(equalTo: habitView.leadingAnchor, constant: 12),
