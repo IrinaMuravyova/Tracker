@@ -20,19 +20,7 @@ final class TrackersViewController: UIViewController {
         return formatter
     }()
     
-    private lazy var searchController: UISearchController = {
-        let searchController = UISearchController(searchResultsController: nil)
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.hidesNavigationBarDuringPresentation = false
-        searchController.searchBar.placeholder = NSLocalizedString(
-            "search",
-            comment: "Text for search bar placeholder"
-        )
-        searchController.searchBar.delegate = self
-        searchController.searchResultsUpdater = self
-        return searchController
-    }()
-    
+    private let searchBar = UISearchBar()
     private let datePicker = UIDatePicker()
     private let titleLabel = UILabel()
     private let searchContainerView = UIView()
@@ -47,7 +35,7 @@ final class TrackersViewController: UIViewController {
     private let container: CoreDataContainer
     private let trackerListViewModel: TrackerListViewModel
     private let analyticsService = AnalyticsService.shared
-
+    
     // MARK: - Init
     init(
         container: CoreDataContainer,
@@ -92,7 +80,7 @@ final class TrackersViewController: UIViewController {
         
         updateUI()
     }
-
+    
     // MARK: - Objc methods
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         currentDate = sender.date
@@ -122,7 +110,7 @@ final class TrackersViewController: UIViewController {
         
         present(navController, animated: true)
     }
-
+    
     // MARK: - Private methods
     private func updateUI() {
         collectionView.reloadData()
@@ -131,7 +119,7 @@ final class TrackersViewController: UIViewController {
         let filterResultsEmpty = trackerListViewModel.sections.isEmpty
         let currentFilter = trackerListViewModel.getCurrentFilter()
         let isSearchActive = trackerListViewModel.isSearchActive
-
+        
         if isSearchActive && filterResultsEmpty {
             collectionView.isHidden = true
             emptyStageView.isHidden = true
@@ -170,23 +158,15 @@ final class TrackersViewController: UIViewController {
     private func updateDatePicker(to date: Date) {
         datePicker.date = date
         currentDate = date
-
+        
         trackerListViewModel.setDate(date)
     }
     
     private func clearSearchIfNeeded() {
-        if let searchText = searchController.searchBar.text, !searchText.isEmpty {
-            searchController.searchBar.text = ""
+        if let searchText = searchBar.text, !searchText.isEmpty {
+            searchBar.text = ""
             trackerListViewModel.updateSearchText("")
         }
-    }
-}
-
-// MARK: - UISearchResultsUpdating
-extension TrackersViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        let searchText = searchController.searchBar.text ?? ""
-        trackerListViewModel.updateSearchText(searchText)
     }
 }
 
@@ -198,6 +178,10 @@ extension TrackersViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        trackerListViewModel.updateSearchText(searchText)
     }
 }
 
@@ -213,11 +197,11 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
     
     func openEditTracker(_ viewModel: EditTrackerViewModel, completedCount: Int) {
         let editVC = EditTrackerViewController(viewModel: viewModel, completedCount: completedCount)
-
+        
         viewModel.onTrackerSaved = { [weak self] in
             self?.trackerListViewModel.updateSections()
         }
-
+        
         let navController = UINavigationController(rootViewController: editVC)
         navController.modalPresentationStyle = .pageSheet
         
@@ -233,7 +217,7 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
             message: nil,
             preferredStyle: .actionSheet
         )
- 
+        
         let delete = UIAlertAction(
             title: NSLocalizedString(
                 "delete",
@@ -256,7 +240,7 @@ extension TrackersViewController: SupplementaryCollectionDelegate {
         
         alert.addAction(delete)
         alert.addAction(cancel)
-    
+        
         present(alert, animated: true)
     }
     
@@ -281,7 +265,7 @@ extension TrackersViewController: TrackerTypeSelectionViewControllerDelegate {
 // MARK: - UI settings methods
 private extension TrackersViewController {
     func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .trackersVCBackground
         setupNavBar()
         setupTitle()
         setupSearchController()
@@ -294,7 +278,8 @@ private extension TrackersViewController {
     
     func setupNavBar() {
         navigationItem.title = ""
-        navigationController?.navigationBar.backgroundColor = .white
+        navigationController?.navigationBar.backgroundColor = .trackersVCBackground
+        
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
         setupNavButton()
@@ -311,34 +296,45 @@ private extension TrackersViewController {
             "trackervc_title",
             comment: "Title for main trackers list"
         )
+        titleLabel.textColor = .textColor
+        
         titleLabel.font = UIFont.systemFont(ofSize: 34, weight: .bold)
         titleLabel.numberOfLines = 0
-
+        
         view.addSubview(titleLabel)
     }
     
     func setupSearchController() {
-        searchController.searchBar.placeholder = NSLocalizedString(
+        
+        searchBar.placeholder = NSLocalizedString(
             "search",
-            comment: "Text for search bar placeholder"
+            comment: "Search placeholder"
         )
         
-        searchController.searchBar.backgroundImage = UIImage()
+        searchBar.delegate = self
+        searchBar.searchTextField.attributedPlaceholder = NSAttributedString(
+            string: NSLocalizedString("search", comment: ""),
+            attributes: [
+                .foregroundColor: UIColor.searchTextPlacholder
+            ]
+        )
         
-        searchController.searchBar.delegate = self
-        searchController.searchResultsUpdater = self
-        
-        searchController.searchBar.translatesAutoresizingMaskIntoConstraints = false
-        searchContainerView.addSubview(searchController.searchBar)
+        searchBar.searchTextField.leftView?.tintColor = .searchTextPlacholder
+        searchBar.backgroundImage = UIImage()
         
         searchContainerView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(searchContainerView)
         
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchContainerView.addSubview(searchBar)
+        
         NSLayoutConstraint.activate([
-            searchController.searchBar.topAnchor.constraint(equalTo: searchContainerView.topAnchor),
-            searchController.searchBar.bottomAnchor.constraint(equalTo: searchContainerView.bottomAnchor),
-            searchController.searchBar.leadingAnchor.constraint(equalTo: searchContainerView.leadingAnchor),
-            searchController.searchBar.trailingAnchor.constraint(equalTo: searchContainerView.trailingAnchor),
+            searchBar.topAnchor.constraint(equalTo: searchContainerView.topAnchor),
+            searchBar.bottomAnchor.constraint(equalTo: searchContainerView.bottomAnchor),
+            searchBar.leadingAnchor.constraint(equalTo: searchContainerView.leadingAnchor),
+            searchBar.trailingAnchor.constraint(equalTo: searchContainerView.trailingAnchor),
+            
+            searchContainerView.heightAnchor.constraint(equalToConstant: 56)
         ])
     }
     
@@ -347,6 +343,8 @@ private extension TrackersViewController {
         datePicker.preferredDatePickerStyle = .compact
         datePicker.date = currentDate
         datePicker.locale = Locale.current
+        
+        datePicker.overrideUserInterfaceStyle = .light
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
         
@@ -373,6 +371,8 @@ private extension TrackersViewController {
         filterButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(filterButton)
         
+        filterButton.overrideUserInterfaceStyle = .light
+        
         filterButton.layer.zPosition = 1
         view.bringSubviewToFront(filterButton)
         
@@ -380,6 +380,8 @@ private extension TrackersViewController {
     }
     
     func setupCollectionView() {
+        collectionView.backgroundColor = .trackersVCBackground
+        
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
         
@@ -407,7 +409,7 @@ private extension TrackersViewController {
     
     func setupAddTrackerButton() {
         addTrackerButtonItem.style = .plain
-        addTrackerButtonItem.tintColor = .blackDay
+        addTrackerButtonItem.tintColor = .textColor
         addTrackerButtonItem.image = UIImage(systemName: "plus")
         addTrackerButtonItem.target = self
         addTrackerButtonItem.action = #selector(addTrackerButtonTapped)
@@ -419,7 +421,7 @@ private extension TrackersViewController {
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
             titleLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
             titleLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -105),
-        
+            
             searchContainerView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 0),
             searchContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             searchContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),

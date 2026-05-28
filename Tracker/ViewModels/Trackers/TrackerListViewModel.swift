@@ -74,7 +74,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     
     func toggleTracker(at indexPath: IndexPath) {
         let tracker = sections[indexPath.section].trackers[indexPath.row]
-
+        
         guard !isFutureDate(selectedDate) else {
             showAlert?(
                 NSLocalizedString(
@@ -98,7 +98,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
                 trackerId: tracker.id,
                 date: selectedDate
             )
-     
+            
             if let record = existingRecord {
                 try recordStore.deleteRecord(record)
             } else {
@@ -130,21 +130,21 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     
     func state(for tracker: Tracker, on date: Date) -> TrackerCellState {
         let records = recordStore.records()
-
+        
         var completedCount = 0
         var isDoneToday = false
-
+        
         for record in records {
             guard record.trackerId == tracker.id else { continue }
-
+            
             completedCount += 1
-
+            
             if !isDoneToday,
                Calendar.current.isDate(record.date, inSameDayAs: date) {
                 isDoneToday = true
             }
         }
-
+        
         return TrackerCellState(
             completedCount: completedCount,
             isDoneToday: isDoneToday
@@ -187,7 +187,7 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     // MARK: - Private methods
     private func isFutureDate(_ date: Date) -> Bool {
         let calendar = Calendar.current
-
+        
         return calendar.startOfDay(for: date)
         > calendar.startOfDay(for: Date())
     }
@@ -212,7 +212,9 @@ final class TrackerListViewModel: TrackerStoreDelegate {
     private func reload() {
         var filteredTrackers = filterTrackersByDate(allTrackersWithCategories)
         filteredTrackers = applySearchFilter(to: filteredTrackers)
+        
         let filteredByOption = applyCurrentFilter(to: filteredTrackers)
+        
         let newSections = buildSections(from: filteredByOption)
         sections = newSections
         onChange?()

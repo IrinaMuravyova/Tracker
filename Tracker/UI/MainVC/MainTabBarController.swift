@@ -35,9 +35,10 @@ class MainTabBarController: UITabBarController {
         )
         let trackersVC = TrackersViewController(
             container: container, viewModel: viewModel)
+        
         trackersVC.tabBarItem = UITabBarItem(
             title: trackerTitle,
-            image: UIImage(systemName: "record.circle.fill")?.withRenderingMode(.alwaysOriginal),
+            image: UIImage(systemName: "record.circle.fill"),
             selectedImage: nil
         )
         let trackersNavVC = UINavigationController(rootViewController: trackersVC)
@@ -71,7 +72,7 @@ class MainTabBarController: UITabBarController {
     private func setupAppearance() {
         let appearance = UITabBarAppearance()
         appearance.configureWithDefaultBackground()
-        appearance.backgroundColor = .white
+        appearance.backgroundColor = .trackersVCBackground
         
         // icon
         appearance.stackedLayoutAppearance.selected.iconColor = .systemBlue
