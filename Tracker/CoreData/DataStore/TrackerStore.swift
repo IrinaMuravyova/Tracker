@@ -24,6 +24,8 @@ protocol TrackerStoreProtocol {
     func titleForSection(_ section: Int) -> String
     
     var delegate: TrackerStoreDelegate? { get set }
+    
+    func togglePinned(for id: UUID) throws
 }
 
 // MARK: - TrackerFetchedResultsControllerDelegate
@@ -40,6 +42,7 @@ final class TrackerStore: NSObject {
         let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         
         fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "isPinned", ascending: false),
             NSSortDescriptor(key: "category.title", ascending: true),
             NSSortDescriptor(key: "name", ascending: true)
         ]
@@ -78,7 +81,7 @@ extension TrackerStore {
         }
                 
         let categoryStore = TrackerCategoryStore(context: context)
-        let categoryCoreData = categoryStore.fetchCategory(by: category)
+        let categoryCoreData = try categoryStore.fetchCategory(by: category)
         
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.id = UUID()
@@ -88,6 +91,7 @@ extension TrackerStore {
         trackerCoreData.emoji = tracker.emoji
         trackerCoreData.schedule = try? JSONEncoder().encode(tracker.schedule)
         trackerCoreData.type = tracker.type.rawValue
+        trackerCoreData.isPinned = tracker.isPinned
         
         try context.save()
     }
@@ -97,10 +101,63 @@ extension TrackerStore {
         try context.save()
     }
 
-    func fetchAllTrackers() throws -> [TrackerCoreData] {
+    func togglePinned(for id: UUID) throws {
         let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        let results = try context.fetch(request)
-        return results
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+
+        guard let tracker = try context.fetch(request).first else {
+            throw TrackerStoreError.trackerNotFound
+        }
+
+        tracker.isPinned.toggle()
+        
+        try context.save()
+    }
+    
+    func updateTracker(
+        id: UUID,
+        title: String,
+        category: String,
+        schedule: Set<Weekday>,
+        emoji: String,
+        color: TrackerColor
+    ) throws {
+
+        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+
+        guard let tracker = try context.fetch(request).first else {
+            throw TrackerStoreError.trackerNotFound
+        }
+
+        let categoryStore = TrackerCategoryStore(context: context)
+        let categoryCoreData = try categoryStore.fetchCategory(by: category)
+
+        guard let categoryCoreData else {
+            throw TrackerStoreError.categoryNotFound
+        }
+
+        tracker.name = title
+        tracker.category = categoryCoreData
+        tracker.emoji = emoji
+        tracker.color = color.rawValue
+
+        let updatedSchedule = TrackerSchedule.daysOfWeek(schedule)
+        tracker.schedule = try? JSONEncoder().encode(updatedSchedule)
+
+        try context.save()
+    }
+    
+    func delete(by id: UUID) throws {
+        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        
+        guard let tracker = try context.fetch(request).first else {
+            throw TrackerStoreError.trackerNotFound
+        }
+        
+        context.delete(tracker)
+        try context.save()
     }
 }
 
@@ -145,7 +202,8 @@ private extension TrackerStore {
             color: TrackerColor.from(coreData.color),
             emoji: coreData.emoji ?? "",
             schedule: schedule,
-            type: TrackerType(rawValue: coreData.type ?? "") ?? .habit
+            type: TrackerType(rawValue: coreData.type ?? "") ?? .habit,
+            isPinned: coreData.isPinned
         )
     }
 }

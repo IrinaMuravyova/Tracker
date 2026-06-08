@@ -44,12 +44,9 @@ class CategoryCell: UITableViewCell {
             selectionImageView.isHidden = true
             return
         }
-        
-        if selected {
-            selectionImageView.image = UIImage(systemName: "checkmark")
-        } else {
-            selectionImageView.image = UIImage()
-        }
+
+        selectionImageView.image = selected ? UIImage(systemName: "checkmark") : UIImage()
+        selectionImageView.isHidden = !selected
     }
     
     // MARK: - Objective-C methods
@@ -60,16 +57,30 @@ class CategoryCell: UITableViewCell {
     
     // MARK: - Public methods
     func configureDefault() {
-        categoryTextField.placeholder = "Введите название категории"
+        let placeholderText = NSLocalizedString(
+            "categorycell_placeholder",
+            comment: "Text in category text field placeholder"
+        )
+        
+        categoryTextField.placeholder = placeholderText
         selectionImageView.image = UIImage(systemName: "checkmark")
     }
     
-    func configure(with category: TrackerCategory) {
+    func configure(with title: String) {
         configureDefault()
-        categoryTextField.text = category.title
+        categoryTextField.text = title
         
         categoryTextField.isEnabled = false
         selectionImageView.isHidden = false
+    }
+    
+    func configureEditable(with title: String) {
+        configureDefault()
+
+        categoryTextField.text = title
+        categoryTextField.isEnabled = true
+
+        selectionImageView.isHidden = true
     }
     
     func getCategoryTitle() -> String {

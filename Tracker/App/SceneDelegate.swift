@@ -40,7 +40,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let tabBarController = MainTabBarController(
             container: container,
-            viewModel: TrackerListUIModel(
+            viewModel: TrackerListViewModel(
                 container: container
             )
         )

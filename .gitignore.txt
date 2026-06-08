@@ -3,6 +3,7 @@
 xcuserdata/
 *.xcuserstate
 **/xcuserdata/
+**/xcshareddata/
 
 # Build artifacts
 build/
@@ -10,6 +11,13 @@ DerivedData/
 
 # Environment / secrets
 .env
+
+# CocoaPods artifacts
+*.xcworkspace/
+Pods/
+
+# Testing
+**/__Snapshots__/
 
 # Temporary ignore
 README.md

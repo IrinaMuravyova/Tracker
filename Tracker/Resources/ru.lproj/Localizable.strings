@@ -1,0 +1,115 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Irina Muravyeva on 22.05.2026.
+  
+*/
+
+// MARK: - MainViewController
+"trackervc_title" = "Трекеры";
+"statisticvc_title" = "Статистика";
+
+// MARK: - Onboarding
+"onboarding_button_title" = "Вот это технологии!";
+"onboarding_first_screen_text" = "Отслеживайте только то, что хотите";
+"onboarding_second_screen_text" = "Даже если это не литры воды и йога";
+
+// MARK: - Helpers
+"alert_okbutton_title" = "OK";
+"alert_title" = "Упс.. Что-то пошло не так";
+"alert_message_for_future_date" = "Нельзя отметить привычку для будущей даты";
+"delete_tracker_alert_title" = "Уверены что хотите удалить трекер?";
+"cancel" = "Отменить";
+"alert_message_for_delete_category" = "Эта категория точно не нужна?";
+"category_delete_not_empty" = "Нельзя удалить категорию, в которой есть трекеры. Сначала удалите все трекеры из этой категории.";
+"category_delete_failed" = "Не удалось удалить категорию.";
+
+// MARK: - Models
+"weekday_monday" = "Понедельник";
+"weekday_tuesday" = "Вторник";
+"weekday_wednesday" = "Среда";
+"weekday_thursday" = "Четверг";
+"weekday_friday" = "Пятница";
+"weekday_saturday" = "Суббота";
+"weekday_sunday" = "Воскресенье";
+
+"weekday_short_monday" = "Пн";
+"weekday_short_tuesday" = "Вт";
+"weekday_short_wednesday" = "Ср";
+"weekday_short_thursday" = "Чт";
+"weekday_short_friday" = "Пт";
+"weekday_short_saturday" = "Сб";
+"weekday_short_sunday" = "Вс";
+
+// MARK: - CategoryCell
+"categorycell_placeholder" = "Введите название категории";
+
+// MARK: - CategoriesViewController
+"savebutton_title" = "Добавить категорию";
+"emptystagelabel_text" = "Привычки и события можно объединить по смыслу";
+
+// MARK: - CreateCategoryViewController
+"createcategory_navigationbar_title" = "Новая категория";
+"createcategory_savebutton_title" = "Готово";
+"editcategory_navigationbar_title" = "Редактирование категории";
+
+// MARK: - ScheduleSettingsVC
+"schedule_savebutton_title" = "Готово";
+
+// MARK: - TrackerDetailsViewController
+"create_habit_title" = "Новая привычка";
+"create_event_title" = "Новое нерегулярное событие";
+"habit_placeholder" = "Введите название трекера";
+"titlefooter_text" = "Ограничение 38 символов";
+"categoryview_title" = "Категория";
+"scheduleview_title" = "Расписание";
+"colorlabel_text" = "Цвет";
+"cancelbutton_title" = "Отменить";
+"savebutton_title" = "Создать";
+"days_string_text" = "Каждый день";
+
+// MARK: - TrackerTypeSelectionViewController
+"habitbutton_title" = "Привычка";
+"irregular_event_button_title" = "Нерегулярное событие";
+"create_event_navigation_item_title" = "Создание трекера";
+
+// MARK: - TrackersViewController
+"search" = "Поиск";
+"filters" = "Фильтры";
+"empty_stage_label_text" = "Что будем отслеживать?";
+"empty_search_result_text" = "Ничего не найдено";
+
+// MARK: - Errors
+"error_message_empty_category" = "Введите название категории";
+"error_message_category_exist" = "Такая категория уже существует";
+"error_message_category_update_failed" = "Не получилось обновить категорию";
+
+// MARK: - SupplementaryCollection
+"pin" = "Закрепить";
+"unpin" = "Открепить";
+"edit" = "Редактировать";
+"delete" = "Удалить";
+
+// MARK: - TrackersListViewModel
+"pinned" = "Закрепленные";
+
+// MARK: - EditTrackersViewController
+"edit_screen_title" = "Редактирование привычки";
+"edit_button_title" = "Сохранить";
+
+// MARK: - FilerViewController
+"allTrackers" = "Все трекеры";
+"todayTrackers" = "Трекеры на сегодня";
+"completedTrackers" = "Завершённые";
+"notCompletedTrackers" = "Не завершённые";
+
+// MARK: - StatisticsViewController
+"statistics_title" = "Статистика";
+"stat_empty_message" = "Анализировать пока нечего";
+
+// MARK: - StatisticsViewModel
+"bestPeriod" = "Лучший период";
+"idealDays" = "Идеальные дни";
+"completed" = "Трекеров завершено";
+"average" = "Среднее значение";

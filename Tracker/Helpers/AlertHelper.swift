@@ -12,7 +12,10 @@ struct AlertHelper {
         on viewController: UIViewController,
         title: String,
         message: String,
-        buttonTitle: String = "OK",
+        buttonTitle: String = NSLocalizedString(
+            "alert_okbutton_title",
+            comment: "Text displayed button title for OK button at an alert"
+        ),
         completion: (() -> Void)? = nil) {
             
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)

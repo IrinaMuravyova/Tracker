@@ -16,7 +16,8 @@ final class TrackersCell: UICollectionViewCell {
     weak var delegate: TrackersCellDelegate?
     
     // MARK: - UI
-    private let habitView = UIView()
+    private(set) lazy var habitView = UIView()
+    private let backgroundCircleView = UIView()
     private let emojiLabel = UILabel()
     private let titleLabel = UILabel()
     
@@ -24,10 +25,16 @@ final class TrackersCell: UICollectionViewCell {
     private let quantityLabel = UILabel()
     private let addButton = UIButton()
     
+    private let pinImageView = UIImageView()
+    
     // MARK: - Private properties
     private let emojiSize = 24
+    private let pinSize = 24
     private var currentTrackerId: UUID?
     private var trackerIsDone: Bool = false
+    
+    // MARK: - Bindings
+    var onAddTap: ((UUID, Bool) -> Void)?
     
     // MARK: - Initializers
     override init(frame: CGRect) {
@@ -49,10 +56,11 @@ final class TrackersCell: UICollectionViewCell {
     
     // MARK: - Public functions
     func configureCell(
-        with tracker: TrackerUIModel,
-        completedCount: Int,
-        isDone: Bool
+        with tracker: Tracker,
+        state: TrackerCellState
     ) {
+        pinImageView.isHidden = !tracker.isPinned
+        
         currentTrackerId = tracker.id
         
         let color = tracker.color.uiColor
@@ -60,16 +68,17 @@ final class TrackersCell: UICollectionViewCell {
         
         titleLabel.text = tracker.name
         
-        let image = isDone
-        ? UIImage(resource: .done).withRenderingMode(.alwaysTemplate)
-        : UIImage(resource: .plus).withRenderingMode(.alwaysTemplate)
+        let image = state.isDoneToday
+            ? UIImage(resource: .done).withRenderingMode(.alwaysTemplate)
+            : UIImage(resource: .plus).withRenderingMode(.alwaysTemplate)
         addButton.setImage(image, for: .normal)
+        
         guard var config = addButton.configuration else { return }
         config.baseForegroundColor = color
         addButton.configuration = config
         
         emojiLabel.text = tracker.emoji
-        quantityLabel.text = "\(daysString(completedCount))"
+        quantityLabel.text = "\(String.localizedDaysString(for: state.completedCount))"
     }
 }
 
@@ -78,6 +87,7 @@ private extension TrackersCell {
     func configure() {
         setupHabitView()
         setupQuantityView()
+        setupPinImageView()
         setupConstraints()
     }
     
@@ -87,6 +97,7 @@ private extension TrackersCell {
         
         habitView.layer.cornerRadius = 16
         
+        setupBackgroundCircle()
         setupEmoji()
         setupLabel()
     }
@@ -104,19 +115,44 @@ private extension TrackersCell {
         setupQuantityViewConstraints()
     }
     
+    func setupBackgroundCircle() {
+        backgroundCircleView.translatesAutoresizingMaskIntoConstraints = false
+
+        backgroundCircleView.backgroundColor = UIColor.white.withAlphaComponent(0.3)
+        backgroundCircleView.layer.cornerRadius = CGFloat(emojiSize / 2)
+        backgroundCircleView.clipsToBounds = true
+
+        contentView.addSubview(backgroundCircleView)
+    }
+    
     func setupEmoji() {
-        emojiLabel.frame.size = CGSize(width: emojiSize, height: emojiSize)
         emojiLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        emojiLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        emojiLabel.textAlignment = .center
+        emojiLabel.adjustsFontSizeToFitWidth = true
+        emojiLabel.minimumScaleFactor = 0.5
+        
         habitView.addSubview(emojiLabel)
     }
     
     func setupLabel() {
-        titleLabel.text = "Текст привычки такой длинный текст"
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        titleLabel.text = "Sample a very long maybe too long habit title"
         titleLabel.font = .systemFont(ofSize: 12, weight: .medium)
         titleLabel.textColor = .white
         titleLabel.numberOfLines = 0
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
         habitView.addSubview(titleLabel)
+    }
+    
+    func setupPinImageView() {
+        pinImageView.translatesAutoresizingMaskIntoConstraints = false
+        pinImageView.image = UIImage(named: "pin")
+        pinImageView.isHidden = true
+
+        habitView.addSubview(pinImageView)
     }
     
     func setupHabitViewConstraints() {
@@ -126,10 +162,18 @@ private extension TrackersCell {
             habitView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             habitView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
-            emojiLabel.topAnchor.constraint(equalTo: habitView.topAnchor, constant: 12),
-            emojiLabel.leadingAnchor.constraint(equalTo: habitView.leadingAnchor, constant: 12),
-            emojiLabel.widthAnchor.constraint(equalToConstant: CGFloat(emojiSize)),
-            emojiLabel.heightAnchor.constraint(equalToConstant: CGFloat(emojiSize)),
+            pinImageView.topAnchor.constraint(equalTo: habitView.topAnchor, constant: 12),
+            pinImageView.rightAnchor.constraint(equalTo: habitView.rightAnchor, constant: -4),
+            pinImageView.widthAnchor.constraint(equalToConstant: CGFloat(pinSize)),
+            pinImageView.heightAnchor.constraint(equalToConstant: CGFloat(pinSize)),
+            
+            backgroundCircleView.topAnchor.constraint(equalTo: habitView.topAnchor, constant: 12),
+            backgroundCircleView.leadingAnchor.constraint(equalTo: habitView.leadingAnchor, constant: 12),
+            backgroundCircleView.widthAnchor.constraint(equalToConstant: CGFloat(emojiSize)),
+            backgroundCircleView.heightAnchor.constraint(equalToConstant: CGFloat(emojiSize)),
+            
+            emojiLabel.centerXAnchor.constraint(equalTo: backgroundCircleView.centerXAnchor),
+            emojiLabel.centerYAnchor.constraint(equalTo: backgroundCircleView.centerYAnchor),
             
             titleLabel.topAnchor.constraint(equalTo: emojiLabel.bottomAnchor, constant: 8),
             titleLabel.leadingAnchor.constraint(equalTo: habitView.leadingAnchor, constant: 12),
@@ -144,7 +188,7 @@ private extension TrackersCell {
         
         quantityLabel.font = .systemFont(ofSize: 12, weight: .semibold)
         quantityLabel.textAlignment = .center
-        quantityLabel.text = "0 дней"
+        quantityLabel.text = "0 " + daysString(0)
     }
     
     func setupAddButton(_ isDone: Bool = false) {
@@ -177,20 +221,10 @@ private extension TrackersCell {
     }
     
     func daysString(_ count: Int) -> String {
-        let remainder100 = count % 100
-        let remainder10 = count % 10
-        
-        if remainder100 >= 11 && remainder100 <= 14 {
-            return "\(count) дней"
-        }
-        
-        switch remainder10 {
-        case 1:
-            return "\(count) день"
-        case 2, 3, 4:
-            return "\(count) дня"
-        default:
-            return "\(count) дней"
-        }
+        let daysString = String.localizedStringWithFormat(
+            NSLocalizedString("dayString", comment: "Number of marked days for habit"),
+            count
+        )
+        return daysString
     }
 }

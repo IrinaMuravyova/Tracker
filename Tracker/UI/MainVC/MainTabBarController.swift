@@ -9,11 +9,11 @@ import UIKit
 
 class MainTabBarController: UITabBarController {
     private let container: CoreDataContainer
-    private let viewModel: TrackerListUIModel
+    private let viewModel: TrackerListViewModel
     
     init(
         container: CoreDataContainer,
-        viewModel: TrackerListUIModel
+        viewModel: TrackerListViewModel
     ) {
         self.container = container
         self.viewModel = viewModel
@@ -29,18 +29,38 @@ class MainTabBarController: UITabBarController {
         
         setupAppearance()
         
+        let trackerTitle = NSLocalizedString(
+            "trackervc_title",
+            comment: "Text displayed title for tracker view controller"
+        )
         let trackersVC = TrackersViewController(
             container: container, viewModel: viewModel)
+        
         trackersVC.tabBarItem = UITabBarItem(
-            title: "Трекеры",
-            image: UIImage(systemName: "record.circle.fill")?.withRenderingMode(.alwaysOriginal),
+            title: trackerTitle,
+            image: UIImage(systemName: "record.circle.fill"),
             selectedImage: nil
         )
         let trackersNavVC = UINavigationController(rootViewController: trackersVC)
         
-        let statisticsVC = StatisticsViewController()
+        let statisticsTitle = NSLocalizedString(
+            "statisticvc_title",
+            comment: "Text displayed title for statistics view controller"
+        )
+        
+        let service = StatisticsService(
+            recordStore: container.recordStore,
+            trackerStore: container.trackerStore
+        )
+        let viewModel = StatisticsViewModel(statisticsService: service, recordStore: container.recordStore)
+        
+        let statisticsVC = StatisticsViewController(
+            viewModel: viewModel,
+            container: container
+        )
+        
         statisticsVC.tabBarItem = UITabBarItem(
-            title: "Статистика",
+            title: statisticsTitle,
             image: UIImage(systemName: "hare.fill")?.withRenderingMode(.alwaysOriginal),
             selectedImage: nil
         )
@@ -52,7 +72,7 @@ class MainTabBarController: UITabBarController {
     private func setupAppearance() {
         let appearance = UITabBarAppearance()
         appearance.configureWithDefaultBackground()
-        appearance.backgroundColor = .white
+        appearance.backgroundColor = .trackersVCBackground
         
         // icon
         appearance.stackedLayoutAppearance.selected.iconColor = .systemBlue
